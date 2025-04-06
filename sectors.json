@@ -1,0 +1,10 @@
+{
+  "IT": [
+    {"name": "Tata Consultancy Services", "ticker": "TCS"},
+    {"name": "Infosys", "ticker": "INFY"}
+  ],
+  "Banking": [
+    {"name": "HDFC Bank", "ticker": "HDFCBANK"},
+    {"name": "ICICI Bank", "ticker": "ICICIBANK"}
+  ]
+}
