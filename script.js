@@ -1,5 +1,5 @@
 // Configuration
-const API_KEY = "SPCY8U9VI3R5HU1Q"; // Your Alpha Vantage key
+const API_KEY = "B9TJH3V7UR3Q5BL5"; // Your Alpha Vantage key
 const API_DELAY = 13000; // 13 seconds between requests (5/minute limit)
 const CACHE_TIME = 15 * 60 * 1000; // 15 minutes cache
 
