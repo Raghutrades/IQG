@@ -3,38 +3,39 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NIFTY50 Stocks Tracker</title>
+  <title>NIFTY50 Stock Tracker</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div class="container">
-    <h1>NIFTY50 Stocks</h1>
+    <h1>NIFTY50 Stock Tracker</h1>
     
     <div class="controls">
-      <label for="sector">Select Sector:</label>
-      <select id="sector">
-        <option value="">--All Sectors--</option>
-      </select>
-      
-      <label for="search">Search Stocks:</label>
-      <input type="text" id="search" placeholder="Type stock name/ticker...">
+      <div class="search-box">
+        <input type="text" id="search" placeholder="Search stocks (e.g., RELIANCE)" autocomplete="off">
+      </div>
     </div>
-    
-    <table id="stocks-table">
-      <thead>
-        <tr>
-          <th>Stock</th>
-          <th>Ticker</th>
-          <th>LTP</th>
-          <th>Open</th>
-          <th>High</th>
-          <th>Low</th>
-          <th>Chart</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+
+    <div class="table-container">
+      <table id="stocks-table">
+        <thead>
+          <tr>
+            <th>Company</th>
+            <th>Ticker</th>
+            <th>LTP</th>
+            <th>Open</th>
+            <th>High</th>
+            <th>Low</th>
+            <th>Chart</th>
+          </tr>
+        </thead>
+        <tbody id="stocks-body"></tbody>
+      </table>
+    </div>
+
+    <div class="status" id="status">Loading data... (5 requests/minute limit)</div>
   </div>
+
   <script src="script.js"></script>
 </body>
 </html>
