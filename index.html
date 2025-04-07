@@ -68,7 +68,6 @@
             background: var(--card);
             border-bottom: 1px solid var(--border);
             position: relative;
-            overflow: hidden;
         }
         
         .header::after {
@@ -86,6 +85,7 @@
             display: flex;
             flex-direction: column;
             gap: 0.5rem;
+            align-items: center;
         }
         
         .main-title {
@@ -104,23 +104,38 @@
         }
         
         .tagline-container {
-            display: flex;
-            gap: 1rem;
-            overflow: hidden;
             height: 24px;
+            text-align: center;
         }
         
         .tagline {
             font-family: 'MarketFont', sans-serif;
             font-size: 1rem;
             color: var(--gold-secondary);
-            white-space: nowrap;
-            animation: scroll-tagline 30s linear infinite;
+            opacity: 0;
+            position: absolute;
+            transition: opacity 0.5s ease;
         }
         
-        @keyframes scroll-tagline {
-            0% { transform: translateX(100%); }
-            100% { transform: translateX(-100%); }
+        .tagline.active {
+            opacity: 1;
+        }
+        
+        /* === RANDOM TICKER DISPLAY === */
+        .ticker-display {
+            background: var(--card);
+            border-radius: 50px;
+            padding: 0.5rem 1.5rem;
+            margin: 1rem auto;
+            width: fit-content;
+            border: 1px solid var(--border);
+            box-shadow: 0 0 15px var(--glow);
+            animation: pulse 2s infinite alternate;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 15px var(--glow); }
+            100% { box-shadow: 0 0 25px rgba(255, 215, 0, 0.5); }
         }
         
         /* === DATE/TIME DISPLAY === */
@@ -277,37 +292,13 @@
             transition: all 0.4s ease;
         }
         
-        .quote-container::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(
-                to bottom right,
-                transparent,
-                transparent,
-                transparent,
-                var(--gold-primary),
-                transparent
-            );
-            opacity: 0.1;
-            transform: rotate(30deg);
-            animation: shine 6s infinite;
-        }
-        
-        @keyframes shine {
-            0% { transform: translateX(-100%) rotate(30deg); }
-            100% { transform: translateX(100%) rotate(30deg); }
-        }
-        
         .quote-text {
             font-size: 1.25rem;
             line-height: 1.6;
             font-style: italic;
             position: relative;
             z-index: 2;
+            transition: opacity 0.5s ease;
         }
         
         .quote-author {
@@ -316,6 +307,7 @@
             text-align: right;
             font-weight: 600;
             color: var(--gold-primary);
+            transition: opacity 0.5s ease;
         }
         
         /* === THEME TOGGLE === */
@@ -390,11 +382,16 @@
     <header class="header">
         <div class="title-container">
             <h1 class="main-title">Intraday Quick Grabber</h1>
-            <div class="tagline-container">
-                <p class="tagline">Catch the Pulse, Ride the Move. • No Noise. Just Precision. • Built for Speed. Designed to Grab Gains. • Strike Fast, Exit Smarter. • From Sector Surge to Pocket Profit – Instantly. • Decode Momentum. Dominate the Move. • Fast Picks. Clean Breaks. Real Edge. • Find the Spark Before the Flame. • Scans That Speak the Market's Language. • One Click Ahead of the Herd.</p>
+            <div class="tagline-container" id="taglineContainer">
+                <!-- Taglines will be inserted here by JavaScript -->
             </div>
         </div>
     </header>
+    
+    <!-- Random Ticker Display -->
+    <div class="ticker-display" id="randomTicker">
+        Loading ticker...
+    </div>
     
     <!-- Date/Time Display -->
     <div class="datetime-container">
@@ -453,6 +450,19 @@ const sectorData = {
     "MIDCAP SELECT": ["AUROPHARMA", "HINDUPETRO", "VOLTAS", "UPL", "HDFCAMC", "PERSISTENT", "FEDERALBNK", "POLYCAB", "COFORGE", "LUPIN", "ASTRAL", "PAGEIND", "PIIND", "BHARATFORG", "MRF", "JUBLFOOD", "CONCOR", "INDHOTEL", "GODREJPROP", "AUBANK", "ASHOKLEY", "MPHASIS", "IDFCFIRSTB", "IDEA", "CUMMINSIND"]
 };
 
+        const punchlines = [
+            "Catch the Pulse, Ride the Move.",
+            "No Noise. Just Precision.",
+            "Built for Speed. Designed to Grab Gains.",
+            "Strike Fast, Exit Smarter.",
+            "From Sector Surge to Pocket Profit – Instantly.",
+            "Decode Momentum. Dominate the Move.",
+            "Fast Picks. Clean Breaks. Real Edge.",
+            "Find the Spark Before the Flame.",
+            "Scans That Speak the Market's Language.",
+            "One Click Ahead of the Herd."
+        ];
+
         const quotes = [
     { text: "Opportunities don't happen, you create them.", author: "" },
     { text: "The market is always right. Never argue with it.", author: "" },
@@ -486,159 +496,232 @@ const sectorData = {
     { text: "The best investment you can make is in yourself.", author: "Warren Buffett" }
 ];
 
+        // ===== INITIALIZE PAGE =====
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize all components
+            initThemeToggle();
+            initDateTime();
+            initTaglines();
+            initRandomTicker();
+            initSectorGrid();
+            initQuotes();
+        });
 
         // ===== THEME TOGGLE =====
-        const themeToggle = document.getElementById('themeToggle');
-        const themeIcon = document.getElementById('themeIcon');
-        const themeText = document.getElementById('themeText');
-        
-        function setTheme(isDark) {
-            if (isDark) {
-                document.body.classList.remove('light-mode');
-                themeIcon.textContent = '🌙';
-                themeText.textContent = 'Dark Mode';
-                localStorage.setItem('theme', 'dark');
-            } else {
-                document.body.classList.add('light-mode');
-                themeIcon.textContent = '☀️';
-                themeText.textContent = 'Light Mode';
-                localStorage.setItem('theme', 'light');
+        function initThemeToggle() {
+            const themeToggle = document.getElementById('themeToggle');
+            const themeIcon = document.getElementById('themeIcon');
+            const themeText = document.getElementById('themeText');
+            
+            function setTheme(isDark) {
+                if (isDark) {
+                    document.body.classList.remove('light-mode');
+                    themeIcon.textContent = '🌙';
+                    themeText.textContent = 'Dark Mode';
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    document.body.classList.add('light-mode');
+                    themeIcon.textContent = '☀️';
+                    themeText.textContent = 'Light Mode';
+                    localStorage.setItem('theme', 'light');
+                }
             }
-        }
-        
-        themeToggle.addEventListener('click', () => {
-            const isDark = !document.body.classList.contains('light-mode');
-            setTheme(!isDark);
-            // Add animation class
-            document.body.classList.add('theme-change');
-            setTimeout(() => {
-                document.body.classList.remove('theme-change');
-            }, 500);
-        });
-        
-        // Check saved theme
-        if (localStorage.getItem('theme') === 'light') {
-            setTheme(false);
+            
+            themeToggle.addEventListener('click', () => {
+                const isDark = !document.body.classList.contains('light-mode');
+                setTheme(!isDark);
+            });
+            
+            // Check saved theme
+            if (localStorage.getItem('theme') === 'light') {
+                setTheme(false);
+            }
         }
 
         // ===== DATE/TIME FUNCTIONS =====
-        function updateDateTime() {
-            const now = new Date();
-            const options = { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric',
-                timeZone: 'Asia/Kolkata'
-            };
-            
-            // Current Date
-            document.getElementById('current-date').textContent = now.toLocaleDateString('en-IN', options);
-            
-            // Current Time
-            const timeOptions = {
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: true,
-                timeZone: 'Asia/Kolkata'
-            };
-            document.getElementById('current-time').textContent = now.toLocaleTimeString('en-IN', timeOptions);
-            
-            // Days remaining in month
-            const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-            const daysInMonth = lastDayOfMonth.getDate();
-            const daysLeftMonth = daysInMonth - now.getDate();
-            document.getElementById('days-month').textContent = `${daysLeftMonth} days (${now.toLocaleString('default', { month: 'short' }) ${now.getFullYear()})`;
-            
-            // Days remaining in year
-            const lastDayOfYear = new Date(now.getFullYear(), 11, 31);
-            const daysLeftYear = Math.ceil((lastDayOfYear - now) / (1000 * 60 * 60 * 24));
-            document.getElementById('days-year').textContent = `${daysLeftYear} days (${now.getFullYear()})`;
-        }
-        
-        // Update immediately and then every second
-        updateDateTime();
-        setInterval(updateDateTime, 1000);
-
-        // ===== BUILD SECTOR GRID =====
-        const sectorGrid = document.getElementById('sectorGrid');
-        
-        Object.entries(sectorData).forEach(([sectorName, stocks]) => {
-            const sectorDiv = document.createElement('div');
-            sectorDiv.className = 'sector-table';
-            sectorDiv.innerHTML = `
-                <div class="sector-header">${sectorName}</div>
-                <div class="stock-list" id="${sectorName}-stocks"></div>
-                <div class="pagination" id="${sectorName}-pagination"></div>
-            `;
-            
-            const stockList = sectorDiv.querySelector('.stock-list');
-            const pagination = sectorDiv.querySelector('.pagination');
-            
-            // Create pages (10 stocks per page)
-            const pageCount = Math.ceil(stocks.length / 10);
-            for (let i = 0; i < pageCount; i++) {
-                const pageDiv = document.createElement('div');
-                pageDiv.className = `stock-page ${i === 0 ? 'active' : ''}`;
-                pageDiv.dataset.page = i + 1;
+        function initDateTime() {
+            function updateDateTime() {
+                const now = new Date();
+                const options = { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric',
+                    timeZone: 'Asia/Kolkata'
+                };
                 
-                const startIdx = i * 10;
-                const endIdx = startIdx + 10;
-                const pageStocks = stocks.slice(startIdx, endIdx);
+                // Current Date
+                document.getElementById('current-date').textContent = now.toLocaleDateString('en-IN', options);
                 
-                // Ensure we always show 10 items (pad with empty if needed)
-                for (let j = 0; j < 10; j++) {
-                    const stockItem = document.createElement('div');
-                    stockItem.className = 'stock-item';
-                    
-                    if (j < pageStocks.length) {
-                        stockItem.textContent = pageStocks[j];
-                        stockItem.addEventListener('click', () => {
-                            window.open(`https://www.tradingview.com/chart/?symbol=NSE:${pageStocks[j]}`, '_blank');
-                        });
-                    } else {
-                        stockItem.style.visibility = 'hidden'; // Maintain consistent spacing
-                    }
-                    
-                    pageDiv.appendChild(stockItem);
-                }
+                // Current Time
+                const timeOptions = {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: true,
+                    timeZone: 'Asia/Kolkata'
+                };
+                document.getElementById('current-time').textContent = now.toLocaleTimeString('en-IN', timeOptions);
                 
-                stockList.appendChild(pageDiv);
+                // Days remaining in month
+                const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+                const daysInMonth = lastDayOfMonth.getDate();
+                const daysLeftMonth = daysInMonth - now.getDate();
+                document.getElementById('days-month').textContent = `${daysLeftMonth} days (${now.toLocaleString('default', { month: 'short' })} ${now.getFullYear()})`;
                 
-                // Pagination buttons
-                const pageBtn = document.createElement('button');
-                pageBtn.className = `page-btn ${i === 0 ? 'active' : ''}`;
-                pageBtn.textContent = i + 1;
-                pageBtn.addEventListener('click', () => {
-                    // Hide all pages
-                    stockList.querySelectorAll('.stock-page').forEach(page => {
-                        page.classList.remove('active');
-                    });
-                    // Show selected page
-                    pageDiv.classList.add('active');
-                    
-                    // Update active pagination button
-                    pagination.querySelectorAll('.page-btn').forEach(btn => {
-                        btn.classList.remove('active');
-                    });
-                    pageBtn.classList.add('active');
-                });
-                pagination.appendChild(pageBtn);
+                // Days remaining in year
+                const lastDayOfYear = new Date(now.getFullYear(), 11, 31);
+                const daysLeftYear = Math.ceil((lastDayOfYear - now) / (1000 * 60 * 60 * 24));
+                document.getElementById('days-year').textContent = `${daysLeftYear} days (${now.getFullYear()})`;
             }
             
-            sectorGrid.appendChild(sectorDiv);
-        });
-
-        // ===== RANDOM QUOTE =====
-        function showRandomQuote() {
-            const quote = quotes[Math.floor(Math.random() * quotes.length)];
-            document.getElementById('quoteText').textContent = `"${quote.text}"`;
-            document.getElementById('quoteAuthor').textContent = quote.author ? `- ${quote.author}` : '';
+            // Update immediately and then every second
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
         }
-        
-        showRandomQuote();
-        setInterval(showRandomQuote, 10000); // Change every 10 seconds
+
+        // ===== TAGLINES =====
+        function initTaglines() {
+            const container = document.getElementById('taglineContainer');
+            
+            // Create all tagline elements
+            punchlines.forEach((line, index) => {
+                const tagline = document.createElement('div');
+                tagline.className = 'tagline';
+                tagline.textContent = line;
+                tagline.dataset.index = index;
+                container.appendChild(tagline);
+            });
+            
+            // Show first tagline
+            container.querySelector('.tagline').classList.add('active');
+            
+            // Rotate taglines
+            let currentIndex = 0;
+            setInterval(() => {
+                const taglines = container.querySelectorAll('.tagline');
+                taglines[currentIndex].classList.remove('active');
+                
+                currentIndex = (currentIndex + 1) % punchlines.length;
+                taglines[currentIndex].classList.add('active');
+            }, 5000);
+        }
+
+        // ===== RANDOM TICKER =====
+        function initRandomTicker() {
+            const tickerDisplay = document.getElementById('randomTicker');
+            
+            // Get all stocks from all sectors
+            const allStocks = [];
+            Object.values(sectorData).forEach(stocks => {
+                allStocks.push(...stocks);
+            });
+            
+            function updateTicker() {
+                const randomStock = allStocks[Math.floor(Math.random() * allStocks.length)];
+                tickerDisplay.textContent = randomStock;
+            }
+            
+            updateTicker();
+            setInterval(updateTicker, 10000);
+        }
+
+        // ===== SECTOR GRID =====
+        function initSectorGrid() {
+            const sectorGrid = document.getElementById('sectorGrid');
+            
+            Object.entries(sectorData).forEach(([sectorName, stocks]) => {
+                const sectorDiv = document.createElement('div');
+                sectorDiv.className = 'sector-table';
+                sectorDiv.innerHTML = `
+                    <div class="sector-header">${sectorName}</div>
+                    <div class="stock-list" id="${sectorName}-stocks"></div>
+                    <div class="pagination" id="${sectorName}-pagination"></div>
+                `;
+                
+                const stockList = sectorDiv.querySelector('.stock-list');
+                const pagination = sectorDiv.querySelector('.pagination');
+                
+                // Create pages (10 stocks per page)
+                const pageCount = Math.ceil(stocks.length / 10);
+                for (let i = 0; i < pageCount; i++) {
+                    const pageDiv = document.createElement('div');
+                    pageDiv.className = `stock-page ${i === 0 ? 'active' : ''}`;
+                    pageDiv.dataset.page = i + 1;
+                    
+                    const startIdx = i * 10;
+                    const endIdx = startIdx + 10;
+                    const pageStocks = stocks.slice(startIdx, endIdx);
+                    
+                    // Add exactly 10 stock items
+                    for (let j = 0; j < 10; j++) {
+                        const stockItem = document.createElement('div');
+                        stockItem.className = 'stock-item';
+                        
+                        if (j < pageStocks.length) {
+                            stockItem.textContent = pageStocks[j];
+                            stockItem.addEventListener('click', () => {
+                                window.open(`https://www.tradingview.com/chart/?symbol=NSE:${pageStocks[j]}`, '_blank');
+                            });
+                        } else {
+                            // Empty placeholder to maintain layout
+                            stockItem.style.visibility = 'hidden';
+                        }
+                        
+                        pageDiv.appendChild(stockItem);
+                    }
+                    
+                    stockList.appendChild(pageDiv);
+                    
+                    // Pagination buttons
+                    const pageBtn = document.createElement('button');
+                    pageBtn.className = `page-btn ${i === 0 ? 'active' : ''}`;
+                    pageBtn.textContent = i + 1;
+                    pageBtn.addEventListener('click', () => {
+                        // Hide all pages
+                        stockList.querySelectorAll('.stock-page').forEach(page => {
+                            page.classList.remove('active');
+                        });
+                        // Show selected page
+                        pageDiv.classList.add('active');
+                        
+                        // Update active pagination button
+                        pagination.querySelectorAll('.page-btn').forEach(btn => {
+                            btn.classList.remove('active');
+                        });
+                        pageBtn.classList.add('active');
+                    });
+                    pagination.appendChild(pageBtn);
+                }
+                
+                sectorGrid.appendChild(sectorDiv);
+            });
+        }
+
+        // ===== QUOTES =====
+        function initQuotes() {
+            const quoteText = document.getElementById('quoteText');
+            const quoteAuthor = document.getElementById('quoteAuthor');
+            
+            function showRandomQuote() {
+                // Fade out
+                quoteText.style.opacity = 0;
+                quoteAuthor.style.opacity = 0;
+                
+                setTimeout(() => {
+                    const quote = quotes[Math.floor(Math.random() * quotes.length)];
+                    quoteText.textContent = `"${quote.text}"`;
+                    quoteAuthor.textContent = quote.author ? `- ${quote.author}` : '';
+                    
+                    // Fade in
+                    quoteText.style.opacity = 1;
+                    quoteAuthor.style.opacity = 1;
+                }, 500);
+            }
+            
+            showRandomQuote();
+            setInterval(showRandomQuote, 10000);
+        }
     </script>
 </body>
 </html>
