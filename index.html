@@ -3,544 +3,415 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SECTOR TRACKER: 15 Key Industries</title>
+    <title>SECTOR MAFIA: Professional Tracker</title>
     <style>
+        /* === YOUR EXTENSION'S STYLES (COPIED VERBATIM) === */
+        @font-face {
+            font-family: 'Quenton';
+            src: url('data:font/opentype;base64,/*[BASE64_FONT_DATA]*/') format('opentype');
+        }
+        
         :root {
-            --primary: #4361ee;
-            --secondary: #3a0ca3;
-            --accent: #f72585;
-            --text: #2b2d42;
-            --bg: #f8f9fa;
-            --card: #ffffff;
-            --border: #e9ecef;
-            --hover-bg: rgba(67, 97, 238, 0.05);
+            --active-green: #4CAF50;
+            --inactive-red: #F44336;
+            --dark-bg: #181d28;
+            --card-bg: #232a3a;
+            --text-white: #ffffff;
+            --text-light: #e0e0e0;
+            --border-dark: #2d3546;
+            --gold-yellow: #FFD700;
+            --shadow-gradient: linear-gradient(to right, rgba(76, 175, 80, 0.3), rgba(33, 150, 243, 0.3), rgba(156, 39, 176, 0.3));
+            --sparkle-color: rgba(255, 215, 0, 0.8);
+            
+            /* New light mode variables */
+            --light-bg: #f8fafc;
+            --light-card: #ffffff;
+            --light-text: #1e293b;
+            --light-border: #e2e8f0;
         }
-
-        .dark-mode {
-            --primary: #4895ef;
-            --secondary: #3a0ca3;
-            --accent: #f72585;
-            --text: #e9ecef;
-            --bg: #121212;
-            --card: #1e1e1e;
-            --border: #333333;
-            --hover-bg: rgba(72, 149, 239, 0.1);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            transition: background-color 0.3s, color 0.3s;
-        }
-
+        
+        /* === DARK/LIGHT TOGGLE SYSTEM === */
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            line-height: 1.6;
-            padding: 2rem;
-            max-width: 1800px;
-            margin: 0 auto;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-white);
+            margin: 0;
+            transition: all 0.3s;
         }
-
-        header {
+        
+        body.light-mode {
+            background: var(--light-bg);
+            color: var(--light-text);
+            --card-bg: var(--light-card);
+            --text-white: var(--light-text);
+            --border-dark: var(--light-border);
+        }
+        
+        /* === HEADER (YOUR EXTENSION STYLE) === */
+        .header {
+            padding: 12px 16px;
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-dark);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 2.5rem;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        h1 {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--primary);
-            background: linear-gradient(90deg, var(--primary), var(--accent));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-
-        .theme-toggle {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 50px;
-            padding: 0.5rem 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            cursor: pointer;
-            font-weight: 500;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-
-        .theme-toggle:hover {
-            background: var(--hover-bg);
-        }
-
-        .header-info {
-            display: flex;
-            gap: 2rem;
-            width: 100%;
-            margin-top: 1rem;
-        }
-
-        .info-card {
-            background: var(--card);
-            border-radius: 12px;
-            padding: 1rem 1.5rem;
-            flex: 1;
-            border: 1px solid var(--border);
-            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
-            min-width: 200px;
-        }
-
-        .info-card h3 {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: var(--primary);
-            margin-bottom: 0.5rem;
-            opacity: 0.8;
-        }
-
-        .info-card p {
-            font-size: 1.1rem;
-            font-weight: 500;
-        }
-
-        .stock-ticker {
-            background: var(--card);
-            border-radius: 50px;
-            padding: 0.7rem 1.5rem;
-            border: 1px solid var(--border);
-            font-weight: 600;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
             position: relative;
-            overflow: hidden;
         }
-
-        .stock-ticker::before {
+        
+        .header::after {
             content: '';
             position: absolute;
-            top: 0;
+            bottom: -5px;
             left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(67, 97, 238, 0.1), transparent);
-            transform: translateX(-100%);
-            animation: shimmer 3s infinite;
+            right: 0;
+            height: 5px;
+            background: var(--shadow-gradient);
+            filter: blur(8px);
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .app-name {
+            font-size: 24px;
+            color: var(--gold-yellow);
+            font-weight: 700;
+            animation: title-glow 2s infinite alternate;
+        }
+        
+        @keyframes title-glow {
+            0% { text-shadow: 0 0 4px rgba(255, 215, 0, 0.6); }
+            100% { text-shadow: 0 0 15px rgba(255, 215, 0, 0.9); }
+        }
+        
+        .theme-toggle {
+            background: var(--card-bg);
+            border: 1px solid var(--border-dark);
+            border-radius: 50px;
+            padding: 8px 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        @keyframes shimmer {
-            100% {
-                transform: translateX(100%);
-            }
-        }
-
+        /* === 5-COLUMN SECTOR GRID === */
         .sector-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 3rem;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 1rem;
+            padding: 1rem;
         }
-
-        .sector-card {
-            background: var(--card);
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-
-        .sector-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
-        }
-
-        .sector-header {
-            padding: 1.2rem;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            font-weight: 600;
-        }
-
-        .stock-list {
-            list-style: none;
-            padding: 0.8rem;
-            max-height: 380px;
-            overflow-y: auto;
-        }
-
-        .stock-list::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .stock-list::-webkit-scrollbar-thumb {
-            background: var(--primary);
-            border-radius: 3px;
-        }
-
-        .stock-item {
-            padding: 0.8rem 0.6rem;
-            margin: 0.2rem 0;
+        
+        .sector-table {
+            background: var(--card-bg);
             border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            height: 380px; /* Fixed height - no scrolling */
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sector-header {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            padding: 12px;
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        .stock-list {
+            padding: 8px;
+            flex-grow: 1;
+            overflow: hidden; /* Hide overflow */
+        }
+        
+        .stock-page {
+            display: none;
+        }
+        
+        .stock-page.active {
+            display: block;
+        }
+        
+        .stock-item {
+            padding: 10px 8px;
+            margin: 4px 0;
+            border-radius: 6px;
+            transition: all 0.2s;
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            transition: all 0.2s;
         }
-
+        
         .stock-item:hover {
-            background: var(--hover-bg);
+            background: rgba(59, 130, 246, 0.1);
             cursor: pointer;
+            transform: translateX(4px);
         }
-
-        .stock-item span {
-            font-weight: 500;
-        }
-
+        
         .stock-item::after {
             content: '→';
-            color: var(--primary);
-            font-weight: bold;
+            color: var(--gold-yellow);
             opacity: 0;
             transition: opacity 0.2s;
         }
-
+        
         .stock-item:hover::after {
             opacity: 1;
         }
-
+        
         .pagination {
             display: flex;
             justify-content: center;
-            gap: 0.5rem;
-            padding: 1rem;
-            border-top: 1px solid var(--border);
+            gap: 4px;
+            padding: 12px;
+            border-top: 1px solid var(--border-dark);
         }
-
+        
         .page-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+            border: 1px solid var(--border-dark);
             background: transparent;
-            color: var(--text);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             cursor: pointer;
-            font-size: 0.9rem;
-            transition: all 0.2s;
         }
-
-        .page-btn:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-        }
-
+        
         .page-btn.active {
-            background: var(--primary);
+            background: #3b82f6;
             color: white;
-            border-color: var(--primary);
+            border-color: #3b82f6;
         }
 
-        footer {
-            margin-top: 3rem;
-            text-align: center;
-        }
-
+        /* === YOUR 3D QUOTE BOX === */
         .quote-container {
-            background: var(--card);
-            border-radius: 12px;
-            padding: 2rem;
-            border: 1px solid var(--border);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            padding: 20px;
+            margin: 20px auto;
             max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .quote {
-            font-size: 1.2rem;
-            font-style: italic;
-            line-height: 1.8;
-            margin-bottom: 1rem;
+            font-size: 18px;
+            line-height: 1.6;
+            color: var(--text-white);
+            text-align: center;
+            background: linear-gradient(145deg, #1e2535, #2a3346);
+            border-radius: 8px;
             position: relative;
+            box-shadow: 
+                inset 0 0 25px rgba(0,0,0,0.5),
+                0 5px 15px rgba(0,0,0,0.3);
+            transform: perspective(500px) rotateX(10deg);
+            font-style: italic;
         }
-
-        .quote::before, .quote::after {
+        
+        .light-mode .quote-container {
+            background: linear-gradient(145deg, #f1f5f9, #e2e8f0);
+            color: #1e293b;
+        }
+        
+        .quote-container::before,
+        .quote-container::after {
             content: '"';
-            color: var(--primary);
-            font-size: 1.5rem;
-            opacity: 0.5;
+            font-size: 42px;
+            font-family: 'Quenton', sans-serif;
+            color: var(--gold-yellow);
+            position: absolute;
+            opacity: 0.3;
         }
-
+        
+        .quote-container::before {
+            top: 5px;
+            left: 10px;
+        }
+        
+        .quote-container::after {
+            bottom: 5px;
+            right: 10px;
+        }
+        
         .author {
+            display: block;
+            margin-top: 10px;
             font-weight: 600;
-            color: var(--primary);
-            text-align: right;
-        }
-
-        @media (max-width: 768px) {
-            body {
-                padding: 1.5rem;
-            }
-            
-            .header-info {
-                flex-direction: column;
-                gap: 1rem;
-            }
-            
-            .sector-grid {
-                grid-template-columns: 1fr;
-            }
+            color: var(--gold-yellow);
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>SECTOR TRACKER: 15 Key Industries</h1>
-        <div class="stock-ticker" id="random-stock">Loading...</div>
-        <button class="theme-toggle" id="theme-toggle">
-            <span id="theme-icon">🌙</span> <span id="theme-text">Dark Mode</span>
+    <div class="header">
+        <div class="logo-container">
+            <div class="app-name">SECTOR MAFIA</div>
+        </div>
+        <button class="theme-toggle" id="themeToggle">
+            <span id="themeIcon">🌙</span>
+            <span id="themeText">Dark Mode</span>
         </button>
-        
-        <div class="header-info">
-            <div class="info-card">
-                <h3>Current Date</h3>
-                <p id="current-date">Loading...</p>
-            </div>
-            <div class="info-card">
-                <h3>Remaining Time</h3>
-                <p id="remaining-time">Loading...</p>
-            </div>
-            <div class="info-card">
-                <h3>Stocks Tracked</h3>
-                <p id="total-stocks">Loading...</p>
-            </div>
-        </div>
-    </header>
+    </div>
     
-    <main>
-        <div class="sector-grid" id="sector-container">
-            <!-- Sectors will be inserted here by JavaScript -->
-        </div>
-    </main>
+    <!-- 5-Column Sector Grid -->
+    <div class="sector-grid" id="sectorGrid">
+        <!-- Sectors will be inserted here by JavaScript -->
+    </div>
     
-    <footer>
-        <div class="quote-container">
-            <div id="quote-display">
-                <!-- Quotes will rotate here -->
-            </div>
-        </div>
-    </footer>
+    <!-- Your 3D Quote Box -->
+    <div class="quote-container" id="quoteBox">
+        <div id="quoteText">"The stock market is filled with individuals who know the price of everything, but the value of nothing."</div>
+        <span class="author" id="quoteAuthor">- Philip Fisher</span>
+    </div>
 
     <script>
-        // Stock data for all 15 sectors
-        const sectorData = {
-            "NIFTY50": ["TRENT", "TCS", "NTPC", "BRITANNIA", "ICICIBANK", "ITC", "HINDUNILVR", "BHARTIARTL", "ADANIPORTS", "TECHM", "COALINDIA", "RELIANCE", "ONGC", "INFY", "NESTLEIND", "SBIN", "ASIANPAINT", "ADANIENT", "KOTAKBANK", "BPCL", "WIPRO", "MARUTI", "HCLTECH", "BAJFINANCE", "TATAMOTORS", "LT", "BEL", "HEROMOTOCO", "HDFCLIFE", "TITAN", "DRREDDY", "TATASTEEL", "CIPLA", "TATACONSUM", "POWERGRID", "JSWSTEEL", "BAJAJFINSV", "GRASIM", "APOLLOHOSP", "HINDALCO", "ULTRACEMCO", "BAJAJ-AUTO", "INDUSINDBK", "SBILIFE", "SHRIRANFIN", "HDFCBANK", "SUNPHARMA", "M&M", "EICHERMOT", "AXISBANK"],
-            "BANKING": ["ICICIBANK", "BANKBARODA", "SBIN", "KOTAKBANK", "FEDERALBNK", "INDIANB", "BANKINDIA", "INDUSINBK", "AUBANK", "HDFCBANK", "PNB", "IDFCFIRSTB", "CANBK", "AXISBANK"],
-            "AUTOMOBILE": ["EXIDEIND", "MOTHERSON", "APOLLOTYRE", "MARUTI", "TATAMOTORS", "BOSCHLTD", "HEROMOTOCO", "BALKRISIND", "TVSMOTOR", "SONACOMS", "TITAGARH", "TIINDIA", "BHARATFORG", "MRF", "BAJAJ-AUTO", "M&M", "EICHERMOT"],
-            "FINANCIAL SERVICES": ["ICICIBANK", "IRFC", "ICICIGI", "PFC", "ICICIPRULI", "SBICARD", "MUTHOOTFIN", "SBIN", "LICHSGFIN", "KOTAKBANK", "BAJFINANCE", "HDFCAMC", "POONAWALLA", "LICI", "HDFCLIFE", "HUDCO", "RECLTD", "CDSL", "JIOFIN", "BAJAJFINSV", "CHOLAFIN", "IIFL", "POLICYBZR", "MAXHEALTH", "SBILIFE", "SHRIRAMFIN", "ANGELONE", "BSE", "HDFCBANK", "PAYTM", "AXISBANK"],
-            "FMCG": ["BRITANNIA", "ITC", "HINDUNILVR", "DMART", "NESTLEIND", "COLPAL", "DABUR", "MARICO", "KALYANJIL", "ZOMATO", "VBL", "TATACONSUM", "PATANJALI", "UNITDSPR", "GODREJCP", "NYKAA", "SUPERMEIND"],
-            "INFORMATION TECHNOLOGY": ["TCS", "TECHM", "INFY", "WIPRO", "HCLTECH", "PERSISTENT", "COFORGE", "CAMS", "LTIM", "KPITTECH", "LTTS", "MPHASIS", "CYIENT", "TATAELXSI", "HFCL"],
-            "SENSEX": ["TCS", "NTPC", "ICICIBANK", "ITC", "HINDUNILVR", "BHARTIARTL", "ADANIPORTS", "TECHM", "RELIANCE", "INFY", "NESTLEIND", "SBIN", "ASIANPAINT", "KOTAKBANK", "MARUTI", "HCLTECH", "BAJFINANCE", "TATAMOTORS", "LT", "TITAN", "TATASTEEL", "POWERGRID", "JSWSTEEL", "BAJAJFINSV", "ULTRACEMCO", "INDUSINDBK", "HDFCBANK", "SUNPHARMA", "M&M", "AXISBANK"],
-            "METALS": ["ADANIENT", "JINDALSTEL", "SAIL", "TATASTEEL", "JSWSTEEL", "HINDALCO", "HINDCOPPER", "VEDL", "NATIONALUM", "NMDC", "JSL", "APLAPOLLO"],
-            "PHARMACEUTICALS": ["AUROPHARMA", "ZYDUSLIFE", "GLENMARK", "DRREDDY", "LAURUSLABS", "CIPLA", "LUPIN", "DIVISLAB", "TORNTPHARM", "GRANULES", "ALKEM", "SUNPHARMA", "BIOCON"],
-            "PSU BANKS": ["BANKBARODA", "SBIN", "INDIANB", "BANKINDIA", "UNIONBANK", "PND", "CANBK"],
-            "PRIVATE BANKS": ["ICICIBANK", "KOTAKBANK", "FEDERALBNK", "RBLBANK", "BANDHANBNK", "INDUSINDBK", "HDFCBANK", "IDFCFIRSTB", "AXISBANK"],
-            "REALTY": ["NCC", "PHOENIXLTD", "PRESTIGE", "OBEROIRLTY", "GODREJPROP", "DLF", "LODHA", "NBCC", "IRB"],
-            "ENERGY": ["NTPC", "COALINDIA", "RELIANCE", "ONGC", "CESE", "SOLARINDS", "TATAPOWER", "TORNTPOWER", "BPCL", "IOC", "ADANIENSOL", "IREDA", "OIL", "POWERGRID", "ATGL", "CGPOWER", "PETRONET", "JSWENERGY", "SJVN", "NHPC", "IGL", "GMRAIRPORT", "ADANIGREEN"],
-            "CEMENT": ["AMBUJACEM", "ACC", "JKCEMENT", "ULTRACEMCO", "DALBHARAT", "SHREECEM", "RAMCOCEM"],
-            "MIDCAP SELECT": ["AUROPHARMA", "HINDUPETRO", "VOLTAS", "UPL", "HDFCAMC", "PERSISTANT", "FEDERALBNK", "POLYCAB", "COFORGE", "LUPIN", "ASTRAL", "PAGEIND", "PIIND", "BHARATFORG", "MRF", "JUBLFOOD", "CONCOR", "INDHOTEL", "GODREJPROP", "AUBANK", "ASHOKLEY", "MPHASIS", "IDFIRSTB", "IDEA", "CUMMINSIND"]
-        };
-
-        // Trading/market quotes
+        // ===== YOUR EXTENSION'S QUOTES =====
         const quotes = [
-            {text: "The stock market is filled with individuals who know the price of everything, but the value of nothing.", author: "Philip Fisher"},
-            {text: "Investing should be more like watching paint dry or watching grass grow. If you want excitement, take $800 and go to Las Vegas.", author: "Paul Samuelson"},
-            {text: "The four most dangerous words in investing are: 'this time it's different.'", author: "Sir John Templeton"},
-            {text: "Risk comes from not knowing what you're doing.", author: "Warren Buffett"},
-            {text: "The individual investor should act consistently as an investor and not as a speculator.", author: "Ben Graham"},
-            {text: "In investing, what is comfortable is rarely profitable.", author: "Robert Arnott"},
-            {text: "Know what you own, and know why you own it.", author: "Peter Lynch"}
-        ];
+    { text: "Opportunities don't happen, you create them.", author: "" },
+    { text: "The market is always right. Never argue with it.", author: "" },
+    { text: "Price is what you pay. Value is what you get.", author: "Benjamin Graham" },
+    { text: "Risk comes from not knowing what you're doing.", author: "Warren Buffett" },
+    { text: "Time is your friend; impulse is your enemy.", author: "" },
+    { text: "Buy when everyone else is selling and hold until everyone else is buying.", author: "Warren Buffett" },
+    { text: "The stock market is filled with individuals who know the price of everything, but the value of nothing.", author: "" },
+    { text: "In investing, what is comfortable is rarely profitable.", author: "" },
+    { text: "The four most dangerous words in investing are: 'This time it's different.'", author: "Sir John Templeton" },
+    { text: "Wide diversification is only required when investors do not understand what they are doing.", author: "Warren Buffett" },
+    { text: "The individual investor should act consistently as an investor and not as a speculator.", author: "Ben Graham" },
+    { text: "It's not whether you're right or wrong that's important, but how much money you make when you're right and how much you lose when you're wrong.", author: "George Soros" },
+    { text: "The goal of a successful trader is to make the best trades. Money is secondary.", author: "Alexander Elder" },
+    { text: "If you can't control your emotions, you can't control your money.", author: "Warren Buffett" },
+    { text: "The most important quality for an investor is temperament, not intellect.", author: "Warren Buffett" },
+    { text: "Know what you own, and know why you own it.", author: "Peter Lynch" },
+    { text: "The stock market is a device for transferring money from the impatient to the patient.", author: "Warren Buffett" },
+    { text: "The best time to plant a tree was 20 years ago. The second best time is now.", author: "Chinese Proverb" },
+    { text: "Don't look for the needle in the haystack. Just buy the haystack!", author: "John Bogle" },
+    { text: "Someone's sitting in the shade today because someone planted a tree a long time ago.", author: "Warren Buffett" },
+    { text: "It's far better to buy a wonderful company at a fair price than a fair company at a wonderful price.", author: "Warren Buffett" },
+    { text: "Our favorite holding period is forever.", author: "Warren Buffett" },
+    { text: "You get recessions, you have stock market declines. If you don't understand that's going to happen, then you're not ready, you won't do well in the markets.", author: "Peter Lynch" },
+    { text: "The stock market is a no-called-strike game. You don't have to swing at everything—you can wait for your pitch.", author: "Warren Buffett" },
+    { text: "The key to making money in stocks is not to get scared out of them.", author: "Peter Lynch" },
+    { text: "The biggest risk of all is not taking one.", author: "" },
+    { text: "Compound interest is the eighth wonder of the world. He who understands it, earns it; he who doesn't, pays it.", author: "Albert Einstein" },
+    { text: "Do not save what is left after spending, but spend what is left after saving.", author: "Warren Buffett" },
+    { text: "Never depend on a single income. Make investment to create a second source.", author: "Warren Buffett" },
+    { text: "The best investment you can make is in yourself.", author: "Warren Buffett" }
+];
 
-        // Initialize the page
-        document.addEventListener('DOMContentLoaded', function() {
-            // Theme toggle functionality
-            const themeToggle = document.getElementById('theme-toggle');
-            const themeIcon = document.getElementById('theme-icon');
-            const themeText = document.getElementById('theme-text');
-            
-            function setTheme(isDark) {
-                if (isDark) {
-                    document.documentElement.classList.add('dark-mode');
-                    themeIcon.textContent = '☀️';
-                    themeText.textContent = 'Light Mode';
-                    localStorage.setItem('theme', 'dark');
-                } else {
-                    document.documentElement.classList.remove('dark-mode');
-                    themeIcon.textContent = '🌙';
-                    themeText.textContent = 'Dark Mode';
-                    localStorage.setItem('theme', 'light');
-                }
+        
+        // Stock data for all 15 sectors
+const sectorData = {
+    "NIFTY50": ["TRENT", "TCS", "NTPC", "BRITANNIA", "ICICIBANK", "ITC", "HINDUNILVR", "BHARTIARTL", "ADANIPORTS", "TECHM", "COALINDIA", "RELIANCE", "ONGC", "INFY", "NESTLEIND", "SBIN", "ASIANPAINT", "ADANIENT", "KOTAKBANK", "BPCL", "WIPRO", "MARUTI", "HCLTECH", "BAJFINANCE", "TATAMOTORS", "LT", "BEL", "HEROMOTOCO", "HDFCLIFE", "TITAN", "DRREDDY", "TATASTEEL", "CIPLA", "TATACONSUM", "POWERGRID", "JSWSTEEL", "BAJAJFINSV", "GRASIM", "APOLLOHOSP", "HINDALCO", "ULTRACEMCO", "BAJAJ-AUTO", "INDUSINDBK", "SBILIFE", "SHRIRANFIN", "HDFCBANK", "SUNPHARMA", "M&M", "EICHERMOT", "AXISBANK"],
+    "BANKING": ["ICICIBANK", "BANKBARODA", "SBIN", "KOTAKBANK", "FEDERALBNK", "INDIANB", "BANKINDIA", "INDUSINBK", "AUBANK", "HDFCBANK", "PNB", "IDFCFIRSTB", "CANBK", "AXISBANK"],
+    "AUTOMOBILE": ["EXIDEIND", "MOTHERSON", "APOLLOTYRE", "MARUTI", "TATAMOTORS", "BOSCHLTD", "HEROMOTOCO", "BALKRISIND", "TVSMOTOR", "SONACOMS", "TITAGARH", "TIINDIA", "BHARATFORG", "MRF", "BAJAJ-AUTO", "M&M", "EICHERMOT"],
+    "FINANCIAL SERVICES": ["ICICIBANK", "IRFC", "ICICIGI", "PFC", "ICICIPRULI", "SBICARD", "MUTHOOTFIN", "SBIN", "LICHSGFIN", "KOTAKBANK", "BAJFINANCE", "HDFCAMC", "POONAWALLA", "LICI", "HDFCLIFE", "HUDCO", "RECLTD", "CDSL", "JIOFIN", "BAJAJFINSV", "CHOLAFIN", "IIFL", "POLICYBZR", "MAXHEALTH", "SBILIFE", "SHRIRAMFIN", "ANGELONE", "BSE", "HDFCBANK", "PAYTM", "AXISBANK"],
+    "FMCG": ["BRITANNIA", "ITC", "HINDUNILVR", "DMART", "NESTLEIND", "COLPAL", "DABUR", "MARICO", "KALYANJIL", "ZOMATO", "VBL", "TATACONSUM", "PATANJALI", "UNITDSPR", "GODREJCP", "NYKAA", "SUPERMEIND"],
+    "INFORMATION TECHNOLOGY": ["TCS", "TECHM", "INFY", "WIPRO", "HCLTECH", "PERSISTENT", "COFORGE", "CAMS", "LTIM", "KPITTECH", "LTTS", "MPHASIS", "CYIENT", "TATAELXSI", "HFCL"],
+    "SENSEX": ["TCS", "NTPC", "ICICIBANK", "ITC", "HINDUNILVR", "BHARTIARTL", "ADANIPORTS", "TECHM", "RELIANCE", "INFY", "NESTLEIND", "SBIN", "ASIANPAINT", "KOTAKBANK", "MARUTI", "HCLTECH", "BAJFINANCE", "TATAMOTORS", "LT", "TITAN", "TATASTEEL", "POWERGRID", "JSWSTEEL", "BAJAJFINSV", "ULTRACEMCO", "INDUSINDBK", "HDFCBANK", "SUNPHARMA", "M&M", "AXISBANK"],
+    "METALS": ["ADANIENT", "JINDALSTEL", "SAIL", "TATASTEEL", "JSWSTEEL", "HINDALCO", "HINDCOPPER", "VEDL", "NATIONALUM", "NMDC", "JSL", "APLAPOLLO"],
+    "PHARMACEUTICALS": ["AUROPHARMA", "ZYDUSLIFE", "GLENMARK", "DRREDDY", "LAURUSLABS", "CIPLA", "LUPIN", "DIVISLAB", "TORNTPHARM", "GRANULES", "ALKEM", "SUNPHARMA", "BIOCON"],
+    "PSU BANKS": ["BANKBARODA", "SBIN", "INDIANB", "BANKINDIA", "UNIONBANK", "PNB", "CANBK"],
+    "PRIVATE BANKS": ["ICICIBANK", "KOTAKBANK", "FEDERALBNK", "RBLBANK", "BANDHANBNK", "INDUSINDBK", "HDFCBANK", "IDFCFIRSTB", "AXISBANK"],
+    "REALTY": ["NCC", "PHOENIXLTD", "PRESTIGE", "OBEROIRLTY", "GODREJPROP", "DLF", "LODHA", "NBCC", "IRB"],
+    "ENERGY": ["NTPC", "COALINDIA", "RELIANCE", "ONGC", "CESE", "SOLARINDS", "TATAPOWER", "TORNTPOWER", "BPCL", "IOC", "ADANIENSOL", "IREDA", "OIL", "POWERGRID", "ATGL", "CGPOWER", "PETRONET", "JSWENERGY", "SJVN", "NHPC", "IGL", "GMRAIRPORT", "ADANIGREEN"],
+    "CEMENT": ["AMBUJACEM", "ACC", "JKCEMENT", "ULTRACEMCO", "DALBHARAT", "SHREECEM", "RAMCOCEM"],
+    "MIDCAP SELECT": ["AUROPHARMA", "HINDUPETRO", "VOLTAS", "UPL", "HDFCAMC", "PERSISTENT", "FEDERALBNK", "POLYCAB", "COFORGE", "LUPIN", "ASTRAL", "PAGEIND", "PIIND", "BHARATFORG", "MRF", "JUBLFOOD", "CONCOR", "INDHOTEL", "GODREJPROP", "AUBANK", "ASHOKLEY", "MPHASIS", "IDFCFIRSTB", "IDEA", "CUMMINSIND"]
+};
+
+        
+        // ===== THEME TOGGLE =====
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+        const themeText = document.getElementById('themeText');
+        
+        function setTheme(isDark) {
+            if (isDark) {
+                document.body.classList.remove('light-mode');
+                themeIcon.textContent = '🌙';
+                themeText.textContent = 'Dark Mode';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.body.classList.add('light-mode');
+                themeIcon.textContent = '☀️';
+                themeText.textContent = 'Light Mode';
+                localStorage.setItem('theme', 'light');
             }
-            
-            // Check for saved theme preference
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'dark') {
-                setTheme(true);
-            } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                setTheme(true);
-            }
-            
-            themeToggle.addEventListener('click', () => {
-                const isDark = !document.documentElement.classList.contains('dark-mode');
-                setTheme(isDark);
-            });
-            
-            // Create sector cards
-            const sectorContainer = document.getElementById('sector-container');
-            let totalStocks = 0;
-            
-            for (const [sectorName, stocks] of Object.entries(sectorData)) {
-                totalStocks += stocks.length;
-                
-                const sectorCard = document.createElement('div');
-                sectorCard.className = 'sector-card';
-                
-                const sectorHeader = document.createElement('div');
-                sectorHeader.className = 'sector-header';
-                sectorHeader.textContent = sectorName;
-                sectorCard.appendChild(sectorHeader);
-                
-                const stockList = document.createElement('ul');
-                stockList.className = 'stock-list';
-                
-                // Show first 10 stocks initially
-                const visibleStocks = stocks.slice(0, 10);
-                visibleStocks.forEach(stock => {
-                    const stockItem = createStockItem(stock);
-                    stockList.appendChild(stockItem);
-                });
-                
-                sectorCard.appendChild(stockList);
-                
-                // Add pagination if more than 10 stocks
-                if (stocks.length > 10) {
-                    const paginationDiv = document.createElement('div');
-                    paginationDiv.className = 'pagination';
-                    
-                    const pageCount = Math.ceil(stocks.length / 10);
-                    for (let i = 1; i <= pageCount; i++) {
-                        const pageBtn = document.createElement('button');
-                        pageBtn.className = 'page-btn' + (i === 1 ? ' active' : '');
-                        pageBtn.textContent = i;
-                        pageBtn.addEventListener('click', () => {
-                            // Update active button
-                            sectorCard.querySelectorAll('.page-btn').forEach(btn => {
-                                btn.classList.remove('active');
-                            });
-                            pageBtn.classList.add('active');
-                            
-                            // Show the selected page's stocks
-                            const startIdx = (i - 1) * 10;
-                            const endIdx = startIdx + 10;
-                            const pageStocks = stocks.slice(startIdx, endIdx);
-                            
-                            // Clear existing items
-                            while (stockList.firstChild) {
-                                stockList.removeChild(stockList.firstChild);
-                            }
-                            
-                            // Add new items
-                            pageStocks.forEach(stock => {
-                                const stockItem = createStockItem(stock);
-                                stockList.appendChild(stockItem);
-                            });
-                        });
-                        paginationDiv.appendChild(pageBtn);
-                    }
-                    
-                    sectorCard.appendChild(paginationDiv);
-                }
-                
-                sectorContainer.appendChild(sectorCard);
-            }
-            
-            // Update total stocks count
-            document.getElementById('total-stocks').textContent = totalStocks + ' stocks across 15 sectors';
-            
-            // Update date and time
-            function updateDateTime() {
-                const now = new Date();
-                const options = { 
-                    hour: 'numeric', 
-                    minute: 'numeric', 
-                    hour12: true, 
-                    weekday: 'long', 
-                    day: 'numeric', 
-                    month: 'long', 
-                    year: 'numeric',
-                    timeZone: 'Asia/Kolkata'
-                };
-                
-                const dateStr = now.toLocaleString('en-IN', options);
-                const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-                const daysLeftInMonth = lastDayOfMonth - now.getDate();
-                const lastDayOfYear = new Date(now.getFullYear(), 11, 31);
-                const daysLeftInYear = Math.floor((lastDayOfYear - now) / (1000 * 60 * 60 * 24));
-                
-                document.getElementById('current-date').textContent = dateStr;
-                document.getElementById('remaining-time').textContent = 
-                    `${daysLeftInMonth} days in ${now.toLocaleString('default', { month: 'long' })} | ${daysLeftInYear} days in ${now.getFullYear()}`;
-            }
-            
-            updateDateTime();
-            setInterval(updateDateTime, 60000); // Update every minute
-            
-            // Random stock ticker
-            function updateRandomStock() {
-                const allStocks = Object.values(sectorData).flat();
-                const randomStock = allStocks[Math.floor(Math.random() * allStocks.length)];
-                document.getElementById('random-stock').textContent = randomStock;
-            }
-            
-            updateRandomStock();
-            setInterval(updateRandomStock, 8000); // Change every 8 seconds
-            
-            // Random quote
-            function showRandomQuote() {
-                const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
-                const quoteHTML = `
-                    <div class="quote">${randomQuote.text}</div>
-                    ${randomQuote.author ? `<div class="author">— ${randomQuote.author}</div>` : ''}
-                `;
-                document.getElementById('quote-display').innerHTML = quoteHTML;
-            }
-            
-            showRandomQuote();
-            
-            // Helper function to create stock list items
-            function createStockItem(stock) {
-                const stockItem = document.createElement('li');
-                stockItem.className = 'stock-item';
-                
-                const stockSpan = document.createElement('span');
-                stockSpan.textContent = stock;
-                stockItem.appendChild(stockSpan);
-                
-                stockItem.addEventListener('click', () => {
-                    window.open(`https://in.tradingview.com/chart/?symbol=NSE:${stock}`, '_blank');
-                });
-                
-                return stockItem;
-            }
+        }
+        
+        themeToggle.addEventListener('click', () => {
+            const isDark = !document.body.classList.contains('light-mode');
+            setTheme(!isDark);
         });
+        
+        // Check saved theme
+        if (localStorage.getItem('theme') === 'light') {
+            setTheme(false);
+        }
+        
+        // ===== BUILD SECTOR GRID =====
+        const sectorGrid = document.getElementById('sectorGrid');
+        
+        Object.entries(sectorData).forEach(([sectorName, stocks]) => {
+            const sectorDiv = document.createElement('div');
+            sectorDiv.className = 'sector-table';
+            sectorDiv.innerHTML = `
+                <div class="sector-header">${sectorName}</div>
+                <div class="stock-list" id="${sectorName}-stocks"></div>
+                <div class="pagination" id="${sectorName}-pagination"></div>
+            `;
+            
+            const stockList = sectorDiv.querySelector('.stock-list');
+            const pagination = sectorDiv.querySelector('.pagination');
+            
+            // Create pages (10 stocks per page)
+            const pageCount = Math.ceil(stocks.length / 10);
+            for (let i = 0; i < pageCount; i++) {
+                const pageDiv = document.createElement('div');
+                pageDiv.className = `stock-page ${i === 0 ? 'active' : ''}`;
+                pageDiv.dataset.page = i + 1;
+                
+                const startIdx = i * 10;
+                const endIdx = startIdx + 10;
+                stocks.slice(startIdx, endIdx).forEach(stock => {
+                    const stockItem = document.createElement('div');
+                    stockItem.className = 'stock-item';
+                    stockItem.textContent = stock;
+                    stockItem.addEventListener('click', () => {
+                        window.open(`https://www.tradingview.com/chart/?symbol=NSE:${stock}`, '_blank');
+                    });
+                    pageDiv.appendChild(stockItem);
+                });
+                
+                stockList.appendChild(pageDiv);
+                
+                // Pagination buttons
+                const pageBtn = document.createElement('button');
+                pageBtn.className = `page-btn ${i === 0 ? 'active' : ''}`;
+                pageBtn.textContent = i + 1;
+                pageBtn.addEventListener('click', () => {
+                    stockList.querySelectorAll('.stock-page').forEach(page => {
+                        page.classList.remove('active');
+                    });
+                    pageDiv.classList.add('active');
+                    
+                    pagination.querySelectorAll('.page-btn').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    pageBtn.classList.add('active');
+                });
+                pagination.appendChild(pageBtn);
+            }
+            
+            sectorGrid.appendChild(sectorDiv);
+        });
+        
+        // ===== ROTATE QUOTES =====
+        function showRandomQuote() {
+            const quote = quotes[Math.floor(Math.random() * quotes.length)];
+            document.getElementById('quoteText').textContent = `"${quote.text}"`;
+            document.getElementById('quoteAuthor').textContent = quote.author ? `- ${quote.author}` : '';
+        }
+        
+        showRandomQuote();
+        setInterval(showRandomQuote, 10000); // Change every 10 seconds
     </script>
 </body>
 </html>
