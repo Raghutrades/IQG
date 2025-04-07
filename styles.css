@@ -1,19 +1,30 @@
 body {
   font-family: Arial, sans-serif;
   margin: 20px;
+  line-height: 1.6;
 }
 .container {
-  max-width: 800px;
+  max-width: 1000px;
   margin: 0 auto;
+}
+.controls {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+input, select {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
 }
 table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 20px;
 }
 th, td {
+  padding: 10px;
   border: 1px solid #ddd;
-  padding: 8px;
   text-align: left;
 }
 th {
@@ -22,4 +33,7 @@ th {
 a {
   color: #0066cc;
   text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
 }
