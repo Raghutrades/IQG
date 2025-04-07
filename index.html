@@ -3,29 +3,37 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Indian Sector Stocks</title>
+  <title>NIFTY50 Stocks Tracker</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div class="container">
-    <h1>Indian Sector Stocks</h1>
-    <label for="sector">Select Sector:</label>
-    <select id="sector">
-      <option value="">--Choose Sector--</option>
-    </select>
+    <h1>NIFTY50 Stocks</h1>
     
-    <div id="stocks-container">
-      <table id="stocks-table">
-        <thead>
-          <tr>
-            <th>Stock</th>
-            <th>Ticker</th>
-            <th>Chart</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+    <div class="controls">
+      <label for="sector">Select Sector:</label>
+      <select id="sector">
+        <option value="">--All Sectors--</option>
+      </select>
+      
+      <label for="search">Search Stocks:</label>
+      <input type="text" id="search" placeholder="Type stock name/ticker...">
     </div>
+    
+    <table id="stocks-table">
+      <thead>
+        <tr>
+          <th>Stock</th>
+          <th>Ticker</th>
+          <th>LTP</th>
+          <th>Open</th>
+          <th>High</th>
+          <th>Low</th>
+          <th>Chart</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
   </div>
   <script src="script.js"></script>
 </body>
