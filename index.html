@@ -1,53 +1,546 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NIFTY50 Stock Tracker</title>
-  <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SECTOR TRACKER: 15 Key Industries</title>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --accent: #f72585;
+            --text: #2b2d42;
+            --bg: #f8f9fa;
+            --card: #ffffff;
+            --border: #e9ecef;
+            --hover-bg: rgba(67, 97, 238, 0.05);
+        }
+
+        .dark-mode {
+            --primary: #4895ef;
+            --secondary: #3a0ca3;
+            --accent: #f72585;
+            --text: #e9ecef;
+            --bg: #121212;
+            --card: #1e1e1e;
+            --border: #333333;
+            --hover-bg: rgba(72, 149, 239, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 2rem;
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .theme-toggle {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            padding: 0.5rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .theme-toggle:hover {
+            background: var(--hover-bg);
+        }
+
+        .header-info {
+            display: flex;
+            gap: 2rem;
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .info-card {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            flex: 1;
+            border: 1px solid var(--border);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+            min-width: 200px;
+        }
+
+        .info-card h3 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            opacity: 0.8;
+        }
+
+        .info-card p {
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .stock-ticker {
+            background: var(--card);
+            border-radius: 50px;
+            padding: 0.7rem 1.5rem;
+            border: 1px solid var(--border);
+            font-weight: 600;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stock-ticker::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(67, 97, 238, 0.1), transparent);
+            transform: translateX(-100%);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        .sector-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .sector-card {
+            background: var(--card);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .sector-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+        }
+
+        .sector-header {
+            padding: 1.2rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            font-weight: 600;
+        }
+
+        .stock-list {
+            list-style: none;
+            padding: 0.8rem;
+            max-height: 380px;
+            overflow-y: auto;
+        }
+
+        .stock-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .stock-list::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 3px;
+        }
+
+        .stock-item {
+            padding: 0.8rem 0.6rem;
+            margin: 0.2rem 0;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+        }
+
+        .stock-item:hover {
+            background: var(--hover-bg);
+            cursor: pointer;
+        }
+
+        .stock-item span {
+            font-weight: 500;
+        }
+
+        .stock-item::after {
+            content: '→';
+            color: var(--primary);
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .stock-item:hover::after {
+            opacity: 1;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .page-btn {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .page-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .page-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        footer {
+            margin-top: 3rem;
+            text-align: center;
+        }
+
+        .quote-container {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 2rem;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .quote {
+            font-size: 1.2rem;
+            font-style: italic;
+            line-height: 1.8;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .quote::before, .quote::after {
+            content: '"';
+            color: var(--primary);
+            font-size: 1.5rem;
+            opacity: 0.5;
+        }
+
+        .author {
+            font-weight: 600;
+            color: var(--primary);
+            text-align: right;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1.5rem;
+            }
+            
+            .header-info {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .sector-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>📊 NIFTY50 Stock Tracker</h1>
+    <header>
+        <h1>SECTOR TRACKER: 15 Key Industries</h1>
+        <div class="stock-ticker" id="random-stock">Loading...</div>
+        <button class="theme-toggle" id="theme-toggle">
+            <span id="theme-icon">🌙</span> <span id="theme-text">Dark Mode</span>
+        </button>
+        
+        <div class="header-info">
+            <div class="info-card">
+                <h3>Current Date</h3>
+                <p id="current-date">Loading...</p>
+            </div>
+            <div class="info-card">
+                <h3>Remaining Time</h3>
+                <p id="remaining-time">Loading...</p>
+            </div>
+            <div class="info-card">
+                <h3>Stocks Tracked</h3>
+                <p id="total-stocks">Loading...</p>
+            </div>
+        </div>
+    </header>
     
-    <div class="controls">
-      <div class="search-box">
-        <input type="text" id="search" placeholder="Search stocks (e.g., RELIANCE)" autocomplete="off">
-      </div>
-      
-      <div class="timeframe-selector">
-        <label for="timeframe">Timeframe:</label>
-        <select id="timeframe">
-          <option value="daily">Daily</option>
-          <option value="weekly">Weekly</option>
-          <option value="monthly">Monthly</option>
-        </select>
-      </div>
-      
-      <button id="refresh-btn">🔄 Refresh Data</button>
-    </div>
+    <main>
+        <div class="sector-grid" id="sector-container">
+            <!-- Sectors will be inserted here by JavaScript -->
+        </div>
+    </main>
+    
+    <footer>
+        <div class="quote-container">
+            <div id="quote-display">
+                <!-- Quotes will rotate here -->
+            </div>
+        </div>
+    </footer>
 
-    <div class="table-container">
-      <table id="stocks-table">
-        <thead>
-          <tr>
-            <th>Company</th>
-            <th>Ticker</th>
-            <th>Open</th>
-            <th>High</th>
-            <th>Low</th>
-            <th>Close</th>
-            <th>Volume</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody id="stocks-body"></tbody>
-      </table>
-    </div>
+    <script>
+        // Stock data for all 15 sectors
+        const sectorData = {
+            "NIFTY50": ["TRENT", "TCS", "NTPC", "BRITANNIA", "ICICIBANK", "ITC", "HINDUNILVR", "BHARTIARTL", "ADANIPORTS", "TECHM", "COALINDIA", "RELIANCE", "ONGC", "INFY", "NESTLEIND", "SBIN", "ASIANPAINT", "ADANIENT", "KOTAKBANK", "BPCL", "WIPRO", "MARUTI", "HCLTECH", "BAJFINANCE", "TATAMOTORS", "LT", "BEL", "HEROMOTOCO", "HDFCLIFE", "TITAN", "DRREDDY", "TATASTEEL", "CIPLA", "TATACONSUM", "POWERGRID", "JSWSTEEL", "BAJAJFINSV", "GRASIM", "APOLLOHOSP", "HINDALCO", "ULTRACEMCO", "BAJAJ-AUTO", "INDUSINDBK", "SBILIFE", "SHRIRANFIN", "HDFCBANK", "SUNPHARMA", "M&M", "EICHERMOT", "AXISBANK"],
+            "BANKING": ["ICICIBANK", "BANKBARODA", "SBIN", "KOTAKBANK", "FEDERALBNK", "INDIANB", "BANKINDIA", "INDUSINBK", "AUBANK", "HDFCBANK", "PNB", "IDFCFIRSTB", "CANBK", "AXISBANK"],
+            "AUTOMOBILE": ["EXIDEIND", "MOTHERSON", "APOLLOTYRE", "MARUTI", "TATAMOTORS", "BOSCHLTD", "HEROMOTOCO", "BALKRISIND", "TVSMOTOR", "SONACOMS", "TITAGARH", "TIINDIA", "BHARATFORG", "MRF", "BAJAJ-AUTO", "M&M", "EICHERMOT"],
+            "FINANCIAL SERVICES": ["ICICIBANK", "IRFC", "ICICIGI", "PFC", "ICICIPRULI", "SBICARD", "MUTHOOTFIN", "SBIN", "LICHSGFIN", "KOTAKBANK", "BAJFINANCE", "HDFCAMC", "POONAWALLA", "LICI", "HDFCLIFE", "HUDCO", "RECLTD", "CDSL", "JIOFIN", "BAJAJFINSV", "CHOLAFIN", "IIFL", "POLICYBZR", "MAXHEALTH", "SBILIFE", "SHRIRAMFIN", "ANGELONE", "BSE", "HDFCBANK", "PAYTM", "AXISBANK"],
+            "FMCG": ["BRITANNIA", "ITC", "HINDUNILVR", "DMART", "NESTLEIND", "COLPAL", "DABUR", "MARICO", "KALYANJIL", "ZOMATO", "VBL", "TATACONSUM", "PATANJALI", "UNITDSPR", "GODREJCP", "NYKAA", "SUPERMEIND"],
+            "INFORMATION TECHNOLOGY": ["TCS", "TECHM", "INFY", "WIPRO", "HCLTECH", "PERSISTENT", "COFORGE", "CAMS", "LTIM", "KPITTECH", "LTTS", "MPHASIS", "CYIENT", "TATAELXSI", "HFCL"],
+            "SENSEX": ["TCS", "NTPC", "ICICIBANK", "ITC", "HINDUNILVR", "BHARTIARTL", "ADANIPORTS", "TECHM", "RELIANCE", "INFY", "NESTLEIND", "SBIN", "ASIANPAINT", "KOTAKBANK", "MARUTI", "HCLTECH", "BAJFINANCE", "TATAMOTORS", "LT", "TITAN", "TATASTEEL", "POWERGRID", "JSWSTEEL", "BAJAJFINSV", "ULTRACEMCO", "INDUSINDBK", "HDFCBANK", "SUNPHARMA", "M&M", "AXISBANK"],
+            "METALS": ["ADANIENT", "JINDALSTEL", "SAIL", "TATASTEEL", "JSWSTEEL", "HINDALCO", "HINDCOPPER", "VEDL", "NATIONALUM", "NMDC", "JSL", "APLAPOLLO"],
+            "PHARMACEUTICALS": ["AUROPHARMA", "ZYDUSLIFE", "GLENMARK", "DRREDDY", "LAURUSLABS", "CIPLA", "LUPIN", "DIVISLAB", "TORNTPHARM", "GRANULES", "ALKEM", "SUNPHARMA", "BIOCON"],
+            "PSU BANKS": ["BANKBARODA", "SBIN", "INDIANB", "BANKINDIA", "UNIONBANK", "PND", "CANBK"],
+            "PRIVATE BANKS": ["ICICIBANK", "KOTAKBANK", "FEDERALBNK", "RBLBANK", "BANDHANBNK", "INDUSINDBK", "HDFCBANK", "IDFCFIRSTB", "AXISBANK"],
+            "REALTY": ["NCC", "PHOENIXLTD", "PRESTIGE", "OBEROIRLTY", "GODREJPROP", "DLF", "LODHA", "NBCC", "IRB"],
+            "ENERGY": ["NTPC", "COALINDIA", "RELIANCE", "ONGC", "CESE", "SOLARINDS", "TATAPOWER", "TORNTPOWER", "BPCL", "IOC", "ADANIENSOL", "IREDA", "OIL", "POWERGRID", "ATGL", "CGPOWER", "PETRONET", "JSWENERGY", "SJVN", "NHPC", "IGL", "GMRAIRPORT", "ADANIGREEN"],
+            "CEMENT": ["AMBUJACEM", "ACC", "JKCEMENT", "ULTRACEMCO", "DALBHARAT", "SHREECEM", "RAMCOCEM"],
+            "MIDCAP SELECT": ["AUROPHARMA", "HINDUPETRO", "VOLTAS", "UPL", "HDFCAMC", "PERSISTANT", "FEDERALBNK", "POLYCAB", "COFORGE", "LUPIN", "ASTRAL", "PAGEIND", "PIIND", "BHARATFORG", "MRF", "JUBLFOOD", "CONCOR", "INDHOTEL", "GODREJPROP", "AUBANK", "ASHOKLEY", "MPHASIS", "IDFIRSTB", "IDEA", "CUMMINSIND"]
+        };
 
-    <div class="status" id="status">Loading initial data... (5 API calls/minute limit)</div>
-  </div>
+        // Trading/market quotes
+        const quotes = [
+            {text: "The stock market is filled with individuals who know the price of everything, but the value of nothing.", author: "Philip Fisher"},
+            {text: "Investing should be more like watching paint dry or watching grass grow. If you want excitement, take $800 and go to Las Vegas.", author: "Paul Samuelson"},
+            {text: "The four most dangerous words in investing are: 'this time it's different.'", author: "Sir John Templeton"},
+            {text: "Risk comes from not knowing what you're doing.", author: "Warren Buffett"},
+            {text: "The individual investor should act consistently as an investor and not as a speculator.", author: "Ben Graham"},
+            {text: "In investing, what is comfortable is rarely profitable.", author: "Robert Arnott"},
+            {text: "Know what you own, and know why you own it.", author: "Peter Lynch"}
+        ];
 
-  <script src="script.js"></script>
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Theme toggle functionality
+            const themeToggle = document.getElementById('theme-toggle');
+            const themeIcon = document.getElementById('theme-icon');
+            const themeText = document.getElementById('theme-text');
+            
+            function setTheme(isDark) {
+                if (isDark) {
+                    document.documentElement.classList.add('dark-mode');
+                    themeIcon.textContent = '☀️';
+                    themeText.textContent = 'Light Mode';
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    document.documentElement.classList.remove('dark-mode');
+                    themeIcon.textContent = '🌙';
+                    themeText.textContent = 'Dark Mode';
+                    localStorage.setItem('theme', 'light');
+                }
+            }
+            
+            // Check for saved theme preference
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                setTheme(true);
+            } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                setTheme(true);
+            }
+            
+            themeToggle.addEventListener('click', () => {
+                const isDark = !document.documentElement.classList.contains('dark-mode');
+                setTheme(isDark);
+            });
+            
+            // Create sector cards
+            const sectorContainer = document.getElementById('sector-container');
+            let totalStocks = 0;
+            
+            for (const [sectorName, stocks] of Object.entries(sectorData)) {
+                totalStocks += stocks.length;
+                
+                const sectorCard = document.createElement('div');
+                sectorCard.className = 'sector-card';
+                
+                const sectorHeader = document.createElement('div');
+                sectorHeader.className = 'sector-header';
+                sectorHeader.textContent = sectorName;
+                sectorCard.appendChild(sectorHeader);
+                
+                const stockList = document.createElement('ul');
+                stockList.className = 'stock-list';
+                
+                // Show first 10 stocks initially
+                const visibleStocks = stocks.slice(0, 10);
+                visibleStocks.forEach(stock => {
+                    const stockItem = createStockItem(stock);
+                    stockList.appendChild(stockItem);
+                });
+                
+                sectorCard.appendChild(stockList);
+                
+                // Add pagination if more than 10 stocks
+                if (stocks.length > 10) {
+                    const paginationDiv = document.createElement('div');
+                    paginationDiv.className = 'pagination';
+                    
+                    const pageCount = Math.ceil(stocks.length / 10);
+                    for (let i = 1; i <= pageCount; i++) {
+                        const pageBtn = document.createElement('button');
+                        pageBtn.className = 'page-btn' + (i === 1 ? ' active' : '');
+                        pageBtn.textContent = i;
+                        pageBtn.addEventListener('click', () => {
+                            // Update active button
+                            sectorCard.querySelectorAll('.page-btn').forEach(btn => {
+                                btn.classList.remove('active');
+                            });
+                            pageBtn.classList.add('active');
+                            
+                            // Show the selected page's stocks
+                            const startIdx = (i - 1) * 10;
+                            const endIdx = startIdx + 10;
+                            const pageStocks = stocks.slice(startIdx, endIdx);
+                            
+                            // Clear existing items
+                            while (stockList.firstChild) {
+                                stockList.removeChild(stockList.firstChild);
+                            }
+                            
+                            // Add new items
+                            pageStocks.forEach(stock => {
+                                const stockItem = createStockItem(stock);
+                                stockList.appendChild(stockItem);
+                            });
+                        });
+                        paginationDiv.appendChild(pageBtn);
+                    }
+                    
+                    sectorCard.appendChild(paginationDiv);
+                }
+                
+                sectorContainer.appendChild(sectorCard);
+            }
+            
+            // Update total stocks count
+            document.getElementById('total-stocks').textContent = totalStocks + ' stocks across 15 sectors';
+            
+            // Update date and time
+            function updateDateTime() {
+                const now = new Date();
+                const options = { 
+                    hour: 'numeric', 
+                    minute: 'numeric', 
+                    hour12: true, 
+                    weekday: 'long', 
+                    day: 'numeric', 
+                    month: 'long', 
+                    year: 'numeric',
+                    timeZone: 'Asia/Kolkata'
+                };
+                
+                const dateStr = now.toLocaleString('en-IN', options);
+                const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+                const daysLeftInMonth = lastDayOfMonth - now.getDate();
+                const lastDayOfYear = new Date(now.getFullYear(), 11, 31);
+                const daysLeftInYear = Math.floor((lastDayOfYear - now) / (1000 * 60 * 60 * 24));
+                
+                document.getElementById('current-date').textContent = dateStr;
+                document.getElementById('remaining-time').textContent = 
+                    `${daysLeftInMonth} days in ${now.toLocaleString('default', { month: 'long' })} | ${daysLeftInYear} days in ${now.getFullYear()}`;
+            }
+            
+            updateDateTime();
+            setInterval(updateDateTime, 60000); // Update every minute
+            
+            // Random stock ticker
+            function updateRandomStock() {
+                const allStocks = Object.values(sectorData).flat();
+                const randomStock = allStocks[Math.floor(Math.random() * allStocks.length)];
+                document.getElementById('random-stock').textContent = randomStock;
+            }
+            
+            updateRandomStock();
+            setInterval(updateRandomStock, 8000); // Change every 8 seconds
+            
+            // Random quote
+            function showRandomQuote() {
+                const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+                const quoteHTML = `
+                    <div class="quote">${randomQuote.text}</div>
+                    ${randomQuote.author ? `<div class="author">— ${randomQuote.author}</div>` : ''}
+                `;
+                document.getElementById('quote-display').innerHTML = quoteHTML;
+            }
+            
+            showRandomQuote();
+            
+            // Helper function to create stock list items
+            function createStockItem(stock) {
+                const stockItem = document.createElement('li');
+                stockItem.className = 'stock-item';
+                
+                const stockSpan = document.createElement('span');
+                stockSpan.textContent = stock;
+                stockItem.appendChild(stockSpan);
+                
+                stockItem.addEventListener('click', () => {
+                    window.open(`https://in.tradingview.com/chart/?symbol=NSE:${stock}`, '_blank');
+                });
+                
+                return stockItem;
+            }
+        });
+    </script>
 </body>
 </html>
