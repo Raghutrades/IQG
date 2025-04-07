@@ -3,159 +3,225 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SECTOR MAFIA: Professional Tracker</title>
+    <title>Intraday Quick Grabber</title>
     <style>
-        /* === YOUR EXTENSION'S STYLES (COPIED VERBATIM) === */
+        /* === CUSTOM FONT === */
         @font-face {
-            font-family: 'Quenton';
-            src: url('data:font/opentype;base64,/*[BASE64_FONT_DATA]*/') format('opentype');
+            font-family: 'MarketFont';
+            src: url('YOUR_CUSTOM_FONT.woff2') format('woff2');
+            font-display: swap;
         }
         
+        /* === COLOR THEMES === */
         :root {
-            --active-green: #4CAF50;
-            --inactive-red: #F44336;
-            --dark-bg: #181d28;
-            --card-bg: #232a3a;
-            --text-white: #ffffff;
-            --text-light: #e0e0e0;
-            --border-dark: #2d3546;
-            --gold-yellow: #FFD700;
-            --shadow-gradient: linear-gradient(to right, rgba(76, 175, 80, 0.3), rgba(33, 150, 243, 0.3), rgba(156, 39, 176, 0.3));
-            --sparkle-color: rgba(255, 215, 0, 0.8);
+            /* Dark Theme */
+            --dark-bg: #121420;
+            --dark-card: #1a1d2e;
+            --dark-text: #e0e3ff;
+            --dark-border: #2a3042;
+            --dark-accent: #4361ee;
+            --dark-glow: rgba(67, 97, 238, 0.3);
             
-            /* New light mode variables */
+            /* Light Theme */
             --light-bg: #f8fafc;
             --light-card: #ffffff;
             --light-text: #1e293b;
             --light-border: #e2e8f0;
+            --light-accent: #3b82f6;
+            --light-glow: rgba(59, 130, 246, 0.2);
+            
+            /* Gold Accents */
+            --gold-primary: #FFD700;
+            --gold-secondary: #FFC300;
+            
+            /* Current Theme Defaults */
+            --bg: var(--dark-bg);
+            --card: var(--dark-card);
+            --text: var(--dark-text);
+            --border: var(--dark-border);
+            --accent: var(--dark-accent);
+            --glow: var(--dark-glow);
         }
         
-        /* === DARK/LIGHT TOGGLE SYSTEM === */
+        .light-mode {
+            --bg: var(--light-bg);
+            --card: var(--light-card);
+            --text: var(--light-text);
+            --border: var(--light-border);
+            --accent: var(--light-accent);
+            --glow: var(--light-glow);
+        }
+        
+        /* === BASE STYLES === */
         body {
             font-family: 'Segoe UI', system-ui, sans-serif;
-            background: var(--dark-bg);
-            color: var(--text-white);
+            background: var(--bg);
+            color: var(--text);
             margin: 0;
-            transition: all 0.3s;
+            padding: 0;
+            transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
         }
         
-        body.light-mode {
-            background: var(--light-bg);
-            color: var(--light-text);
-            --card-bg: var(--light-card);
-            --text-white: var(--light-text);
-            --border-dark: var(--light-border);
-        }
-        
-        /* === HEADER (YOUR EXTENSION STYLE) === */
+        /* === HEADER STYLES === */
         .header {
-            padding: 12px 16px;
-            background: var(--card-bg);
-            border-bottom: 1px solid var(--border-dark);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            padding: 1.5rem 2rem;
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
             position: relative;
+            overflow: hidden;
         }
         
         .header::after {
             content: '';
             position: absolute;
-            bottom: -5px;
+            bottom: 0;
             left: 0;
             right: 0;
-            height: 5px;
-            background: var(--shadow-gradient);
-            filter: blur(8px);
+            height: 3px;
+            background: linear-gradient(90deg, #4361ee, #3a0ca3, #7209b7);
+            filter: blur(4px);
         }
         
-        .logo-container {
+        .title-container {
             display: flex;
-            align-items: center;
-            gap: 12px;
+            flex-direction: column;
+            gap: 0.5rem;
         }
         
-        .app-name {
-            font-size: 24px;
-            color: var(--gold-yellow);
-            font-weight: 700;
+        .main-title {
+            font-family: 'MarketFont', sans-serif;
+            font-size: 2.5rem;
+            color: var(--gold-primary);
+            margin: 0;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+            letter-spacing: 1px;
             animation: title-glow 2s infinite alternate;
         }
         
         @keyframes title-glow {
-            0% { text-shadow: 0 0 4px rgba(255, 215, 0, 0.6); }
-            100% { text-shadow: 0 0 15px rgba(255, 215, 0, 0.9); }
+            0% { text-shadow: 0 0 10px rgba(255, 215, 0, 0.3); }
+            100% { text-shadow: 0 0 20px rgba(255, 215, 0, 0.6); }
         }
         
-        .theme-toggle {
-            background: var(--card-bg);
-            border: 1px solid var(--border-dark);
-            border-radius: 50px;
-            padding: 8px 16px;
-            cursor: pointer;
+        .tagline-container {
             display: flex;
-            align-items: center;
-            gap: 8px;
+            gap: 1rem;
+            overflow: hidden;
+            height: 24px;
         }
-
-        /* === 5-COLUMN SECTOR GRID === */
+        
+        .tagline {
+            font-family: 'MarketFont', sans-serif;
+            font-size: 1rem;
+            color: var(--gold-secondary);
+            white-space: nowrap;
+            animation: scroll-tagline 30s linear infinite;
+        }
+        
+        @keyframes scroll-tagline {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        
+        /* === DATE/TIME DISPLAY === */
+        .datetime-container {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem 2rem;
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .datetime-card {
+            background: rgba(67, 97, 238, 0.1);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.75rem 1.25rem;
+            min-width: 200px;
+        }
+        
+        .datetime-card h3 {
+            margin: 0 0 0.5rem 0;
+            font-size: 0.9rem;
+            color: var(--accent);
+            opacity: 0.8;
+        }
+        
+        .datetime-card p {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+        
+        /* === SECTOR GRID (5 COLUMNS) === */
         .sector-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 1rem;
-            padding: 1rem;
+            gap: 1.5rem;
+            padding: 2rem;
         }
         
         .sector-table {
-            background: var(--card-bg);
-            border-radius: 8px;
+            background: var(--card);
+            border-radius: 12px;
+            border: 1px solid var(--border);
             overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            height: 380px; /* Fixed height - no scrolling */
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            height: 420px;
             display: flex;
             flex-direction: column;
+            transition: all 0.3s ease;
+        }
+        
+        .sector-table:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 40px var(--glow);
         }
         
         .sector-header {
-            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            background: linear-gradient(135deg, var(--accent), #3a0ca3);
             color: white;
-            padding: 12px;
+            padding: 1rem;
             font-weight: 600;
             text-align: center;
+            font-size: 1.1rem;
         }
         
         .stock-list {
-            padding: 8px;
-            flex-grow: 1;
-            overflow: hidden; /* Hide overflow */
+            flex: 1;
+            overflow: hidden;
+            padding: 0.5rem;
         }
         
         .stock-page {
             display: none;
+            height: 100%;
         }
         
         .stock-page.active {
-            display: block;
+            display: flex;
+            flex-direction: column;
         }
         
         .stock-item {
-            padding: 10px 8px;
-            margin: 4px 0;
+            padding: 0.75rem 1rem;
+            margin: 0.25rem 0;
             border-radius: 6px;
-            transition: all 0.2s;
             display: flex;
             justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
         }
         
         .stock-item:hover {
-            background: rgba(59, 130, 246, 0.1);
+            background: rgba(67, 97, 238, 0.1);
             cursor: pointer;
-            transform: translateX(4px);
+            transform: translateX(5px);
         }
         
         .stock-item::after {
             content: '→';
-            color: var(--gold-yellow);
+            color: var(--gold-primary);
             opacity: 0;
             transition: opacity 0.2s;
         }
@@ -164,90 +230,190 @@
             opacity: 1;
         }
         
+        /* === PAGINATION === */
         .pagination {
             display: flex;
             justify-content: center;
-            gap: 4px;
-            padding: 12px;
-            border-top: 1px solid var(--border-dark);
+            gap: 0.5rem;
+            padding: 1rem;
+            border-top: 1px solid var(--border);
         }
         
         .page-btn {
-            width: 30px;
-            height: 30px;
-            border-radius: 6px;
-            border: 1px solid var(--border-dark);
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
             background: transparent;
+            color: var(--text);
             cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .page-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
         }
         
         .page-btn.active {
-            background: #3b82f6;
+            background: var(--accent);
             color: white;
-            border-color: #3b82f6;
+            border-color: var(--accent);
         }
-
-        /* === YOUR 3D QUOTE BOX === */
+        
+        /* === 3D QUOTE BOX === */
         .quote-container {
-            padding: 20px;
-            margin: 20px auto;
             max-width: 800px;
-            font-size: 18px;
-            line-height: 1.6;
-            color: var(--text-white);
-            text-align: center;
-            background: linear-gradient(145deg, #1e2535, #2a3346);
-            border-radius: 8px;
-            position: relative;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: linear-gradient(145deg, var(--card), #232a3a);
+            border-radius: 12px;
             box-shadow: 
-                inset 0 0 25px rgba(0,0,0,0.5),
-                0 5px 15px rgba(0,0,0,0.3);
+                0 10px 30px rgba(0, 0, 0, 0.2),
+                inset 0 0 20px rgba(0, 0, 0, 0.3);
             transform: perspective(500px) rotateX(10deg);
-            font-style: italic;
-        }
-        
-        .light-mode .quote-container {
-            background: linear-gradient(145deg, #f1f5f9, #e2e8f0);
-            color: #1e293b;
-        }
-        
-        .quote-container::before,
-        .quote-container::after {
-            content: '"';
-            font-size: 42px;
-            font-family: 'Quenton', sans-serif;
-            color: var(--gold-yellow);
-            position: absolute;
-            opacity: 0.3;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
         }
         
         .quote-container::before {
-            top: 5px;
-            left: 10px;
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right,
+                transparent,
+                transparent,
+                transparent,
+                var(--gold-primary),
+                transparent
+            );
+            opacity: 0.1;
+            transform: rotate(30deg);
+            animation: shine 6s infinite;
         }
         
-        .quote-container::after {
-            bottom: 5px;
-            right: 10px;
+        @keyframes shine {
+            0% { transform: translateX(-100%) rotate(30deg); }
+            100% { transform: translateX(100%) rotate(30deg); }
         }
         
-        .author {
+        .quote-text {
+            font-size: 1.25rem;
+            line-height: 1.6;
+            font-style: italic;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .quote-author {
             display: block;
-            margin-top: 10px;
+            margin-top: 1rem;
+            text-align: right;
             font-weight: 600;
-            color: var(--gold-yellow);
+            color: var(--gold-primary);
+        }
+        
+        /* === THEME TOGGLE === */
+        .theme-toggle {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            padding: 0.75rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .theme-toggle:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 25px var(--glow);
+        }
+        
+        .theme-icon {
+            font-size: 1.25rem;
+        }
+        
+        /* === RESPONSIVE ADJUSTMENTS === */
+        @media (max-width: 1600px) {
+            .sector-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
+        @media (max-width: 1200px) {
+            .sector-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        @media (max-width: 900px) {
+            .sector-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .datetime-container {
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .sector-grid {
+                grid-template-columns: 1fr;
+                padding: 1rem;
+            }
+            
+            .header {
+                padding: 1rem;
+            }
+            
+            .main-title {
+                font-size: 2rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="logo-container">
-            <div class="app-name">SECTOR MAFIA</div>
+    <!-- Header with Title and Tagline -->
+    <header class="header">
+        <div class="title-container">
+            <h1 class="main-title">Intraday Quick Grabber</h1>
+            <div class="tagline-container">
+                <p class="tagline">Catch the Pulse, Ride the Move. • No Noise. Just Precision. • Built for Speed. Designed to Grab Gains. • Strike Fast, Exit Smarter. • From Sector Surge to Pocket Profit – Instantly. • Decode Momentum. Dominate the Move. • Fast Picks. Clean Breaks. Real Edge. • Find the Spark Before the Flame. • Scans That Speak the Market's Language. • One Click Ahead of the Herd.</p>
+            </div>
         </div>
-        <button class="theme-toggle" id="themeToggle">
-            <span id="themeIcon">🌙</span>
-            <span id="themeText">Dark Mode</span>
-        </button>
+    </header>
+    
+    <!-- Date/Time Display -->
+    <div class="datetime-container">
+        <div class="datetime-card">
+            <h3>Current Date</h3>
+            <p id="current-date">Loading...</p>
+        </div>
+        <div class="datetime-card">
+            <h3>Time (IST)</h3>
+            <p id="current-time">Loading...</p>
+        </div>
+        <div class="datetime-card">
+            <h3>Remaining in Month</h3>
+            <p id="days-month">Loading...</p>
+        </div>
+        <div class="datetime-card">
+            <h3>Remaining in Year</h3>
+            <p id="days-year">Loading...</p>
+        </div>
     </div>
     
     <!-- 5-Column Sector Grid -->
@@ -255,14 +421,38 @@
         <!-- Sectors will be inserted here by JavaScript -->
     </div>
     
-    <!-- Your 3D Quote Box -->
-    <div class="quote-container" id="quoteBox">
-        <div id="quoteText">"The stock market is filled with individuals who know the price of everything, but the value of nothing."</div>
-        <span class="author" id="quoteAuthor">- Philip Fisher</span>
+    <!-- 3D Quote Box -->
+    <div class="quote-container">
+        <p class="quote-text" id="quoteText">"The market is a device for transferring money from the impatient to the patient."</p>
+        <span class="quote-author" id="quoteAuthor">- Warren Buffett</span>
     </div>
+    
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" id="themeToggle">
+        <span class="theme-icon" id="themeIcon">🌙</span>
+        <span id="themeText">Dark Mode</span>
+    </button>
 
     <script>
-        // ===== YOUR EXTENSION'S QUOTES =====
+        // Stock data for all 15 sectors
+const sectorData = {
+    "NIFTY50": ["TRENT", "TCS", "NTPC", "BRITANNIA", "ICICIBANK", "ITC", "HINDUNILVR", "BHARTIARTL", "ADANIPORTS", "TECHM", "COALINDIA", "RELIANCE", "ONGC", "INFY", "NESTLEIND", "SBIN", "ASIANPAINT", "ADANIENT", "KOTAKBANK", "BPCL", "WIPRO", "MARUTI", "HCLTECH", "BAJFINANCE", "TATAMOTORS", "LT", "BEL", "HEROMOTOCO", "HDFCLIFE", "TITAN", "DRREDDY", "TATASTEEL", "CIPLA", "TATACONSUM", "POWERGRID", "JSWSTEEL", "BAJAJFINSV", "GRASIM", "APOLLOHOSP", "HINDALCO", "ULTRACEMCO", "BAJAJ-AUTO", "INDUSINDBK", "SBILIFE", "SHRIRANFIN", "HDFCBANK", "SUNPHARMA", "M&M", "EICHERMOT", "AXISBANK"],
+    "BANKING": ["ICICIBANK", "BANKBARODA", "SBIN", "KOTAKBANK", "FEDERALBNK", "INDIANB", "BANKINDIA", "INDUSINBK", "AUBANK", "HDFCBANK", "PNB", "IDFCFIRSTB", "CANBK", "AXISBANK"],
+    "AUTOMOBILE": ["EXIDEIND", "MOTHERSON", "APOLLOTYRE", "MARUTI", "TATAMOTORS", "BOSCHLTD", "HEROMOTOCO", "BALKRISIND", "TVSMOTOR", "SONACOMS", "TITAGARH", "TIINDIA", "BHARATFORG", "MRF", "BAJAJ-AUTO", "M&M", "EICHERMOT"],
+    "FINANCIAL SERVICES": ["ICICIBANK", "IRFC", "ICICIGI", "PFC", "ICICIPRULI", "SBICARD", "MUTHOOTFIN", "SBIN", "LICHSGFIN", "KOTAKBANK", "BAJFINANCE", "HDFCAMC", "POONAWALLA", "LICI", "HDFCLIFE", "HUDCO", "RECLTD", "CDSL", "JIOFIN", "BAJAJFINSV", "CHOLAFIN", "IIFL", "POLICYBZR", "MAXHEALTH", "SBILIFE", "SHRIRAMFIN", "ANGELONE", "BSE", "HDFCBANK", "PAYTM", "AXISBANK"],
+    "FMCG": ["BRITANNIA", "ITC", "HINDUNILVR", "DMART", "NESTLEIND", "COLPAL", "DABUR", "MARICO", "KALYANJIL", "ZOMATO", "VBL", "TATACONSUM", "PATANJALI", "UNITDSPR", "GODREJCP", "NYKAA", "SUPERMEIND"],
+    "INFORMATION TECHNOLOGY": ["TCS", "TECHM", "INFY", "WIPRO", "HCLTECH", "PERSISTENT", "COFORGE", "CAMS", "LTIM", "KPITTECH", "LTTS", "MPHASIS", "CYIENT", "TATAELXSI", "HFCL"],
+    "SENSEX": ["TCS", "NTPC", "ICICIBANK", "ITC", "HINDUNILVR", "BHARTIARTL", "ADANIPORTS", "TECHM", "RELIANCE", "INFY", "NESTLEIND", "SBIN", "ASIANPAINT", "KOTAKBANK", "MARUTI", "HCLTECH", "BAJFINANCE", "TATAMOTORS", "LT", "TITAN", "TATASTEEL", "POWERGRID", "JSWSTEEL", "BAJAJFINSV", "ULTRACEMCO", "INDUSINDBK", "HDFCBANK", "SUNPHARMA", "M&M", "AXISBANK"],
+    "METALS": ["ADANIENT", "JINDALSTEL", "SAIL", "TATASTEEL", "JSWSTEEL", "HINDALCO", "HINDCOPPER", "VEDL", "NATIONALUM", "NMDC", "JSL", "APLAPOLLO"],
+    "PHARMACEUTICALS": ["AUROPHARMA", "ZYDUSLIFE", "GLENMARK", "DRREDDY", "LAURUSLABS", "CIPLA", "LUPIN", "DIVISLAB", "TORNTPHARM", "GRANULES", "ALKEM", "SUNPHARMA", "BIOCON"],
+    "PSU BANKS": ["BANKBARODA", "SBIN", "INDIANB", "BANKINDIA", "UNIONBANK", "PNB", "CANBK"],
+    "PRIVATE BANKS": ["ICICIBANK", "KOTAKBANK", "FEDERALBNK", "RBLBANK", "BANDHANBNK", "INDUSINDBK", "HDFCBANK", "IDFCFIRSTB", "AXISBANK"],
+    "REALTY": ["NCC", "PHOENIXLTD", "PRESTIGE", "OBEROIRLTY", "GODREJPROP", "DLF", "LODHA", "NBCC", "IRB"],
+    "ENERGY": ["NTPC", "COALINDIA", "RELIANCE", "ONGC", "CESE", "SOLARINDS", "TATAPOWER", "TORNTPOWER", "BPCL", "IOC", "ADANIENSOL", "IREDA", "OIL", "POWERGRID", "ATGL", "CGPOWER", "PETRONET", "JSWENERGY", "SJVN", "NHPC", "IGL", "GMRAIRPORT", "ADANIGREEN"],
+    "CEMENT": ["AMBUJACEM", "ACC", "JKCEMENT", "ULTRACEMCO", "DALBHARAT", "SHREECEM", "RAMCOCEM"],
+    "MIDCAP SELECT": ["AUROPHARMA", "HINDUPETRO", "VOLTAS", "UPL", "HDFCAMC", "PERSISTENT", "FEDERALBNK", "POLYCAB", "COFORGE", "LUPIN", "ASTRAL", "PAGEIND", "PIIND", "BHARATFORG", "MRF", "JUBLFOOD", "CONCOR", "INDHOTEL", "GODREJPROP", "AUBANK", "ASHOKLEY", "MPHASIS", "IDFCFIRSTB", "IDEA", "CUMMINSIND"]
+};
+
         const quotes = [
     { text: "Opportunities don't happen, you create them.", author: "" },
     { text: "The market is always right. Never argue with it.", author: "" },
@@ -296,27 +486,7 @@
     { text: "The best investment you can make is in yourself.", author: "Warren Buffett" }
 ];
 
-        
-        // Stock data for all 15 sectors
-const sectorData = {
-    "NIFTY50": ["TRENT", "TCS", "NTPC", "BRITANNIA", "ICICIBANK", "ITC", "HINDUNILVR", "BHARTIARTL", "ADANIPORTS", "TECHM", "COALINDIA", "RELIANCE", "ONGC", "INFY", "NESTLEIND", "SBIN", "ASIANPAINT", "ADANIENT", "KOTAKBANK", "BPCL", "WIPRO", "MARUTI", "HCLTECH", "BAJFINANCE", "TATAMOTORS", "LT", "BEL", "HEROMOTOCO", "HDFCLIFE", "TITAN", "DRREDDY", "TATASTEEL", "CIPLA", "TATACONSUM", "POWERGRID", "JSWSTEEL", "BAJAJFINSV", "GRASIM", "APOLLOHOSP", "HINDALCO", "ULTRACEMCO", "BAJAJ-AUTO", "INDUSINDBK", "SBILIFE", "SHRIRANFIN", "HDFCBANK", "SUNPHARMA", "M&M", "EICHERMOT", "AXISBANK"],
-    "BANKING": ["ICICIBANK", "BANKBARODA", "SBIN", "KOTAKBANK", "FEDERALBNK", "INDIANB", "BANKINDIA", "INDUSINBK", "AUBANK", "HDFCBANK", "PNB", "IDFCFIRSTB", "CANBK", "AXISBANK"],
-    "AUTOMOBILE": ["EXIDEIND", "MOTHERSON", "APOLLOTYRE", "MARUTI", "TATAMOTORS", "BOSCHLTD", "HEROMOTOCO", "BALKRISIND", "TVSMOTOR", "SONACOMS", "TITAGARH", "TIINDIA", "BHARATFORG", "MRF", "BAJAJ-AUTO", "M&M", "EICHERMOT"],
-    "FINANCIAL SERVICES": ["ICICIBANK", "IRFC", "ICICIGI", "PFC", "ICICIPRULI", "SBICARD", "MUTHOOTFIN", "SBIN", "LICHSGFIN", "KOTAKBANK", "BAJFINANCE", "HDFCAMC", "POONAWALLA", "LICI", "HDFCLIFE", "HUDCO", "RECLTD", "CDSL", "JIOFIN", "BAJAJFINSV", "CHOLAFIN", "IIFL", "POLICYBZR", "MAXHEALTH", "SBILIFE", "SHRIRAMFIN", "ANGELONE", "BSE", "HDFCBANK", "PAYTM", "AXISBANK"],
-    "FMCG": ["BRITANNIA", "ITC", "HINDUNILVR", "DMART", "NESTLEIND", "COLPAL", "DABUR", "MARICO", "KALYANJIL", "ZOMATO", "VBL", "TATACONSUM", "PATANJALI", "UNITDSPR", "GODREJCP", "NYKAA", "SUPERMEIND"],
-    "INFORMATION TECHNOLOGY": ["TCS", "TECHM", "INFY", "WIPRO", "HCLTECH", "PERSISTENT", "COFORGE", "CAMS", "LTIM", "KPITTECH", "LTTS", "MPHASIS", "CYIENT", "TATAELXSI", "HFCL"],
-    "SENSEX": ["TCS", "NTPC", "ICICIBANK", "ITC", "HINDUNILVR", "BHARTIARTL", "ADANIPORTS", "TECHM", "RELIANCE", "INFY", "NESTLEIND", "SBIN", "ASIANPAINT", "KOTAKBANK", "MARUTI", "HCLTECH", "BAJFINANCE", "TATAMOTORS", "LT", "TITAN", "TATASTEEL", "POWERGRID", "JSWSTEEL", "BAJAJFINSV", "ULTRACEMCO", "INDUSINDBK", "HDFCBANK", "SUNPHARMA", "M&M", "AXISBANK"],
-    "METALS": ["ADANIENT", "JINDALSTEL", "SAIL", "TATASTEEL", "JSWSTEEL", "HINDALCO", "HINDCOPPER", "VEDL", "NATIONALUM", "NMDC", "JSL", "APLAPOLLO"],
-    "PHARMACEUTICALS": ["AUROPHARMA", "ZYDUSLIFE", "GLENMARK", "DRREDDY", "LAURUSLABS", "CIPLA", "LUPIN", "DIVISLAB", "TORNTPHARM", "GRANULES", "ALKEM", "SUNPHARMA", "BIOCON"],
-    "PSU BANKS": ["BANKBARODA", "SBIN", "INDIANB", "BANKINDIA", "UNIONBANK", "PNB", "CANBK"],
-    "PRIVATE BANKS": ["ICICIBANK", "KOTAKBANK", "FEDERALBNK", "RBLBANK", "BANDHANBNK", "INDUSINDBK", "HDFCBANK", "IDFCFIRSTB", "AXISBANK"],
-    "REALTY": ["NCC", "PHOENIXLTD", "PRESTIGE", "OBEROIRLTY", "GODREJPROP", "DLF", "LODHA", "NBCC", "IRB"],
-    "ENERGY": ["NTPC", "COALINDIA", "RELIANCE", "ONGC", "CESE", "SOLARINDS", "TATAPOWER", "TORNTPOWER", "BPCL", "IOC", "ADANIENSOL", "IREDA", "OIL", "POWERGRID", "ATGL", "CGPOWER", "PETRONET", "JSWENERGY", "SJVN", "NHPC", "IGL", "GMRAIRPORT", "ADANIGREEN"],
-    "CEMENT": ["AMBUJACEM", "ACC", "JKCEMENT", "ULTRACEMCO", "DALBHARAT", "SHREECEM", "RAMCOCEM"],
-    "MIDCAP SELECT": ["AUROPHARMA", "HINDUPETRO", "VOLTAS", "UPL", "HDFCAMC", "PERSISTENT", "FEDERALBNK", "POLYCAB", "COFORGE", "LUPIN", "ASTRAL", "PAGEIND", "PIIND", "BHARATFORG", "MRF", "JUBLFOOD", "CONCOR", "INDHOTEL", "GODREJPROP", "AUBANK", "ASHOKLEY", "MPHASIS", "IDFCFIRSTB", "IDEA", "CUMMINSIND"]
-};
 
-        
         // ===== THEME TOGGLE =====
         const themeToggle = document.getElementById('themeToggle');
         const themeIcon = document.getElementById('themeIcon');
@@ -339,13 +509,58 @@ const sectorData = {
         themeToggle.addEventListener('click', () => {
             const isDark = !document.body.classList.contains('light-mode');
             setTheme(!isDark);
+            // Add animation class
+            document.body.classList.add('theme-change');
+            setTimeout(() => {
+                document.body.classList.remove('theme-change');
+            }, 500);
         });
         
         // Check saved theme
         if (localStorage.getItem('theme') === 'light') {
             setTheme(false);
         }
+
+        // ===== DATE/TIME FUNCTIONS =====
+        function updateDateTime() {
+            const now = new Date();
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                timeZone: 'Asia/Kolkata'
+            };
+            
+            // Current Date
+            document.getElementById('current-date').textContent = now.toLocaleDateString('en-IN', options);
+            
+            // Current Time
+            const timeOptions = {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true,
+                timeZone: 'Asia/Kolkata'
+            };
+            document.getElementById('current-time').textContent = now.toLocaleTimeString('en-IN', timeOptions);
+            
+            // Days remaining in month
+            const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+            const daysInMonth = lastDayOfMonth.getDate();
+            const daysLeftMonth = daysInMonth - now.getDate();
+            document.getElementById('days-month').textContent = `${daysLeftMonth} days (${now.toLocaleString('default', { month: 'short' }) ${now.getFullYear()})`;
+            
+            // Days remaining in year
+            const lastDayOfYear = new Date(now.getFullYear(), 11, 31);
+            const daysLeftYear = Math.ceil((lastDayOfYear - now) / (1000 * 60 * 60 * 24));
+            document.getElementById('days-year').textContent = `${daysLeftYear} days (${now.getFullYear()})`;
+        }
         
+        // Update immediately and then every second
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+
         // ===== BUILD SECTOR GRID =====
         const sectorGrid = document.getElementById('sectorGrid');
         
@@ -370,15 +585,24 @@ const sectorData = {
                 
                 const startIdx = i * 10;
                 const endIdx = startIdx + 10;
-                stocks.slice(startIdx, endIdx).forEach(stock => {
+                const pageStocks = stocks.slice(startIdx, endIdx);
+                
+                // Ensure we always show 10 items (pad with empty if needed)
+                for (let j = 0; j < 10; j++) {
                     const stockItem = document.createElement('div');
                     stockItem.className = 'stock-item';
-                    stockItem.textContent = stock;
-                    stockItem.addEventListener('click', () => {
-                        window.open(`https://www.tradingview.com/chart/?symbol=NSE:${stock}`, '_blank');
-                    });
+                    
+                    if (j < pageStocks.length) {
+                        stockItem.textContent = pageStocks[j];
+                        stockItem.addEventListener('click', () => {
+                            window.open(`https://www.tradingview.com/chart/?symbol=NSE:${pageStocks[j]}`, '_blank');
+                        });
+                    } else {
+                        stockItem.style.visibility = 'hidden'; // Maintain consistent spacing
+                    }
+                    
                     pageDiv.appendChild(stockItem);
-                });
+                }
                 
                 stockList.appendChild(pageDiv);
                 
@@ -387,11 +611,14 @@ const sectorData = {
                 pageBtn.className = `page-btn ${i === 0 ? 'active' : ''}`;
                 pageBtn.textContent = i + 1;
                 pageBtn.addEventListener('click', () => {
+                    // Hide all pages
                     stockList.querySelectorAll('.stock-page').forEach(page => {
                         page.classList.remove('active');
                     });
+                    // Show selected page
                     pageDiv.classList.add('active');
                     
+                    // Update active pagination button
                     pagination.querySelectorAll('.page-btn').forEach(btn => {
                         btn.classList.remove('active');
                     });
@@ -402,8 +629,8 @@ const sectorData = {
             
             sectorGrid.appendChild(sectorDiv);
         });
-        
-        // ===== ROTATE QUOTES =====
+
+        // ===== RANDOM QUOTE =====
         function showRandomQuote() {
             const quote = quotes[Math.floor(Math.random() * quotes.length)];
             document.getElementById('quoteText').textContent = `"${quote.text}"`;
