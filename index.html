@@ -8,12 +8,23 @@
 </head>
 <body>
   <div class="container">
-    <h1>NIFTY50 Stock Tracker</h1>
+    <h1>📊 NIFTY50 Stock Tracker</h1>
     
     <div class="controls">
       <div class="search-box">
         <input type="text" id="search" placeholder="Search stocks (e.g., RELIANCE)" autocomplete="off">
       </div>
+      
+      <div class="timeframe-selector">
+        <label for="timeframe">Timeframe:</label>
+        <select id="timeframe">
+          <option value="daily">Daily</option>
+          <option value="weekly">Weekly</option>
+          <option value="monthly">Monthly</option>
+        </select>
+      </div>
+      
+      <button id="refresh-btn">🔄 Refresh Data</button>
     </div>
 
     <div class="table-container">
@@ -22,18 +33,19 @@
           <tr>
             <th>Company</th>
             <th>Ticker</th>
-            <th>LTP</th>
             <th>Open</th>
             <th>High</th>
             <th>Low</th>
-            <th>Chart</th>
+            <th>Close</th>
+            <th>Volume</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody id="stocks-body"></tbody>
       </table>
     </div>
 
-    <div class="status" id="status">Loading data... (5 requests/minute limit)</div>
+    <div class="status" id="status">Loading initial data... (5 API calls/minute limit)</div>
   </div>
 
   <script src="script.js"></script>
