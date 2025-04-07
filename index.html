@@ -5,22 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Intraday Quick Grabber</title>
     <style>
-        /* === CUSTOM FONT === */
         @font-face {
-            font-family: 'MarketFont';
-            src: url('quenton.otf') format('woff2');
-            font-display: swap;
+            font-family: 'Quenton';
+            src: url('quenton.otf') format('opentype');
         }
-        
-        /* === COLOR THEMES === */
+
         :root {
-            /* Dark Theme */
-            --dark-bg: #121420;
-            --dark-card: #1a1d2e;
-            --dark-text: #e0e3ff;
-            --dark-border: #2a3042;
-            --dark-accent: #4361ee;
-            --dark-glow: rgba(67, 97, 238, 0.3);
+            --dark-bg: #181d28;
+            --card-bg: #232a3a;
+            --text-white: #ffffff;
+            --text-light: #e0e0e0;
+            --border-dark: #2d3546;
+            --gold-yellow: #FFD700;
+            --gold-secondary: #FFC300;
+            --active-green: #4CAF50;
+            --shadow-gradient: linear-gradient(
+                to right,
+                rgba(76, 175, 80, 0.3),
+                rgba(33, 150, 243, 0.3),
+                rgba(156, 39, 176, 0.3)
+            );
             
             /* Light Theme */
             --light-bg: #f8fafc;
@@ -28,19 +32,13 @@
             --light-text: #1e293b;
             --light-border: #e2e8f0;
             --light-accent: #3b82f6;
-            --light-glow: rgba(59, 130, 246, 0.2);
-            
-            /* Gold Accents */
-            --gold-primary: #FFD700;
-            --gold-secondary: #FFC300;
             
             /* Current Theme Defaults */
             --bg: var(--dark-bg);
-            --card: var(--dark-card);
-            --text: var(--dark-text);
-            --border: var(--dark-border);
-            --accent: var(--dark-accent);
-            --glow: var(--dark-glow);
+            --card: var(--card-bg);
+            --text: var(--text-white);
+            --border: var(--border-dark);
+            --accent: var(--active-green);
         }
         
         .light-mode {
@@ -49,22 +47,23 @@
             --text: var(--light-text);
             --border: var(--light-border);
             --accent: var(--light-accent);
-            --glow: var(--light-glow);
+            --gold-yellow: #d4af37;
         }
         
-        /* === BASE STYLES === */
         body {
             font-family: 'Segoe UI', system-ui, sans-serif;
             background: var(--bg);
             color: var(--text);
             margin: 0;
             padding: 0;
-            transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
         }
         
         /* === HEADER STYLES === */
         .header {
-            padding: 1.5rem 2rem;
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
+            padding: 1rem 2rem;
             background: var(--card);
             border-bottom: 1px solid var(--border);
             position: relative;
@@ -77,21 +76,37 @@
             left: 0;
             right: 0;
             height: 3px;
-            background: linear-gradient(90deg, #4361ee, #3a0ca3, #7209b7);
+            background: var(--shadow-gradient);
             filter: blur(4px);
+        }
+        
+        .datetime-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .datetime-item {
+            display: flex;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .datetime-label {
+            font-weight: 600;
+            color: var(--gold-secondary);
         }
         
         .title-container {
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
             align-items: center;
         }
         
         .main-title {
-            font-family: 'MarketFont', sans-serif;
+            font-family: 'Quenton', sans-serif;
             font-size: 2.5rem;
-            color: var(--gold-primary);
+            color: var(--gold-yellow);
             margin: 0;
             text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
             letter-spacing: 1px;
@@ -103,72 +118,36 @@
             100% { text-shadow: 0 0 20px rgba(255, 215, 0, 0.6); }
         }
         
-        .tagline-container {
-            height: 24px;
+        .tagline {
+            font-family: system-ui, sans-serif;
+            font-size: 1rem;
+            color: var(--text-white);
+            margin-top: 0.5rem;
             text-align: center;
         }
         
-        .tagline {
-            font-family: 'MarketFont', sans-serif;
-            font-size: 1rem;
-            color: var(--gold-secondary);
-            opacity: 0;
-            position: absolute;
-            transition: opacity 0.5s ease;
+        .light-mode .tagline {
+            color: var(--light-text);
         }
         
-        .tagline.active {
-            opacity: 1;
-        }
-        
-        /* === RANDOM TICKER DISPLAY === */
         .ticker-display {
             background: var(--card);
             border-radius: 50px;
             padding: 0.5rem 1.5rem;
-            margin: 1rem auto;
-            width: fit-content;
             border: 1px solid var(--border);
-            box-shadow: 0 0 15px var(--glow);
+            box-shadow: 0 0 15px rgba(76, 175, 80, 0.3);
             animation: pulse 2s infinite alternate;
+            font-weight: 600;
+            align-self: center;
+            justify-self: end;
         }
         
         @keyframes pulse {
-            0% { box-shadow: 0 0 15px var(--glow); }
-            100% { box-shadow: 0 0 25px rgba(255, 215, 0, 0.5); }
+            0% { box-shadow: 0 0 15px rgba(76, 175, 80, 0.3); }
+            100% { box-shadow: 0 0 25px rgba(76, 175, 80, 0.5); }
         }
         
-        /* === DATE/TIME DISPLAY === */
-        .datetime-container {
-            display: flex;
-            justify-content: space-between;
-            padding: 1rem 2rem;
-            background: var(--card);
-            border-bottom: 1px solid var(--border);
-        }
-        
-        .datetime-card {
-            background: rgba(67, 97, 238, 0.1);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 0.75rem 1.25rem;
-            min-width: 200px;
-        }
-        
-        .datetime-card h3 {
-            margin: 0 0 0.5rem 0;
-            font-size: 0.9rem;
-            color: var(--accent);
-            opacity: 0.8;
-        }
-        
-        .datetime-card p {
-            margin: 0;
-            font-size: 1.1rem;
-            font-weight: 500;
-        }
-        
-        /* === SECTOR GRID (5 COLUMNS) === */
+        /* === SECTOR GRID === */
         .sector-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
@@ -190,7 +169,7 @@
         
         .sector-table:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 40px var(--glow);
+            box-shadow: 0 8px 40px rgba(76, 175, 80, 0.2);
         }
         
         .sector-header {
@@ -229,14 +208,14 @@
         }
         
         .stock-item:hover {
-            background: rgba(67, 97, 238, 0.1);
+            background: rgba(76, 175, 80, 0.1);
             cursor: pointer;
             transform: translateX(5px);
         }
         
         .stock-item::after {
             content: '→';
-            color: var(--gold-primary);
+            color: var(--gold-yellow);
             opacity: 0;
             transition: opacity 0.2s;
         }
@@ -276,7 +255,7 @@
             border-color: var(--accent);
         }
         
-        /* === 3D QUOTE BOX === */
+        /* === QUOTE CONTAINER === */
         .quote-container {
             max-width: 800px;
             margin: 2rem auto;
@@ -290,6 +269,10 @@
             position: relative;
             overflow: hidden;
             transition: all 0.4s ease;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
         
         .quote-text {
@@ -298,7 +281,8 @@
             font-style: italic;
             position: relative;
             z-index: 2;
-            transition: opacity 0.5s ease;
+            margin: 0;
+            text-align: center;
         }
         
         .quote-author {
@@ -306,8 +290,20 @@
             margin-top: 1rem;
             text-align: right;
             font-weight: 600;
-            color: var(--gold-primary);
-            transition: opacity 0.5s ease;
+            color: var(--gold-yellow);
+        }
+        
+        /* === FOOTER === */
+        .footer {
+            text-align: center;
+            padding: 1rem;
+            font-size: 0.9rem;
+            color: var(--text);
+        }
+        
+        .footer a {
+            color: var(--accent);
+            text-decoration: none;
         }
         
         /* === THEME TOGGLE === */
@@ -330,7 +326,7 @@
         
         .theme-toggle:hover {
             transform: scale(1.05);
-            box-shadow: 0 6px 25px var(--glow);
+            box-shadow: 0 6px 25px rgba(76, 175, 80, 0.3);
         }
         
         .theme-icon {
@@ -355,9 +351,16 @@
                 grid-template-columns: repeat(2, 1fr);
             }
             
-            .datetime-container {
-                flex-wrap: wrap;
+            .header {
+                grid-template-columns: 1fr;
                 gap: 1rem;
+                text-align: center;
+            }
+            
+            .datetime-container {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
             }
         }
         
@@ -378,50 +381,51 @@
     </style>
 </head>
 <body>
-    <!-- Header with Title and Tagline -->
+    <!-- Header with Date/Time, Title, and Ticker -->
     <header class="header">
+        <div class="datetime-container">
+            <div class="datetime-item">
+                <span class="datetime-label">Date:</span>
+                <span id="current-date">Loading...</span>
+            </div>
+            <div class="datetime-item">
+                <span class="datetime-label">Time:</span>
+                <span id="current-time">Loading...</span>
+            </div>
+            <div class="datetime-item">
+                <span class="datetime-label">Remaining in Month:</span>
+                <span id="days-month">Loading...</span>
+            </div>
+            <div class="datetime-item">
+                <span class="datetime-label">Remaining in Year:</span>
+                <span id="days-year">Loading...</span>
+            </div>
+        </div>
+        
         <div class="title-container">
             <h1 class="main-title">Intraday Quick Grabber</h1>
-            <div class="tagline-container" id="taglineContainer">
-                <!-- Taglines will be inserted here by JavaScript -->
-            </div>
+            <div class="tagline" id="tagline">Catch the Pulse, Ride the Move.</div>
+        </div>
+        
+        <div class="ticker-display" id="randomTicker">
+            Loading ticker...
         </div>
     </header>
     
-    <!-- Random Ticker Display -->
-    <div class="ticker-display" id="randomTicker">
-        Loading ticker...
-    </div>
-    
-    <!-- Date/Time Display -->
-    <div class="datetime-container">
-        <div class="datetime-card">
-            <h3>Current Date</h3>
-            <p id="current-date">Loading...</p>
-        </div>
-        <div class="datetime-card">
-            <h3>Time (IST)</h3>
-            <p id="current-time">Loading...</p>
-        </div>
-        <div class="datetime-card">
-            <h3>Remaining in Month</h3>
-            <p id="days-month">Loading...</p>
-        </div>
-        <div class="datetime-card">
-            <h3>Remaining in Year</h3>
-            <p id="days-year">Loading...</p>
-        </div>
-    </div>
-    
-    <!-- 5-Column Sector Grid -->
+    <!-- Sector Grid -->
     <div class="sector-grid" id="sectorGrid">
         <!-- Sectors will be inserted here by JavaScript -->
     </div>
     
-    <!-- 3D Quote Box -->
+    <!-- Quote Container -->
     <div class="quote-container">
         <p class="quote-text" id="quoteText">"The market is a device for transferring money from the impatient to the patient."</p>
         <span class="quote-author" id="quoteAuthor">- Warren Buffett</span>
+    </div>
+    
+    <!-- Footer -->
+    <div class="footer">
+        Designed by <a href="https://www.instagram.com/nerdyintruder/" target="_blank">@Nerdyintruder</a>
     </div>
     
     <!-- Theme Toggle -->
@@ -501,7 +505,7 @@ const sectorData = {
             // Initialize all components
             initThemeToggle();
             initDateTime();
-            initTaglines();
+            initTagline();
             initRandomTicker();
             initSectorGrid();
             initQuotes();
@@ -567,12 +571,12 @@ const sectorData = {
                 const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
                 const daysInMonth = lastDayOfMonth.getDate();
                 const daysLeftMonth = daysInMonth - now.getDate();
-                document.getElementById('days-month').textContent = `${daysLeftMonth} days (${now.toLocaleString('default', { month: 'short' })} ${now.getFullYear()})`;
+                document.getElementById('days-month').textContent = `${daysLeftMonth} days`;
                 
                 // Days remaining in year
                 const lastDayOfYear = new Date(now.getFullYear(), 11, 31);
                 const daysLeftYear = Math.ceil((lastDayOfYear - now) / (1000 * 60 * 60 * 24));
-                document.getElementById('days-year').textContent = `${daysLeftYear} days (${now.getFullYear()})`;
+                document.getElementById('days-year').textContent = `${daysLeftYear} days`;
             }
             
             // Update immediately and then every second
@@ -580,31 +584,11 @@ const sectorData = {
             setInterval(updateDateTime, 1000);
         }
 
-        // ===== TAGLINES =====
-        function initTaglines() {
-            const container = document.getElementById('taglineContainer');
-            
-            // Create all tagline elements
-            punchlines.forEach((line, index) => {
-                const tagline = document.createElement('div');
-                tagline.className = 'tagline';
-                tagline.textContent = line;
-                tagline.dataset.index = index;
-                container.appendChild(tagline);
-            });
-            
-            // Show first tagline
-            container.querySelector('.tagline').classList.add('active');
-            
-            // Rotate taglines
-            let currentIndex = 0;
-            setInterval(() => {
-                const taglines = container.querySelectorAll('.tagline');
-                taglines[currentIndex].classList.remove('active');
-                
-                currentIndex = (currentIndex + 1) % punchlines.length;
-                taglines[currentIndex].classList.add('active');
-            }, 5000);
+        // ===== TAGLINE =====
+        function initTagline() {
+            const taglineElement = document.getElementById('tagline');
+            const randomPunchline = punchlines[Math.floor(Math.random() * punchlines.length)];
+            taglineElement.textContent = randomPunchline;
         }
 
         // ===== RANDOM TICKER =====
@@ -636,7 +620,7 @@ const sectorData = {
                 sectorDiv.innerHTML = `
                     <div class="sector-header">${sectorName}</div>
                     <div class="stock-list" id="${sectorName}-stocks"></div>
-                    <div class="pagination" id="${sectorName}-pagination"></div>
+                    ${stocks.length > 10 ? `<div class="pagination" id="${sectorName}-pagination"></div>` : ''}
                 `;
                 
                 const stockList = sectorDiv.querySelector('.stock-list');
@@ -673,25 +657,27 @@ const sectorData = {
                     
                     stockList.appendChild(pageDiv);
                     
-                    // Pagination buttons
-                    const pageBtn = document.createElement('button');
-                    pageBtn.className = `page-btn ${i === 0 ? 'active' : ''}`;
-                    pageBtn.textContent = i + 1;
-                    pageBtn.addEventListener('click', () => {
-                        // Hide all pages
-                        stockList.querySelectorAll('.stock-page').forEach(page => {
-                            page.classList.remove('active');
+                    // Only add pagination if needed
+                    if (pageCount > 1) {
+                        const pageBtn = document.createElement('button');
+                        pageBtn.className = `page-btn ${i === 0 ? 'active' : ''}`;
+                        pageBtn.textContent = i + 1;
+                        pageBtn.addEventListener('click', () => {
+                            // Hide all pages
+                            stockList.querySelectorAll('.stock-page').forEach(page => {
+                                page.classList.remove('active');
+                            });
+                            // Show selected page
+                            pageDiv.classList.add('active');
+                            
+                            // Update active pagination button
+                            pagination.querySelectorAll('.page-btn').forEach(btn => {
+                                btn.classList.remove('active');
+                            });
+                            pageBtn.classList.add('active');
                         });
-                        // Show selected page
-                        pageDiv.classList.add('active');
-                        
-                        // Update active pagination button
-                        pagination.querySelectorAll('.page-btn').forEach(btn => {
-                            btn.classList.remove('active');
-                        });
-                        pageBtn.classList.add('active');
-                    });
-                    pagination.appendChild(pageBtn);
+                        pagination.appendChild(pageBtn);
+                    }
                 }
                 
                 sectorGrid.appendChild(sectorDiv);
@@ -704,19 +690,9 @@ const sectorData = {
             const quoteAuthor = document.getElementById('quoteAuthor');
             
             function showRandomQuote() {
-                // Fade out
-                quoteText.style.opacity = 0;
-                quoteAuthor.style.opacity = 0;
-                
-                setTimeout(() => {
-                    const quote = quotes[Math.floor(Math.random() * quotes.length)];
-                    quoteText.textContent = `"${quote.text}"`;
-                    quoteAuthor.textContent = quote.author ? `- ${quote.author}` : '';
-                    
-                    // Fade in
-                    quoteText.style.opacity = 1;
-                    quoteAuthor.style.opacity = 1;
-                }, 500);
+                const quote = quotes[Math.floor(Math.random() * quotes.length)];
+                quoteText.textContent = `"${quote.text}"`;
+                quoteAuthor.textContent = quote.author ? `- ${quote.author}` : '';
             }
             
             showRandomQuote();
