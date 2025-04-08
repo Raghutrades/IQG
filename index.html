@@ -109,19 +109,19 @@
         }
         
         .logo {
-    width: 100px;  /* Updated from 60px */
-    height: 100px; /* Updated from 60px */
-    border-radius: 8px;
-    border: 1px solid rgba(255,255,255,0.1);
-    box-shadow: 0 0 20px rgba(76, 175, 80, 0.6);
-    object-fit: contain;
-    background: rgba(255,255,255,0.05);
-    z-index: 2;
-    animation: 
-        logo-pulse-green 2s infinite alternate,
-        logo-bounce 0.8s ease-in-out;
-    transform-origin: center;
-}
+            width: 100px;
+            height: 100px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 0 20px rgba(76, 175, 80, 0.6);
+            object-fit: contain;
+            background: rgba(255,255,255,0.05);
+            z-index: 2;
+            animation: 
+                logo-pulse-green 2s infinite alternate,
+                logo-bounce 0.8s ease-in-out;
+            transform-origin: center;
+        }
 
         @keyframes logo-bounce {
             0%, 100% { transform: scale(1); }
@@ -216,6 +216,7 @@
             display: flex;
             flex-direction: column;
             transition: all 0.3s ease;
+            position: relative; /* Added for pagination positioning */
         }
         
         .sector-table:hover {
@@ -230,12 +231,16 @@
             font-weight: 600;
             text-align: center;
             font-size: 1.1rem;
+            position: sticky;
+            top: 0;
+            z-index: 1;
         }
         
         .stock-list {
             flex: 1;
-            overflow: hidden;
+            overflow-y: auto; /* Makes content scrollable */
             padding: 0.5rem;
+            position: relative;
         }
         
         .stock-page {
@@ -275,35 +280,42 @@
             opacity: 1;
         }
         
-        /* === PAGINATION === */
-        .pagination {
+        /* === NEW PAGINATION STYLES === */
+        .mini-pagination {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
             display: flex;
-            justify-content: center;
-            gap: 0.5rem;
-            padding: 1rem;
-            border-top: 1px solid var(--border);
+            gap: 5px;
+            background: rgba(0,0,0,0.3);
+            padding: 5px;
+            border-radius: 20px;
+            backdrop-filter: blur(5px);
+            z-index: 2;
         }
         
-        .page-btn {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            background: transparent;
+        .mini-page-btn {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(255,255,255,0.1);
             color: var(--text);
             cursor: pointer;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             transition: all 0.2s ease;
         }
         
-        .page-btn:hover {
-            border-color: var(--accent);
-            color: var(--accent);
+        .mini-page-btn:hover {
+            background: rgba(255,255,255,0.2);
         }
         
-        .page-btn.active {
+        .mini-page-btn.active {
             background: var(--accent);
             color: white;
-            border-color: var(--accent);
         }
         
         /* === 3D QUOTE BOX === */
@@ -703,11 +715,13 @@ const sectorData = {
                 sectorDiv.innerHTML = `
                     <div class="sector-header">${sectorName}</div>
                     <div class="stock-list" id="${sectorName}-stocks"></div>
-                    ${stocks.length > 10 ? `<div class="pagination" id="${sectorName}-pagination"></div>` : ''}
                 `;
                 
                 const stockList = sectorDiv.querySelector('.stock-list');
-                const pagination = sectorDiv.querySelector('.pagination');
+                
+                // Create mini pagination container
+                const miniPagination = document.createElement('div');
+                miniPagination.className = 'mini-pagination';
                 
                 const pageCount = Math.ceil(stocks.length / 10);
                 for (let i = 0; i < pageCount; i++) {
@@ -739,7 +753,7 @@ const sectorData = {
                     
                     if (pageCount > 1) {
                         const pageBtn = document.createElement('button');
-                        pageBtn.className = `page-btn ${i === 0 ? 'active' : ''}`;
+                        pageBtn.className = `mini-page-btn ${i === 0 ? 'active' : ''}`;
                         pageBtn.textContent = i + 1;
                         pageBtn.addEventListener('click', () => {
                             stockList.querySelectorAll('.stock-page').forEach(page => {
@@ -747,13 +761,17 @@ const sectorData = {
                             });
                             pageDiv.classList.add('active');
                             
-                            pagination.querySelectorAll('.page-btn').forEach(btn => {
+                            miniPagination.querySelectorAll('.mini-page-btn').forEach(btn => {
                                 btn.classList.remove('active');
                             });
                             pageBtn.classList.add('active');
                         });
-                        pagination.appendChild(pageBtn);
+                        miniPagination.appendChild(pageBtn);
                     }
+                }
+                
+                if (pageCount > 1) {
+                    sectorDiv.appendChild(miniPagination);
                 }
                 
                 sectorGrid.appendChild(sectorDiv);
