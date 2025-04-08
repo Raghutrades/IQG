@@ -255,6 +255,8 @@
             padding: 0.5rem;
             position: relative;
             scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+            touch-action: pan-y;
         }
         
         .stock-list::-webkit-scrollbar {
@@ -687,6 +689,105 @@
             font-size: 1.25rem;
         }
         
+        /* === SCAN MODE TOGGLE === */
+        #ragsym-scan-toggle {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            background: linear-gradient(135deg, #4361ee, #3a0ca3);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 30px rgba(67, 97, 238, 0.4);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+        
+        #ragsym-scan-toggle:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 40px rgba(67, 97, 238, 0.6);
+        }
+        
+        #ragsym-scan-toggle.active {
+            background: linear-gradient(135deg, #4cc9f0, #3a0ca3);
+        }
+        
+        .pulse-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 2px solid #FFD700;
+            border-radius: 50px;
+            top: 0;
+            left: 0;
+            animation: ragsym-pulse 2s infinite;
+            opacity: 0;
+            z-index: -1;
+        }
+        
+        @keyframes ragsym-pulse {
+            0% { transform: scale(0.95); opacity: 0.7; }
+            100% { transform: scale(1.1); opacity: 0; }
+        }
+        
+        /* === CHART PREVIEW === */
+        #ragsym-chart-preview {
+            position: fixed;
+            width: 400px;
+            height: 300px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            z-index: 999;
+            display: none;
+            overflow: hidden;
+        }
+        
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background: linear-gradient(135deg, var(--accent), #3a0ca3);
+            color: white;
+        }
+        
+        .full-chart-btn {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .chart-iframe {
+            width: 100%;
+            height: calc(100% - 40px);
+            border: none;
+        }
+        
+        .ragsym-highlight {
+            background: rgba(67, 97, 238, 0.2);
+            border-radius: 3px;
+            padding: 0 2px;
+            position: relative;
+        }
+        
+        .ragsym-highlight:hover::after {
+            content: '📈';
+            position: absolute;
+            right: -20px;
+        }
+        
         /* === RESPONSIVE ADJUSTMENTS === */
         @media (max-width: 1600px) {
             .sector-grid {
@@ -728,6 +829,20 @@
             .ticker-display {
                 justify-self: center;
             }
+            
+            #ragsym-scan-toggle {
+                bottom: 80px;
+                left: 20px;
+                right: auto;
+            }
+            
+            #ragsym-chart-preview {
+                width: 300px;
+                height: 250px;
+                left: 50% !important;
+                transform: translateX(-50%);
+                top: 120px !important;
+            }
         }
         
         @media (max-width: 600px) {
@@ -756,6 +871,17 @@
             .trades-table th, 
             .trades-table td {
                 padding: 0.5rem;
+            }
+            
+            #ragsym-scan-toggle {
+                padding: 10px 15px;
+                font-size: 0.9rem;
+                bottom: 70px;
+            }
+            
+            #ragsym-chart-preview {
+                width: 280px;
+                height: 220px;
             }
         }
     </style>
@@ -937,6 +1063,21 @@
         <span id="themeText">Dark Mode</span>
     </button>
 
+    <!-- Scan Mode Toggle -->
+    <button id="ragsym-scan-toggle">
+        <span>🔍 Scan Mode</span>
+        <div class="pulse-ring"></div>
+    </button>
+
+    <!-- Chart Preview Container -->
+    <div id="ragsym-chart-preview">
+        <div class="preview-header">
+            <span class="ticker-name">RELIANCE</span>
+            <button class="full-chart-btn">Full Chart ↗</button>
+        </div>
+        <iframe class="chart-iframe"></iframe>
+    </div>
+
     <script>
         // Stock data for all 15 sectors
         const sectorData = {
@@ -1014,6 +1155,7 @@
             initCalculator();
             initTradeMultiplier();
             initCollapsibleSections();
+            initScanMode();
         });
 
         // ===== THEME TOGGLE =====
@@ -1405,189 +1547,116 @@
                 document.getElementById('toggleDetails').textContent = 'Show Detailed Breakdown ▼';
             }
         }
-    </script>
-    <script>
-    // ===== TICKER SCAN SYSTEM =====
-    (function() {
-        // 1. Floating Toggle Button
-        const toggle = document.createElement('button');
-        toggle.id = 'ragsym-scan-toggle';
-        toggle.innerHTML = `
-            <span>🔍 Scan Mode</span>
-            <div class="pulse-ring"></div>
-        `;
-        document.body.appendChild(toggle);
 
-        // 2. Chart Preview Container
-        const preview = document.createElement('div');
-        preview.id = 'ragsym-chart-preview';
-        preview.innerHTML = `
-            <div class="preview-header">
-                <span class="ticker-name">RELIANCE</span>
-                <button class="full-chart-btn">Full Chart ↗</button>
-            </div>
-            <iframe class="chart-iframe"></iframe>
-        `;
-        document.body.appendChild(preview);
-
-        // 3. Dynamic Styles
-        const style = document.createElement('style');
-        style.textContent = `
-            #ragsym-scan-toggle {
-                position: fixed;
-                bottom: 30px;
-                right: 30px;
-                background: linear-gradient(135deg, #4361ee, #3a0ca3);
-                color: white;
-                padding: 12px 24px;
-                border-radius: 50px;
-                border: none;
-                font-weight: 600;
-                cursor: pointer;
-                box-shadow: 0 4px 30px rgba(67, 97, 238, 0.4);
-                z-index: 1000;
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                transition: all 0.3s;
-            }
-            #ragsym-scan-toggle:hover {
-                transform: translateY(-3px);
-                box-shadow: 0 8px 40px rgba(67, 97, 238, 0.6);
-            }
-            #ragsym-scan-toggle.active {
-                background: linear-gradient(135deg, #4cc9f0, #3a0ca3);
-            }
-            .pulse-ring {
-                position: absolute;
-                width: 100%;
-                height: 100%;
-                border: 2px solid #FFD700;
-                border-radius: 50px;
-                top: 0;
-                left: 0;
-                animation: ragsym-pulse 2s infinite;
-                opacity: 0;
-                z-index: -1;
-            }
-            @keyframes ragsym-pulse {
-                0% { transform: scale(0.95); opacity: 0.7; }
-                100% { transform: scale(1.1); opacity: 0; }
-            }
-            #ragsym-chart-preview {
-                position: fixed;
-                width: 400px;
-                height: 300px;
-                background: var(--dark-card);
-                border: 1px solid var(--border);
-                border-radius: 12px;
-                box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-                z-index: 999;
-                display: none;
-                overflow: hidden;
-            }
-            .preview-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 10px 15px;
-                background: linear-gradient(135deg, var(--accent), #3a0ca3);
-                color: white;
-            }
-            .full-chart-btn {
-                background: rgba(255,255,255,0.1);
-                border: none;
-                color: white;
-                padding: 5px 10px;
-                border-radius: 4px;
-                cursor: pointer;
-                font-size: 12px;
-            }
-            .chart-iframe {
-                width: 100%;
-                height: calc(100% - 40px);
-                border: none;
-            }
-            .ragsym-highlight {
-                background: rgba(67, 97, 238, 0.2);
-                border-radius: 3px;
-                padding: 0 2px;
-                position: relative;
-            }
-            .ragsym-highlight:hover::after {
-                content: '📈';
-                position: absolute;
-                right: -20px;
-            }
-        `;
-        document.head.appendChild(style);
-
-        // 4. Core Functionality
-        let scanActive = false;
-        let currentTicker = null;
-        
-        // Toggle scan mode
-        toggle.addEventListener('click', () => {
-            scanActive = !scanActive;
-            toggle.classList.toggle('active');
-            if (!scanActive) hidePreview();
-        });
-
-        // Ticker detection
-        document.addEventListener('mouseover', (e) => {
-            if (!scanActive) return;
+        // ===== SCAN MODE SYSTEM =====
+        function initScanMode() {
+            const toggle = document.getElementById('ragsym-scan-toggle');
+            const preview = document.getElementById('ragsym-chart-preview');
+            const iframe = preview.querySelector('.chart-iframe');
+            const fullChartBtn = preview.querySelector('.full-chart-btn');
+            const tickerName = preview.querySelector('.ticker-name');
             
-            const text = e.target?.textContent?.trim() || '';
-            const ticker = text.match(/^[A-Z]{2,10}$/)?.[0];
+            let scanActive = false;
+            let currentTicker = null;
             
-            if (ticker && isKnownTicker(ticker)) {
-                highlightTicker(e.target, ticker);
-                showPreview(ticker);
+            // Toggle scan mode
+            toggle.addEventListener('click', () => {
+                scanActive = !scanActive;
+                toggle.classList.toggle('active');
+                if (!scanActive) hidePreview();
+            });
+
+            // Ticker detection
+            document.addEventListener('mouseover', (e) => {
+                if (!scanActive) return;
+                
+                const text = e.target?.textContent?.trim() || '';
+                // Match uppercase text that looks like a stock ticker (2-10 characters)
+                const ticker = text.match(/^[A-Z]{2,10}$/)?.[0];
+                
+                if (ticker && isKnownTicker(ticker)) {
+                    highlightTicker(e.target, ticker);
+                    showPreview(ticker);
+                }
+            });
+
+            function isKnownTicker(ticker) {
+                return Object.values(sectorData).some(sector => 
+                    sector.includes(ticker)
+                );
             }
-        });
 
-        function isKnownTicker(ticker) {
-            return Object.values(sectorData).some(sector => 
-                sector.includes(ticker)
-            );
+            function highlightTicker(element, ticker) {
+                const html = element.innerHTML;
+                // Only replace if it's not already highlighted
+                if (!html.includes('ragsym-highlight')) {
+                    element.innerHTML = html.replace(
+                        new RegExp(`\\b${ticker}\\b`, 'g'),
+                        `<span class="ragsym-highlight">${ticker}</span>`
+                    );
+                }
+            }
+
+            function showPreview(ticker) {
+                if (currentTicker === ticker) return;
+                currentTicker = ticker;
+                
+                tickerName.textContent = ticker;
+                // Use TradingView's lightweight widget instead of full chart for better compatibility
+                iframe.src = `https://www.tradingview.com/embed-widget/mini-symbol-overview/?symbol=NSE:${ticker}&locale=en`;
+                
+                preview.style.display = 'block';
+                positionPreview();
+            }
+
+            function hidePreview() {
+                preview.style.display = 'none';
+                currentTicker = null;
+                iframe.src = '';
+            }
+
+            function positionPreview() {
+                // Position near the mouse cursor
+                const mouseX = event.clientX;
+                const mouseY = event.clientY;
+                
+                // Adjust position to avoid going off-screen
+                const viewportWidth = window.innerWidth;
+                const viewportHeight = window.innerHeight;
+                const previewWidth = preview.offsetWidth;
+                const previewHeight = preview.offsetHeight;
+                
+                let left = mouseX + 20;
+                let top = mouseY + 20;
+                
+                // Adjust if going off right edge
+                if (left + previewWidth > viewportWidth) {
+                    left = mouseX - previewWidth - 20;
+                }
+                
+                // Adjust if going off bottom edge
+                if (top + previewHeight > viewportHeight) {
+                    top = mouseY - previewHeight - 20;
+                }
+                
+                preview.style.left = `${left}px`;
+                preview.style.top = `${top}px`;
+            }
+
+            // Full chart button
+            fullChartBtn.addEventListener('click', () => {
+                if (currentTicker) {
+                    window.open(`https://www.tradingview.com/chart/?symbol=NSE:${currentTicker}`, '_blank');
+                }
+            });
+
+            // Close preview when clicking outside
+            document.addEventListener('click', (e) => {
+                if (scanActive && !preview.contains(e.target) && e.target !== toggle) {
+                    hidePreview();
+                }
+            });
         }
-
-        function highlightTicker(element, ticker) {
-            const html = element.innerHTML;
-            element.innerHTML = html.replace(
-                new RegExp(`\\b${ticker}\\b`, 'g'),
-                `<span class="ragsym-highlight">${ticker}</span>`
-            );
-        }
-
-        function showPreview(ticker) {
-            if (currentTicker === ticker) return;
-            currentTicker = ticker;
-            
-            preview.querySelector('.ticker-name').textContent = ticker;
-            preview.querySelector('.chart-iframe').src = 
-                `https://www.tradingview.com/chart/?symbol=NSE:${ticker}&interval=15&embed=1`;
-            
-            preview.style.display = 'block';
-            positionPreview();
-        }
-
-        function hidePreview() {
-            preview.style.display = 'none';
-            currentTicker = null;
-        }
-
-        function positionPreview() {
-            // Simple positioning - can enhance with mouse tracking
-            preview.style.left = '50px';
-            preview.style.top = '100px';
-        }
-
-        // Full chart button
-        preview.querySelector('.full-chart-btn').addEventListener('click', () => {
-            window.open(`https://www.tradingview.com/chart/?symbol=NSE:${currentTicker}`, '_blank');
-        });
-    })();
     </script>
 </body>
 </html>
