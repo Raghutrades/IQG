@@ -109,19 +109,19 @@
         }
         
         .logo {
-            width: 60px;
-            height: 60px;
-            border-radius: 8px;
-            border: 1px solid rgba(255,255,255,0.1);
-            box-shadow: 0 0 20px rgba(76, 175, 80, 0.6);
-            object-fit: contain;
-            background: rgba(255,255,255,0.05);
-            z-index: 2;
-            animation: 
-                logo-pulse-green 2s infinite alternate,
-                logo-bounce 0.8s ease-in-out;
-            transform-origin: center;
-        }
+    width: 100px;  /* Updated from 60px */
+    height: 100px; /* Updated from 60px */
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 0 20px rgba(76, 175, 80, 0.6);
+    object-fit: contain;
+    background: rgba(255,255,255,0.05);
+    z-index: 2;
+    animation: 
+        logo-pulse-green 2s infinite alternate,
+        logo-bounce 0.8s ease-in-out;
+    transform-origin: center;
+}
 
         @keyframes logo-bounce {
             0%, 100% { transform: scale(1); }
