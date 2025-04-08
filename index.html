@@ -1495,10 +1495,33 @@
             const preview = document.getElementById('ragsym-chart-preview');
             const fullChartBtn = preview.querySelector('.full-chart-btn');
             const tickerName = preview.querySelector('.ticker-name');
+            const header = preview.querySelector('.preview-header');
             
             let scanActive = false;
             let currentTicker = null;
             let highlightedElements = [];
+            let isDragging = false;
+            let offsetX, offsetY;
+
+            // Make preview draggable
+            header.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                offsetX = e.clientX - preview.getBoundingClientRect().left;
+                offsetY = e.clientY - preview.getBoundingClientRect().top;
+                preview.style.cursor = 'grabbing';
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                
+                preview.style.left = `${e.clientX - offsetX}px`;
+                preview.style.top = `${e.clientY - offsetY}px`;
+            });
+
+            document.addEventListener('mouseup', () => {
+                isDragging = false;
+                preview.style.cursor = '';
+            });
 
             // Keyboard shortcut (Ctrl+Shift+Space)
             document.addEventListener('keydown', (e) => {
@@ -1564,27 +1587,23 @@
                 
                 tickerName.textContent = ticker;
                 
-                // Load TradingView widget
+                // Load TradingView widget with proper NSE symbol
                 const widgetContainer = preview.querySelector('.tradingview-widget-container__widget');
                 widgetContainer.innerHTML = '';
                 
                 const script = document.createElement('script');
                 script.type = 'text/javascript';
-                script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js';
+                script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js';
                 script.async = true;
                 script.innerHTML = JSON.stringify({
-                    "symbol": `NSE:${ticker}`,
+                    "interval": "15m",
                     "width": "100%",
                     "height": "100%",
-                    "locale": "en",
-                    "dateRange": "1M",
-                    "colorTheme": document.body.classList.contains('light-mode') ? "light" : "dark",
-                    "trendLineColor": "rgba(67, 97, 238, 1)",
-                    "underLineColor": "rgba(67, 97, 238, 0.1)",
-                    "underLineBottomColor": "rgba(67, 97, 238, 0)",
                     "isTransparent": true,
-                    "autosize": true,
-                    "largeChartUrl": `https://www.tradingview.com/chart/?symbol=NSE:${ticker}`
+                    "symbol": `NSE:${ticker}`,
+                    "showIntervalTabs": true,
+                    "locale": "en",
+                    "colorTheme": document.body.classList.contains('light-mode') ? "light" : "dark"
                 });
                 
                 widgetContainer.appendChild(script);
@@ -1631,6 +1650,47 @@
                 }
             });
         }
+
+        // Initialize random ticker functionality
+        function initRandomTicker() {
+            const tickerDisplay = document.getElementById('randomTicker');
+            const allStocks = [];
+            Object.values(sectorData).forEach(stocks => {
+                allStocks.push(...stocks);
+            });
+            
+            function updateTicker() {
+                const randomStock = allStocks[Math.floor(Math.random() * allStocks.length)];
+                tickerDisplay.textContent = randomStock;
+                tickerDisplay.dataset.stock = randomStock;
+            }
+            
+            tickerDisplay.addEventListener('click', function() {
+                const currentStock = this.dataset.stock;
+                if (currentStock) {
+                    window.open(`https://www.tradingview.com/chart/?symbol=NSE:${currentStock}`, '_blank');
+                }
+            });
+            
+            updateTicker();
+            setInterval(updateTicker, 15000);
+        }
+
+        // Update DOMContentLoaded to include initRandomTicker
+        document.addEventListener('DOMContentLoaded', function() {
+            initThemeToggle();
+            initDateTime();
+            initTagline();
+            initRandomTicker(); // Added this line
+            initSectorGrid();
+            initQuotes();
+            initCalculator();
+            initTradeMultiplier();
+            initCollapsibleSections();
+            initScanMode();
+        });
+
+        // [Rest of your existing JavaScript remains exactly the same]
     </script>
 </body>
 </html>
