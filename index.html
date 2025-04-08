@@ -28,6 +28,8 @@
             
             --gold-primary: #FFD700;
             --gold-secondary: #FFC300;
+            --profit-green: #10B981;
+            --loss-red: #EF4444;
             
             --bg: var(--dark-bg);
             --card: var(--dark-card);
@@ -45,6 +47,8 @@
             --accent: var(--light-accent);
             --glow: var(--light-glow);
             --gold-primary: #d4af37;
+            --profit-green: #059669;
+            --loss-red: #DC2626;
         }
         
         .light-mode .main-title {
@@ -422,9 +426,9 @@
             color: var(--gold-primary);
         }
         
-        /* === TRADING CALCULATOR === */
+        /* === ENHANCED TRADING CALCULATOR === */
         .calculator-container {
-            max-width: 800px;
+            max-width: 1000px;
             margin: 2rem auto;
             padding: 2rem;
             background: var(--card);
@@ -438,6 +442,68 @@
             margin-bottom: 1.5rem;
             color: var(--gold-primary);
             font-size: 1.5rem;
+        }
+        
+        .calculator-mode-selector {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: rgba(67, 97, 238, 0.1);
+            border-radius: 8px;
+            border-left: 3px solid var(--accent);
+        }
+        
+        .calculator-mode-selector label {
+            font-weight: 600;
+            margin-right: 10px;
+            color: var(--accent);
+        }
+        
+        .calculator-mode-selector select {
+            padding: 0.5rem;
+            border-radius: 6px;
+            background: var(--bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        
+        .trades-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+            background: var(--card);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 20px var(--glow);
+        }
+        
+        .trades-table th {
+            background: linear-gradient(135deg, var(--accent), #3a0ca3);
+            color: white;
+            padding: 0.75rem;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .trades-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .trades-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .trades-table tr:hover {
+            background: rgba(67, 97, 238, 0.05);
+        }
+        
+        .trade-input {
+            width: 100%;
+            padding: 0.5rem;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            color: var(--text);
         }
         
         .calculator-grid {
@@ -456,6 +522,30 @@
             color: var(--accent);
             border-bottom: 1px solid var(--border);
             padding-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .calculator-section-title::after {
+            content: '▼';
+            font-size: 0.8rem;
+            transition: transform 0.3s;
+        }
+        
+        .calculator-section-title.collapsed::after {
+            transform: rotate(-90deg);
+        }
+        
+        .calculator-section-content {
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .calculator-section-content.collapsed {
+            max-height: 0 !important;
+            opacity: 0;
         }
         
         .calculator-input-group {
@@ -506,6 +596,13 @@
             transform: translateY(-2px);
         }
         
+        .calculator-button.secondary {
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            margin-top: 0.5rem;
+        }
+        
         .calculator-results {
             margin-top: 1.5rem;
             padding: 1rem;
@@ -522,6 +619,32 @@
         
         .calculator-result-label {
             font-weight: 600;
+        }
+        
+        .summary-card {
+            background: var(--card);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            border: 1px solid var(--border);
+            box-shadow: 0 0 20px var(--glow);
+        }
+        
+        .summary-card h3 {
+            margin-top: 0;
+            color: var(--gold-primary);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+        
+        .profit {
+            color: var(--profit-green);
+            font-weight: bold;
+        }
+        
+        .loss {
+            color: var(--loss-red);
+            font-weight: bold;
         }
         
         /* === FOOTER === */
@@ -625,6 +748,15 @@
                 width: 50px;
                 height: 50px;
             }
+            
+            .trades-table {
+                font-size: 0.8rem;
+            }
+            
+            .trades-table th, 
+            .trades-table td {
+                padding: 0.5rem;
+            }
         }
     </style>
 </head>
@@ -670,87 +802,120 @@
         <!-- Sectors will be inserted here by JavaScript -->
     </div>
     
-    <!-- Trading Calculator -->
+    <!-- Enhanced Trading Calculator -->
     <div class="calculator-container">
-        <h2 class="calculator-title">Trading Calculator</h2>
+        <h2 class="calculator-title">Advanced Trading Calculator</h2>
+        
+        <!-- Trade Multiplier Selector -->
+        <div class="calculator-mode-selector">
+            <label>Calculation Mode:</label>
+            <select id="tradeMultiplier">
+                <option value="1">Single Trade</option>
+                <option value="5">5 Trades</option>
+                <option value="10">10 Trades</option>
+                <option value="20">20 Trades</option>
+            </select>
+        </div>
+        
+        <!-- Dynamic Trades Table -->
+        <table class="trades-table" id="tradesTable">
+            <thead>
+                <tr>
+                    <th>Trade</th>
+                    <th>Buy Price (₹)</th>
+                    <th>Sell Price (₹)</th>
+                    <th>Quantity</th>
+                </tr>
+            </thead>
+            <tbody id="tradesTableBody">
+                <!-- Rows will be inserted here by JavaScript -->
+            </tbody>
+        </table>
+        
         <div class="calculator-grid">
+            <!-- Trade Type Section -->
             <div class="calculator-section">
-                <h3 class="calculator-section-title">Trade Details</h3>
-                <div class="calculator-input-group">
-                    <label class="calculator-label">Trade Type</label>
-                    <select class="calculator-select" id="tradeType">
-                        <option value="equity_delivery">Equity Delivery</option>
-                        <option value="equity_intraday">Equity Intraday</option>
-                        <option value="futures">Futures</option>
-                        <option value="options">Options</option>
-                    </select>
-                </div>
-                <div class="calculator-input-group">
-                    <label class="calculator-label">Buy Price (₹)</label>
-                    <input type="number" class="calculator-input" id="buyPrice" placeholder="Enter buy price">
-                </div>
-                <div class="calculator-input-group">
-                    <label class="calculator-label">Sell Price (₹)</label>
-                    <input type="number" class="calculator-input" id="sellPrice" placeholder="Enter sell price">
-                </div>
-                <div class="calculator-input-group">
-                    <label class="calculator-label">Quantity</label>
-                    <input type="number" class="calculator-input" id="quantity" placeholder="Enter quantity">
+                <h3 class="calculator-section-title">Trade Configuration</h3>
+                <div class="calculator-section-content">
+                    <div class="calculator-input-group">
+                        <label class="calculator-label">Trade Type</label>
+                        <select class="calculator-select" id="tradeType">
+                            <option value="equity_delivery">Equity Delivery</option>
+                            <option value="equity_intraday">Equity Intraday</option>
+                            <option value="futures">Futures</option>
+                            <option value="options">Options</option>
+                        </select>
+                    </div>
                 </div>
             </div>
+            
+            <!-- Brokerage Section (Collapsible) -->
             <div class="calculator-section">
-                <h3 class="calculator-section-title">Brokerage Charges</h3>
-                <div class="calculator-input-group">
-                    <label class="calculator-label">Equity Delivery</label>
-                    <input type="text" class="calculator-input" id="equityDelivery" value="₹0 (Zero Brokerage)" readonly>
-                </div>
-                <div class="calculator-input-group">
-                    <label class="calculator-label">Equity Intraday</label>
-                    <input type="text" class="calculator-input" id="equityIntraday" value="0.03% or ₹20 per order (lower)" readonly>
-                </div>
-                <div class="calculator-input-group">
-                    <label class="calculator-label">Futures</label>
-                    <input type="text" class="calculator-input" id="futures" value="0.03% or ₹20 per order (lower)" readonly>
-                </div>
-                <div class="calculator-input-group">
-                    <label class="calculator-label">Options</label>
-                    <input type="text" class="calculator-input" id="options" value="Flat ₹20 per order" readonly>
+                <h3 class="calculator-section-title collapsed">Brokerage Charges</h3>
+                <div class="calculator-section-content collapsed">
+                    <div class="calculator-input-group">
+                        <label class="calculator-label">Equity Delivery</label>
+                        <input type="text" class="calculator-input" id="equityDelivery" value="₹0 (Zero Brokerage)" readonly>
+                    </div>
+                    <div class="calculator-input-group">
+                        <label class="calculator-label">Equity Intraday</label>
+                        <input type="text" class="calculator-input" id="equityIntraday" value="0.03% or ₹20 per order (lower)" readonly>
+                    </div>
+                    <div class="calculator-input-group">
+                        <label class="calculator-label">Futures</label>
+                        <input type="text" class="calculator-input" id="futures" value="0.03% or ₹20 per order (lower)" readonly>
+                    </div>
+                    <div class="calculator-input-group">
+                        <label class="calculator-label">Options</label>
+                        <input type="text" class="calculator-input" id="options" value="Flat ₹20 per order" readonly>
+                    </div>
                 </div>
             </div>
         </div>
-        <button class="calculator-button" id="calculateButton">Calculate Profit/Loss</button>
+        
+        <button class="calculator-button" id="calculateButton">Calculate All Trades</button>
+        
+        <!-- Results Section -->
         <div class="calculator-results" id="calculatorResults" style="display: none;">
-            <div class="calculator-result-item">
-                <span class="calculator-result-label">Gross Profit/Loss:</span>
-                <span id="grossResult">₹0.00</span>
+            <div class="summary-card">
+                <h3>Summary Results</h3>
+                <div class="calculator-result-item">
+                    <span class="calculator-result-label">Total Gross Profit/Loss:</span>
+                    <span id="grossResult">₹0.00</span>
+                </div>
+                <div class="calculator-result-item">
+                    <span class="calculator-result-label">Total Net Profit/Loss:</span>
+                    <span id="netResult" style="font-weight: bold;">₹0.00</span>
+                </div>
             </div>
-            <div class="calculator-result-item">
-                <span class="calculator-result-label">Brokerage:</span>
-                <span id="brokerageResult">₹0.00</span>
-            </div>
-            <div class="calculator-result-item">
-                <span class="calculator-result-label">STT/CTT:</span>
-                <span id="sttResult">₹0.00</span>
-            </div>
-            <div class="calculator-result-item">
-                <span class="calculator-result-label">Transaction Charges:</span>
-                <span id="transactionResult">₹0.00</span>
-            </div>
-            <div class="calculator-result-item">
-                <span class="calculator-result-label">GST:</span>
-                <span id="gstResult">₹0.00</span>
-            </div>
-            <div class="calculator-result-item">
-                <span class="calculator-result-label">Stamp Duty:</span>
-                <span id="stampResult">₹0.00</span>
-            </div>
-            <div class="calculator-result-item">
-                <span class="calculator-result-label">SEBI Charges:</span>
-                <span id="sebiResult">₹0.00</span>
-            </div>
-            <div class="calculator-result-item">
-                <span class="calculator-result-label">Net Profit/Loss:</span>
-                <span id="netResult" style="font-weight: bold;">₹0.00</span>
+            
+            <button class="calculator-button secondary" id="toggleDetails">Show Detailed Breakdown ▼</button>
+            
+            <div id="detailedResults" style="display: none; margin-top: 1rem;">
+                <div class="calculator-result-item">
+                    <span class="calculator-result-label">Total Brokerage:</span>
+                    <span id="brokerageResult">₹0.00</span>
+                </div>
+                <div class="calculator-result-item">
+                    <span class="calculator-result-label">Total STT/CTT:</span>
+                    <span id="sttResult">₹0.00</span>
+                </div>
+                <div class="calculator-result-item">
+                    <span class="calculator-result-label">Total Transaction Charges:</span>
+                    <span id="transactionResult">₹0.00</span>
+                </div>
+                <div class="calculator-result-item">
+                    <span class="calculator-result-label">Total GST:</span>
+                    <span id="gstResult">₹0.00</span>
+                </div>
+                <div class="calculator-result-item">
+                    <span class="calculator-result-label">Total Stamp Duty:</span>
+                    <span id="stampResult">₹0.00</span>
+                </div>
+                <div class="calculator-result-item">
+                    <span class="calculator-result-label">Total SEBI Charges:</span>
+                    <span id="sebiResult">₹0.00</span>
+                </div>
             </div>
         </div>
     </div>
@@ -774,23 +939,23 @@
 
     <script>
         // Stock data for all 15 sectors
-const sectorData = {
-    "NIFTY50": ["TRENT", "TCS", "NTPC", "BRITANNIA", "ICICIBANK", "ITC", "HINDUNILVR", "BHARTIARTL", "ADANIPORTS", "TECHM", "COALINDIA", "RELIANCE", "ONGC", "INFY", "NESTLEIND", "SBIN", "ASIANPAINT", "ADANIENT", "KOTAKBANK", "BPCL", "WIPRO", "MARUTI", "HCLTECH", "BAJFINANCE", "TATAMOTORS", "LT", "BEL", "HEROMOTOCO", "HDFCLIFE", "TITAN", "DRREDDY", "TATASTEEL", "CIPLA", "TATACONSUM", "POWERGRID", "JSWSTEEL", "BAJAJFINSV", "GRASIM", "APOLLOHOSP", "HINDALCO", "ULTRACEMCO", "BAJAJ-AUTO", "INDUSINDBK", "SBILIFE", "SHRIRANFIN", "HDFCBANK", "SUNPHARMA", "M&M", "EICHERMOT", "AXISBANK"],
-    "BANKING": ["ICICIBANK", "BANKBARODA", "SBIN", "KOTAKBANK", "FEDERALBNK", "INDIANB", "BANKINDIA", "INDUSINBK", "AUBANK", "HDFCBANK", "PNB", "IDFCFIRSTB", "CANBK", "AXISBANK"],
-    "AUTOMOBILE": ["EXIDEIND", "MOTHERSON", "APOLLOTYRE", "MARUTI", "TATAMOTORS", "BOSCHLTD", "HEROMOTOCO", "BALKRISIND", "TVSMOTOR", "SONACOMS", "TITAGARH", "TIINDIA", "BHARATFORG", "MRF", "BAJAJ-AUTO", "M&M", "EICHERMOT"],
-    "FINANCIAL SERVICES": ["ICICIBANK", "IRFC", "ICICIGI", "PFC", "ICICIPRULI", "SBICARD", "MUTHOOTFIN", "SBIN", "LICHSGFIN", "KOTAKBANK", "BAJFINANCE", "HDFCAMC", "POONAWALLA", "LICI", "HDFCLIFE", "HUDCO", "RECLTD", "CDSL", "JIOFIN", "BAJAJFINSV", "CHOLAFIN", "IIFL", "POLICYBZR", "MAXHEALTH", "SBILIFE", "SHRIRAMFIN", "ANGELONE", "BSE", "HDFCBANK", "PAYTM", "AXISBANK"],
-    "FMCG": ["BRITANNIA", "ITC", "HINDUNILVR", "DMART", "NESTLEIND", "COLPAL", "DABUR", "MARICO", "KALYANJIL", "ZOMATO", "VBL", "TATACONSUM", "PATANJALI", "UNITDSPR", "GODREJCP", "NYKAA", "SUPERMEIND"],
-    "INFORMATION TECHNOLOGY": ["TCS", "TECHM", "INFY", "WIPRO", "HCLTECH", "PERSISTENT", "COFORGE", "CAMS", "LTIM", "KPITTECH", "LTTS", "MPHASIS", "CYIENT", "TATAELXSI", "HFCL"],
-    "SENSEX": ["TCS", "NTPC", "ICICIBANK", "ITC", "HINDUNILVR", "BHARTIARTL", "ADANIPORTS", "TECHM", "RELIANCE", "INFY", "NESTLEIND", "SBIN", "ASIANPAINT", "KOTAKBANK", "MARUTI", "HCLTECH", "BAJFINANCE", "TATAMOTORS", "LT", "TITAN", "TATASTEEL", "POWERGRID", "JSWSTEEL", "BAJAJFINSV", "ULTRACEMCO", "INDUSINDBK", "HDFCBANK", "SUNPHARMA", "M&M", "AXISBANK"],
-    "METALS": ["ADANIENT", "JINDALSTEL", "SAIL", "TATASTEEL", "JSWSTEEL", "HINDALCO", "HINDCOPPER", "VEDL", "NATIONALUM", "NMDC", "JSL", "APLAPOLLO"],
-    "PHARMACEUTICALS": ["AUROPHARMA", "ZYDUSLIFE", "GLENMARK", "DRREDDY", "LAURUSLABS", "CIPLA", "LUPIN", "DIVISLAB", "TORNTPHARM", "GRANULES", "ALKEM", "SUNPHARMA", "BIOCON"],
-    "PSU BANKS": ["BANKBARODA", "SBIN", "INDIANB", "BANKINDIA", "UNIONBANK", "PNB", "CANBK"],
-    "PRIVATE BANKS": ["ICICIBANK", "KOTAKBANK", "FEDERALBNK", "RBLBANK", "BANDHANBNK", "INDUSINDBK", "HDFCBANK", "IDFCFIRSTB", "AXISBANK"],
-    "REALTY": ["NCC", "PHOENIXLTD", "PRESTIGE", "OBEROIRLTY", "GODREJPROP", "DLF", "LODHA", "NBCC", "IRB"],
-    "ENERGY": ["NTPC", "COALINDIA", "RELIANCE", "ONGC", "CESE", "SOLARINDS", "TATAPOWER", "TORNTPOWER", "BPCL", "IOC", "ADANIENSOL", "IREDA", "OIL", "POWERGRID", "ATGL", "CGPOWER", "PETRONET", "JSWENERGY", "SJVN", "NHPC", "IGL", "GMRAIRPORT", "ADANIGREEN"],
-    "CEMENT": ["AMBUJACEM", "ACC", "JKCEMENT", "ULTRACEMCO", "DALBHARAT", "SHREECEM", "RAMCOCEM"],
-    "MIDCAP SELECT": ["AUROPHARMA", "HINDUPETRO", "VOLTAS", "UPL", "HDFCAMC", "PERSISTENT", "FEDERALBNK", "POLYCAB", "COFORGE", "LUPIN", "ASTRAL", "PAGEIND", "PIIND", "BHARATFORG", "MRF", "JUBLFOOD", "CONCOR", "INDHOTEL", "GODREJPROP", "AUBANK", "ASHOKLEY", "MPHASIS", "IDFCFIRSTB", "IDEA", "CUMMINSIND"]
-};
+        const sectorData = {
+            "NIFTY50": ["TRENT", "TCS", "NTPC", "BRITANNIA", "ICICIBANK", "ITC", "HINDUNILVR", "BHARTIARTL", "ADANIPORTS", "TECHM", "COALINDIA", "RELIANCE", "ONGC", "INFY", "NESTLEIND", "SBIN", "ASIANPAINT", "ADANIENT", "KOTAKBANK", "BPCL", "WIPRO", "MARUTI", "HCLTECH", "BAJFINANCE", "TATAMOTORS", "LT", "BEL", "HEROMOTOCO", "HDFCLIFE", "TITAN", "DRREDDY", "TATASTEEL", "CIPLA", "TATACONSUM", "POWERGRID", "JSWSTEEL", "BAJAJFINSV", "GRASIM", "APOLLOHOSP", "HINDALCO", "ULTRACEMCO", "BAJAJ-AUTO", "INDUSINDBK", "SBILIFE", "SHRIRANFIN", "HDFCBANK", "SUNPHARMA", "M&M", "EICHERMOT", "AXISBANK"],
+            "BANKING": ["ICICIBANK", "BANKBARODA", "SBIN", "KOTAKBANK", "FEDERALBNK", "INDIANB", "BANKINDIA", "INDUSINBK", "AUBANK", "HDFCBANK", "PNB", "IDFCFIRSTB", "CANBK", "AXISBANK"],
+            "AUTOMOBILE": ["EXIDEIND", "MOTHERSON", "APOLLOTYRE", "MARUTI", "TATAMOTORS", "BOSCHLTD", "HEROMOTOCO", "BALKRISIND", "TVSMOTOR", "SONACOMS", "TITAGARH", "TIINDIA", "BHARATFORG", "MRF", "BAJAJ-AUTO", "M&M", "EICHERMOT"],
+            "FINANCIAL SERVICES": ["ICICIBANK", "IRFC", "ICICIGI", "PFC", "ICICIPRULI", "SBICARD", "MUTHOOTFIN", "SBIN", "LICHSGFIN", "KOTAKBANK", "BAJFINANCE", "HDFCAMC", "POONAWALLA", "LICI", "HDFCLIFE", "HUDCO", "RECLTD", "CDSL", "JIOFIN", "BAJAJFINSV", "CHOLAFIN", "IIFL", "POLICYBZR", "MAXHEALTH", "SBILIFE", "SHRIRAMFIN", "ANGELONE", "BSE", "HDFCBANK", "PAYTM", "AXISBANK"],
+            "FMCG": ["BRITANNIA", "ITC", "HINDUNILVR", "DMART", "NESTLEIND", "COLPAL", "DABUR", "MARICO", "KALYANJIL", "ZOMATO", "VBL", "TATACONSUM", "PATANJALI", "UNITDSPR", "GODREJCP", "NYKAA", "SUPERMEIND"],
+            "INFORMATION TECHNOLOGY": ["TCS", "TECHM", "INFY", "WIPRO", "HCLTECH", "PERSISTENT", "COFORGE", "CAMS", "LTIM", "KPITTECH", "LTTS", "MPHASIS", "CYIENT", "TATAELXSI", "HFCL"],
+            "SENSEX": ["TCS", "NTPC", "ICICIBANK", "ITC", "HINDUNILVR", "BHARTIARTL", "ADANIPORTS", "TECHM", "RELIANCE", "INFY", "NESTLEIND", "SBIN", "ASIANPAINT", "KOTAKBANK", "MARUTI", "HCLTECH", "BAJFINANCE", "TATAMOTORS", "LT", "TITAN", "TATASTEEL", "POWERGRID", "JSWSTEEL", "BAJAJFINSV", "ULTRACEMCO", "INDUSINDBK", "HDFCBANK", "SUNPHARMA", "M&M", "AXISBANK"],
+            "METALS": ["ADANIENT", "JINDALSTEL", "SAIL", "TATASTEEL", "JSWSTEEL", "HINDALCO", "HINDCOPPER", "VEDL", "NATIONALUM", "NMDC", "JSL", "APLAPOLLO"],
+            "PHARMACEUTICALS": ["AUROPHARMA", "ZYDUSLIFE", "GLENMARK", "DRREDDY", "LAURUSLABS", "CIPLA", "LUPIN", "DIVISLAB", "TORNTPHARM", "GRANULES", "ALKEM", "SUNPHARMA", "BIOCON"],
+            "PSU BANKS": ["BANKBARODA", "SBIN", "INDIANB", "BANKINDIA", "UNIONBANK", "PNB", "CANBK"],
+            "PRIVATE BANKS": ["ICICIBANK", "KOTAKBANK", "FEDERALBNK", "RBLBANK", "BANDHANBNK", "INDUSINDBK", "HDFCBANK", "IDFCFIRSTB", "AXISBANK"],
+            "REALTY": ["NCC", "PHOENIXLTD", "PRESTIGE", "OBEROIRLTY", "GODREJPROP", "DLF", "LODHA", "NBCC", "IRB"],
+            "ENERGY": ["NTPC", "COALINDIA", "RELIANCE", "ONGC", "CESE", "SOLARINDS", "TATAPOWER", "TORNTPOWER", "BPCL", "IOC", "ADANIENSOL", "IREDA", "OIL", "POWERGRID", "ATGL", "CGPOWER", "PETRONET", "JSWENERGY", "SJVN", "NHPC", "IGL", "GMRAIRPORT", "ADANIGREEN"],
+            "CEMENT": ["AMBUJACEM", "ACC", "JKCEMENT", "ULTRACEMCO", "DALBHARAT", "SHREECEM", "RAMCOCEM"],
+            "MIDCAP SELECT": ["AUROPHARMA", "HINDUPETRO", "VOLTAS", "UPL", "HDFCAMC", "PERSISTENT", "FEDERALBNK", "POLYCAB", "COFORGE", "LUPIN", "ASTRAL", "PAGEIND", "PIIND", "BHARATFORG", "MRF", "JUBLFOOD", "CONCOR", "INDHOTEL", "GODREJPROP", "AUBANK", "ASHOKLEY", "MPHASIS", "IDFCFIRSTB", "IDEA", "CUMMINSIND"]
+        };
 
         const punchlines = [
             "Catch the Pulse, Ride the Move.",
@@ -847,6 +1012,8 @@ const sectorData = {
             initSectorGrid();
             initQuotes();
             initCalculator();
+            initTradeMultiplier();
+            initCollapsibleSections();
         });
 
         // ===== THEME TOGGLE =====
@@ -1053,96 +1220,189 @@ const sectorData = {
             setInterval(showRandomQuote, 10000);
         }
         
-        // ===== TRADING CALCULATOR =====
-        function initCalculator() {
-            const calculateButton = document.getElementById('calculateButton');
-            calculateButton.addEventListener('click', calculateTrade);
+        // ===== TRADE MULTIPLIER =====
+        function initTradeMultiplier() {
+            const tradeMultiplier = document.getElementById('tradeMultiplier');
+            const tradesTableBody = document.getElementById('tradesTableBody');
             
-            function calculateTrade() {
-                // Get input values
-                const tradeType = document.getElementById('tradeType').value;
-                const buyPrice = parseFloat(document.getElementById('buyPrice').value) || 0;
-                const sellPrice = parseFloat(document.getElementById('sellPrice').value) || 0;
-                const quantity = parseInt(document.getElementById('quantity').value) || 0;
+            function generateTradeRows(count) {
+                tradesTableBody.innerHTML = '';
+                for (let i = 0; i < count; i++) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>Trade ${i + 1}</td>
+                        <td><input type="number" class="trade-input" id="buyPrice${i}" placeholder="Buy Price"></td>
+                        <td><input type="number" class="trade-input" id="sellPrice${i}" placeholder="Sell Price"></td>
+                        <td><input type="number" class="trade-input" id="quantity${i}" placeholder="Quantity"></td>
+                    `;
+                    tradesTableBody.appendChild(row);
+                }
+            }
+            
+            // Initialize with single trade
+            generateTradeRows(1);
+            
+            // Update when multiplier changes
+            tradeMultiplier.addEventListener('change', function() {
+                generateTradeRows(parseInt(this.value));
+            });
+        }
+        
+        // ===== COLLAPSIBLE SECTIONS =====
+        function initCollapsibleSections() {
+            const sections = document.querySelectorAll('.calculator-section');
+            
+            sections.forEach(section => {
+                const title = section.querySelector('.calculator-section-title');
+                const content = section.querySelector('.calculator-section-content');
                 
-                // Calculate turnover
-                const buyValue = buyPrice * quantity;
-                const sellValue = sellPrice * quantity;
-                const turnover = buyValue + sellValue;
-                
-                // Calculate gross profit/loss
-                let grossPL = (sellValue - buyValue);
-                
-                // Initialize charges
-                let brokerage = 0;
-                let stt = 0;
-                let transactionCharges = 0;
-                let gst = 0;
-                let sebiCharges = 0;
-                let stampDuty = 0;
-                
-                // Calculate brokerage based on trade type
-                switch(tradeType) {
-                    case 'equity_delivery':
-                        brokerage = 0; // Zero brokerage
-                        stt = sellValue * 0.001; // 0.1% on sell side
-                        transactionCharges = buyValue * 0.0000297 + sellValue * 0.0000297; // NSE charges
-                        stampDuty = buyValue * 0.00015; // 0.015% on buy side
-                        break;
-                    case 'equity_intraday':
-                        // Brokerage is 0.03% or ₹20 per order (whichever is lower)
-                        const brokerageRate = 0.0003;
-                        brokerage = Math.min(buyValue * brokerageRate, 20) + Math.min(sellValue * brokerageRate, 20);
-                        stt = sellValue * 0.00025; // 0.025% on sell side
-                        transactionCharges = buyValue * 0.0000297 + sellValue * 0.0000297; // NSE charges
-                        stampDuty = buyValue * 0.00003; // 0.003% on buy side
-                        break;
-                    case 'futures':
-                        // Brokerage is 0.03% or ₹20 per order (whichever is lower)
-                        const futuresBrokerageRate = 0.0003;
-                        brokerage = Math.min(buyValue * futuresBrokerageRate, 20) + Math.min(sellValue * futuresBrokerageRate, 20);
-                        stt = sellValue * 0.0002; // 0.02% on sell side
-                        transactionCharges = buyValue * 0.0000173 + sellValue * 0.0000173; // NSE futures charges
-                        stampDuty = buyValue * 0.00003; // 0.003% on buy side
-                        break;
-                    case 'options':
-                        // Flat ₹20 per order
-                        brokerage = 20 * 2; // Buy and sell
-                        stt = sellValue * 0.001; // 0.1% on sell side (on premium)
-                        transactionCharges = (buyPrice + sellPrice) * quantity * 0.0003503; // NSE options charges on premium
-                        stampDuty = buyValue * 0.00003; // 0.003% on buy side
-                        break;
+                // Set initial height
+                if (content.classList.contains('collapsed')) {
+                    content.style.maxHeight = '0';
+                } else {
+                    content.style.maxHeight = content.scrollHeight + 'px';
                 }
                 
-                // Calculate other charges
-                sebiCharges = turnover * 0.000001; // ₹10 per crore
-                const totalBeforeGST = brokerage + transactionCharges + sebiCharges;
-                gst = totalBeforeGST * 0.18; // 18% GST
+                title.addEventListener('click', function() {
+                    this.classList.toggle('collapsed');
+                    content.classList.toggle('collapsed');
+                    
+                    if (content.classList.contains('collapsed')) {
+                        content.style.maxHeight = '0';
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                    }
+                });
+            });
+            
+            // Toggle detailed results
+            const toggleDetails = document.getElementById('toggleDetails');
+            const detailedResults = document.getElementById('detailedResults');
+            
+            toggleDetails.addEventListener('click', function() {
+                if (detailedResults.style.display === 'none') {
+                    detailedResults.style.display = 'block';
+                    this.textContent = 'Hide Detailed Breakdown ▲';
+                } else {
+                    detailedResults.style.display = 'none';
+                    this.textContent = 'Show Detailed Breakdown ▼';
+                }
+            });
+        }
+        
+        // ===== ENHANCED TRADING CALCULATOR =====
+        function initCalculator() {
+            const calculateButton = document.getElementById('calculateButton');
+            calculateButton.addEventListener('click', calculateAllTrades);
+            
+            function calculateAllTrades() {
+                const tradeType = document.getElementById('tradeType').value;
+                const tradeCount = parseInt(document.getElementById('tradeMultiplier').value);
+                
+                let totalGrossPL = 0;
+                let totalBrokerage = 0;
+                let totalStt = 0;
+                let totalTransactionCharges = 0;
+                let totalGst = 0;
+                let totalSebiCharges = 0;
+                let totalStampDuty = 0;
+                
+                // Calculate each trade
+                for (let i = 0; i < tradeCount; i++) {
+                    const buyPrice = parseFloat(document.getElementById(`buyPrice${i}`).value) || 0;
+                    const sellPrice = parseFloat(document.getElementById(`sellPrice${i}`).value) || 0;
+                    const quantity = parseInt(document.getElementById(`quantity${i}`).value) || 0;
+                    
+                    // Calculate turnover
+                    const buyValue = buyPrice * quantity;
+                    const sellValue = sellPrice * quantity;
+                    const turnover = buyValue + sellValue;
+                    
+                    // Calculate gross profit/loss
+                    let grossPL = (sellValue - buyValue);
+                    totalGrossPL += grossPL;
+                    
+                    // Initialize charges
+                    let brokerage = 0;
+                    let stt = 0;
+                    let transactionCharges = 0;
+                    let gst = 0;
+                    let sebiCharges = 0;
+                    let stampDuty = 0;
+                    
+                    // Calculate brokerage based on trade type
+                    switch(tradeType) {
+                        case 'equity_delivery':
+                            brokerage = 0; // Zero brokerage
+                            stt = sellValue * 0.001; // 0.1% on sell side
+                            transactionCharges = buyValue * 0.0000297 + sellValue * 0.0000297; // NSE charges
+                            stampDuty = buyValue * 0.00015; // 0.015% on buy side
+                            break;
+                        case 'equity_intraday':
+                            // Brokerage is 0.03% or ₹20 per order (whichever is lower)
+                            const brokerageRate = 0.0003;
+                            brokerage = Math.min(buyValue * brokerageRate, 20) + Math.min(sellValue * brokerageRate, 20);
+                            stt = sellValue * 0.00025; // 0.025% on sell side
+                            transactionCharges = buyValue * 0.0000297 + sellValue * 0.0000297; // NSE charges
+                            stampDuty = buyValue * 0.00003; // 0.003% on buy side
+                            break;
+                        case 'futures':
+                            // Brokerage is 0.03% or ₹20 per order (whichever is lower)
+                            const futuresBrokerageRate = 0.0003;
+                            brokerage = Math.min(buyValue * futuresBrokerageRate, 20) + Math.min(sellValue * futuresBrokerageRate, 20);
+                            stt = sellValue * 0.0002; // 0.02% on sell side
+                            transactionCharges = buyValue * 0.0000173 + sellValue * 0.0000173; // NSE futures charges
+                            stampDuty = buyValue * 0.00003; // 0.003% on buy side
+                            break;
+                        case 'options':
+                            // Flat ₹20 per order
+                            brokerage = 20 * 2; // Buy and sell
+                            stt = sellValue * 0.001; // 0.1% on sell side (on premium)
+                            transactionCharges = (buyPrice + sellPrice) * quantity * 0.0003503; // NSE options charges on premium
+                            stampDuty = buyValue * 0.00003; // 0.003% on buy side
+                            break;
+                    }
+                    
+                    // Calculate other charges
+                    sebiCharges = turnover * 0.000001; // ₹10 per crore
+                    const totalBeforeGST = brokerage + transactionCharges + sebiCharges;
+                    gst = totalBeforeGST * 0.18; // 18% GST
+                    
+                    // Add to totals
+                    totalBrokerage += brokerage;
+                    totalStt += stt;
+                    totalTransactionCharges += transactionCharges;
+                    totalGst += gst;
+                    totalSebiCharges += sebiCharges;
+                    totalStampDuty += stampDuty;
+                }
                 
                 // Calculate net profit/loss
-                const totalCharges = brokerage + stt + transactionCharges + gst + sebiCharges + stampDuty;
-                const netPL = grossPL - totalCharges;
+                const totalCharges = totalBrokerage + totalStt + totalTransactionCharges + totalGst + totalSebiCharges + totalStampDuty;
+                const totalNetPL = totalGrossPL - totalCharges;
                 
                 // Display results
-                document.getElementById('grossResult').textContent = `₹${grossPL.toFixed(2)}`;
-                document.getElementById('brokerageResult').textContent = `₹${brokerage.toFixed(2)}`;
-                document.getElementById('sttResult').textContent = `₹${stt.toFixed(2)}`;
-                document.getElementById('transactionResult').textContent = `₹${transactionCharges.toFixed(2)}`;
-                document.getElementById('gstResult').textContent = `₹${gst.toFixed(2)}`;
-                document.getElementById('sebiResult').textContent = `₹${sebiCharges.toFixed(2)}`;
-                document.getElementById('stampResult').textContent = `₹${stampDuty.toFixed(2)}`;
-                document.getElementById('netResult').textContent = `₹${netPL.toFixed(2)}`;
+                document.getElementById('grossResult').textContent = `₹${totalGrossPL.toFixed(2)}`;
+                document.getElementById('brokerageResult').textContent = `₹${totalBrokerage.toFixed(2)}`;
+                document.getElementById('sttResult').textContent = `₹${totalStt.toFixed(2)}`;
+                document.getElementById('transactionResult').textContent = `₹${totalTransactionCharges.toFixed(2)}`;
+                document.getElementById('gstResult').textContent = `₹${totalGst.toFixed(2)}`;
+                document.getElementById('sebiResult').textContent = `₹${totalSebiCharges.toFixed(2)}`;
+                document.getElementById('stampResult').textContent = `₹${totalStampDuty.toFixed(2)}`;
+                document.getElementById('netResult').textContent = `₹${totalNetPL.toFixed(2)}`;
                 
                 // Color net result based on profit/loss
                 const netResultElement = document.getElementById('netResult');
-                if (netPL >= 0) {
-                    netResultElement.style.color = '#10B981'; // Green for profit
+                if (totalNetPL >= 0) {
+                    netResultElement.className = 'profit';
                 } else {
-                    netResultElement.style.color = '#EF4444'; // Red for loss
+                    netResultElement.className = 'loss';
                 }
                 
                 // Show results
                 document.getElementById('calculatorResults').style.display = 'block';
+                document.getElementById('detailedResults').style.display = 'none';
+                document.getElementById('toggleDetails').textContent = 'Show Detailed Breakdown ▼';
             }
         }
     </script>
