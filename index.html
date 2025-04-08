@@ -1057,26 +1057,77 @@
         Designed by <a href="https://www.instagram.com/nerdyintruder/" target="_blank">@Nerdyintruder</a>
     </div>
     
+    <style>
+/* Add this at the top of your CSS section */
+.floating-ticker-container {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    z-index: 1000;
+}
+
+/* Update existing ticker styles */
+.ticker-display {
+    margin: 0; /* Remove any default margins */
+}
+
+#ragsym-scan-toggle {
+    background: linear-gradient(135deg, #4361ee, #3a0ca3);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 50px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 30px rgba(67, 97, 238, 0.4);
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+#ragsym-scan-toggle:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 40px var(--glow);
+}
+
+#ragsym-scan-toggle.active {
+    background: linear-gradient(135deg, #4cc9f0, #3a0ca3);
+}
+</style>
+
     <!-- Theme Toggle -->
     <button class="theme-toggle" id="themeToggle">
         <span class="theme-icon" id="themeIcon">🌙</span>
         <span id="themeText">Dark Mode</span>
     </button>
 
-    <!-- Scan Mode Toggle -->
+    <!-- Floating Ticker + Scan Mode Container -->
+<div class="floating-ticker-container">
+    <div class="ticker-display" id="randomTicker">Loading ticker...</div>
     <button id="ragsym-scan-toggle">
         <span>🔍 Scan Mode</span>
         <div class="pulse-ring"></div>
     </button>
+</div>
 
     <!-- Chart Preview Container -->
     <div id="ragsym-chart-preview">
-        <div class="preview-header">
-            <span class="ticker-name">RELIANCE</span>
-            <button class="full-chart-btn">Full Chart ↗</button>
-        </div>
-        <iframe class="chart-iframe"></iframe>
+    <div class="preview-header">
+        <span class="ticker-name">RELIANCE</span>
+        <button class="full-chart-btn">Full Chart (15m) ↗</button>
     </div>
+    <!-- Changed to technical analysis widget -->
+    <iframe class="chart-iframe" 
+            src="about:blank"
+            frameborder="0" 
+            allow="autoplay; encrypted-media" 
+            allowfullscreen>
+    </iframe>
+</div>
 
     <script>
         // Stock data for all 15 sectors
@@ -1549,114 +1600,134 @@
         }
 
         // ===== SCAN MODE SYSTEM =====
-        function initScanMode() {
-            const toggle = document.getElementById('ragsym-scan-toggle');
-            const preview = document.getElementById('ragsym-chart-preview');
-            const iframe = preview.querySelector('.chart-iframe');
-            const fullChartBtn = preview.querySelector('.full-chart-btn');
-            const tickerName = preview.querySelector('.ticker-name');
-            
-            let scanActive = false;
-            let currentTicker = null;
-            
-            // Toggle scan mode
-            toggle.addEventListener('click', () => {
-                scanActive = !scanActive;
-                toggle.classList.toggle('active');
-                if (!scanActive) hidePreview();
-            });
+function initScanMode() {
+    const toggle = document.getElementById('ragsym-scan-toggle');
+    const preview = document.getElementById('ragsym-chart-preview');
+    const iframe = preview.querySelector('.chart-iframe');
+    const fullChartBtn = preview.querySelector('.full-chart-btn');
+    const tickerName = preview.querySelector('.ticker-name');
+    
+    let scanActive = false;
+    let currentTicker = null;
+    let highlightedElements = []; // Tracks all highlighted elements
 
-            // Ticker detection
-            document.addEventListener('mouseover', (e) => {
-                if (!scanActive) return;
-                
-                const text = e.target?.textContent?.trim() || '';
-                // Match uppercase text that looks like a stock ticker (2-10 characters)
-                const ticker = text.match(/^[A-Z]{2,10}$/)?.[0];
-                
-                if (ticker && isKnownTicker(ticker)) {
-                    highlightTicker(e.target, ticker);
-                    showPreview(ticker);
-                }
-            });
-
-            function isKnownTicker(ticker) {
-                return Object.values(sectorData).some(sector => 
-                    sector.includes(ticker)
-                );
-            }
-
-            function highlightTicker(element, ticker) {
-                const html = element.innerHTML;
-                // Only replace if it's not already highlighted
-                if (!html.includes('ragsym-highlight')) {
-                    element.innerHTML = html.replace(
-                        new RegExp(`\\b${ticker}\\b`, 'g'),
-                        `<span class="ragsym-highlight">${ticker}</span>`
-                    );
-                }
-            }
-
-            function showPreview(ticker) {
-                if (currentTicker === ticker) return;
-                currentTicker = ticker;
-                
-                tickerName.textContent = ticker;
-                // Use TradingView's lightweight widget instead of full chart for better compatibility
-                iframe.src = `https://www.tradingview.com/embed-widget/mini-symbol-overview/?symbol=NSE:${ticker}&locale=en`;
-                
-                preview.style.display = 'block';
-                positionPreview();
-            }
-
-            function hidePreview() {
-                preview.style.display = 'none';
-                currentTicker = null;
-                iframe.src = '';
-            }
-
-            function positionPreview() {
-                // Position near the mouse cursor
-                const mouseX = event.clientX;
-                const mouseY = event.clientY;
-                
-                // Adjust position to avoid going off-screen
-                const viewportWidth = window.innerWidth;
-                const viewportHeight = window.innerHeight;
-                const previewWidth = preview.offsetWidth;
-                const previewHeight = preview.offsetHeight;
-                
-                let left = mouseX + 20;
-                let top = mouseY + 20;
-                
-                // Adjust if going off right edge
-                if (left + previewWidth > viewportWidth) {
-                    left = mouseX - previewWidth - 20;
-                }
-                
-                // Adjust if going off bottom edge
-                if (top + previewHeight > viewportHeight) {
-                    top = mouseY - previewHeight - 20;
-                }
-                
-                preview.style.left = `${left}px`;
-                preview.style.top = `${top}px`;
-            }
-
-            // Full chart button
-            fullChartBtn.addEventListener('click', () => {
-                if (currentTicker) {
-                    window.open(`https://www.tradingview.com/chart/?symbol=NSE:${currentTicker}`, '_blank');
-                }
-            });
-
-            // Close preview when clicking outside
-            document.addEventListener('click', (e) => {
-                if (scanActive && !preview.contains(e.target) && e.target !== toggle) {
-                    hidePreview();
-                }
-            });
+    // NEW: Keyboard shortcut (Ctrl+Shift+Space)
+    document.addEventListener('keydown', (e) => {
+        if (e.ctrlKey && e.shiftKey && e.code === 'Space') {
+            e.preventDefault();
+            toggle.click();
         }
+    });
+
+    // Toggle scan mode
+    toggle.addEventListener('click', () => {
+        scanActive = !scanActive;
+        toggle.classList.toggle('active');
+        
+        if (!scanActive) {
+            hidePreview();
+            removeHighlights(); // Clear all highlights when turning off
+        }
+    });
+
+    // Ticker detection
+    document.addEventListener('mouseover', (e) => {
+        if (!scanActive) return;
+        
+        const text = e.target?.textContent?.trim() || '';
+        const ticker = text.match(/^[A-Z]{2,10}$/)?.[0];
+        
+        if (ticker && isKnownTicker(ticker)) {
+            highlightTicker(e.target, ticker);
+            showPreview(ticker, e); // Pass the event for positioning
+        }
+    });
+
+    function isKnownTicker(ticker) {
+        return Object.values(sectorData).some(sector => 
+            sector.includes(ticker)
+        );
+    }
+
+    function highlightTicker(element, ticker) {
+        // First remove any existing highlights
+        removeHighlights();
+        
+        // Save original HTML before modifying
+        element.dataset.originalHTML = element.innerHTML;
+        
+        // Apply new highlight
+        element.innerHTML = element.innerHTML.replace(
+            new RegExp(`\\b${ticker}\\b`, 'g'),
+            `<span class="ragsym-highlight">${ticker}</span>`
+        );
+        
+        // Track this highlighted element
+        highlightedElements.push(element);
+    }
+
+    function removeHighlights() {
+        highlightedElements.forEach(el => {
+            if (el.dataset.originalHTML) {
+                el.innerHTML = el.dataset.originalHTML;
+                delete el.dataset.originalHTML;
+            }
+        });
+        highlightedElements = []; // Reset the tracker
+    }
+
+    function showPreview(ticker, event) {
+        if (currentTicker === ticker) return;
+        currentTicker = ticker;
+        
+        tickerName.textContent = ticker;
+        iframe.src = `https://www.tradingview.com/embed-widget/technical-analysis/?symbol=NSE:${ticker}&interval=15&locale=en`;
+        
+        preview.style.display = 'block';
+        positionPreview(event);
+    }
+
+    function hidePreview() {
+        preview.style.display = 'none';
+        currentTicker = null;
+        iframe.src = '';
+    }
+
+    function positionPreview(event) {
+        const mouseX = event.clientX;
+        const mouseY = event.clientY;
+        const previewWidth = preview.offsetWidth;
+        const previewHeight = preview.offsetHeight;
+        
+        let left = mouseX + 20;
+        let top = mouseY + 20;
+        
+        if (left + previewWidth > window.innerWidth) {
+            left = mouseX - previewWidth - 20;
+        }
+        
+        if (top + previewHeight > window.innerHeight) {
+            top = mouseY - previewHeight - 20;
+        }
+        
+        preview.style.left = `${left}px`;
+        preview.style.top = `${top}px`;
+    }
+
+    // Full chart button (15m timeframe)
+    fullChartBtn.addEventListener('click', () => {
+        if (currentTicker) {
+            window.open(`https://www.tradingview.com/chart/?symbol=NSE:${currentTicker}&interval=15`, '_blank');
+        }
+    });
+
+    // Close preview when clicking outside
+    document.addEventListener('click', (e) => {
+        if (scanActive && !preview.contains(e.target) && e.target !== toggle) {
+            hidePreview();
+        }
+    });
+}
     </script>
 </body>
 </html>
