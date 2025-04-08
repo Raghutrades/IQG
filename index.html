@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Intraday Quick Grabber</title>
+    <link rel="icon" href="favicon.png" type="image/png">
     <style>
         @font-face {
             font-family: 'Quenton';
@@ -11,34 +12,29 @@
         }
 
         :root {
-            --dark-bg: #181d28;
-            --card-bg: #232a3a;
-            --text-white: #ffffff;
-            --text-light: #e0e0e0;
-            --border-dark: #2d3546;
-            --gold-yellow: #FFD700;
-            --gold-secondary: #FFC300;
-            --active-green: #4CAF50;
-            --shadow-gradient: linear-gradient(
-                to right,
-                rgba(76, 175, 80, 0.3),
-                rgba(33, 150, 243, 0.3),
-                rgba(156, 39, 176, 0.3)
-            );
+            --dark-bg: #121420;
+            --dark-card: #1a1d2e;
+            --dark-text: #e0e3ff;
+            --dark-border: #2a3042;
+            --dark-accent: #4361ee;
+            --dark-glow: rgba(67, 97, 238, 0.3);
             
-            /* Light Theme */
             --light-bg: #f8fafc;
             --light-card: #ffffff;
             --light-text: #1e293b;
             --light-border: #e2e8f0;
             --light-accent: #3b82f6;
+            --light-glow: rgba(59, 130, 246, 0.2);
             
-            /* Current Theme Defaults */
+            --gold-primary: #FFD700;
+            --gold-secondary: #FFC300;
+            
             --bg: var(--dark-bg);
-            --card: var(--card-bg);
-            --text: var(--text-white);
-            --border: var(--border-dark);
-            --accent: var(--active-green);
+            --card: var(--dark-card);
+            --text: var(--dark-text);
+            --border: var(--dark-border);
+            --accent: var(--dark-accent);
+            --glow: var(--dark-glow);
         }
         
         .light-mode {
@@ -47,7 +43,8 @@
             --text: var(--light-text);
             --border: var(--light-border);
             --accent: var(--light-accent);
-            --gold-yellow: #d4af37;
+            --glow: var(--light-glow);
+            --gold-primary: #d4af37;
         }
         
         body {
@@ -56,6 +53,7 @@
             color: var(--text);
             margin: 0;
             padding: 0;
+            transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
         }
         
         /* === HEADER STYLES === */
@@ -76,7 +74,7 @@
             left: 0;
             right: 0;
             height: 3px;
-            background: var(--shadow-gradient);
+            background: linear-gradient(90deg, #4361ee, #3a0ca3, #7209b7);
             filter: blur(4px);
         }
         
@@ -101,12 +99,44 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            position: relative;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 0 20px rgba(76, 175, 80, 0.6);
+            object-fit: contain;
+            background: rgba(255,255,255,0.05);
+            z-index: 2;
+            animation: 
+                logo-pulse-green 2s infinite alternate,
+                logo-bounce 0.8s ease-in-out;
+            transform-origin: center;
+        }
+
+        @keyframes logo-bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(0.9); }
+        }
+
+        @keyframes logo-pulse-green {
+            0% { box-shadow: 0 0 20px rgba(76, 175, 80, 0.6); }
+            100% { box-shadow: 0 0 30px rgba(76, 175, 80, 0.8); }
         }
         
         .main-title {
             font-family: 'Quenton', sans-serif;
             font-size: 2.5rem;
-            color: var(--gold-yellow);
+            color: var(--gold-primary);
             margin: 0;
             text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
             letter-spacing: 1px;
@@ -133,21 +163,42 @@
         .ticker-display {
             background: var(--card);
             border-radius: 50px;
-            padding: 0.5rem 1.5rem;
+            padding: 0.75rem 1.75rem;
             border: 1px solid var(--border);
-            box-shadow: 0 0 15px rgba(76, 175, 80, 0.3);
+            box-shadow: 0 0 20px var(--glow);
             animation: pulse 2s infinite alternate;
             font-weight: 600;
             align-self: center;
             justify-self: end;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .ticker-display:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px var(--glow);
+        }
+        
+        .ticker-display::after {
+            content: '↗';
+            color: var(--gold-primary);
+            opacity: 0;
+            transition: opacity 0.2s;
+            position: absolute;
+            right: 10px;
+        }
+        
+        .ticker-display:hover::after {
+            opacity: 1;
         }
         
         @keyframes pulse {
-            0% { box-shadow: 0 0 15px rgba(76, 175, 80, 0.3); }
-            100% { box-shadow: 0 0 25px rgba(76, 175, 80, 0.5); }
+            0% { box-shadow: 0 0 20px var(--glow); }
+            100% { box-shadow: 0 0 30px rgba(255, 215, 0, 0.6); }
         }
         
-        /* === SECTOR GRID STYLES (FROM PREVIOUS VERSION) === */
+        /* === SECTOR GRID === */
         .sector-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
@@ -169,7 +220,7 @@
         
         .sector-table:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 40px rgba(67, 97, 238, 0.3);
+            box-shadow: 0 8px 40px var(--glow);
         }
         
         .sector-header {
@@ -215,7 +266,7 @@
         
         .stock-item::after {
             content: '→';
-            color: var(--gold-yellow);
+            color: var(--gold-primary);
             opacity: 0;
             transition: opacity 0.2s;
         }
@@ -255,7 +306,7 @@
             border-color: var(--accent);
         }
         
-        /* === QUOTE CONTAINER === */
+        /* === 3D QUOTE BOX === */
         .quote-container {
             max-width: 800px;
             margin: 2rem auto;
@@ -273,6 +324,21 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { 
+                transform: perspective(500px) rotateX(10deg) translateY(0);
+            }
+            50% { 
+                transform: perspective(500px) rotateX(12deg) translateY(-10px);
+            }
+        }
+        
+        .quote-container:hover {
+            animation: none;
+            transform: perspective(500px) rotateX(12deg) translateY(-5px);
         }
         
         .quote-text {
@@ -290,7 +356,7 @@
             margin-top: 1rem;
             text-align: right;
             font-weight: 600;
-            color: var(--gold-yellow);
+            color: var(--gold-primary);
         }
         
         /* === FOOTER === */
@@ -326,7 +392,7 @@
         
         .theme-toggle:hover {
             transform: scale(1.05);
-            box-shadow: 0 6px 25px rgba(76, 175, 80, 0.3);
+            box-shadow: 0 6px 25px var(--glow);
         }
         
         .theme-icon {
@@ -362,6 +428,14 @@
                 flex-wrap: wrap;
                 justify-content: center;
             }
+            
+            .logo-container {
+                justify-content: center;
+            }
+            
+            .ticker-display {
+                justify-self: center;
+            }
         }
         
         @media (max-width: 600px) {
@@ -376,6 +450,11 @@
             
             .main-title {
                 font-size: 2rem;
+            }
+            
+            .logo {
+                width: 50px;
+                height: 50px;
             }
         }
     </style>
@@ -403,8 +482,13 @@
         </div>
         
         <div class="title-container">
-            <h1 class="main-title">Intraday Quick Grabber</h1>
-            <div class="tagline" id="tagline">Catch the Pulse, Ride the Move.</div>
+            <div class="logo-container">
+                <img src="logo.png" class="logo" alt="Intraday Quick Grabber Logo">
+                <div>
+                    <h1 class="main-title">Intraday Quick Grabber</h1>
+                    <div class="tagline" id="tagline">Catch the Pulse, Ride the Move.</div>
+                </div>
+            </div>
         </div>
         
         <div class="ticker-display" id="randomTicker">
@@ -435,24 +519,24 @@
     </button>
 
     <script>
-        // Stock data for all sectors
-        const sectorData = {
-            "NIFTY50": ["TRENT", "TCS", "NTPC", "BRITANNIA", "ICICIBANK", "ITC", "HINDUNILVR", "BHARTIARTL", "ADANIPORTS", "TECHM", "COALINDIA", "RELIANCE", "ONGC", "INFY", "NESTLEIND", "SBIN", "ASIANPAINT", "ADANIENT", "KOTAKBANK", "BPCL", "WIPRO", "MARUTI", "HCLTECH", "BAJFINANCE", "TATAMOTORS", "LT", "BEL", "HEROMOTOCO", "HDFCLIFE", "TITAN", "DRREDDY", "TATASTEEL", "CIPLA", "TATACONSUM", "POWERGRID", "JSWSTEEL", "BAJAJFINSV", "GRASIM", "APOLLOHOSP", "HINDALCO", "ULTRACEMCO", "BAJAJ-AUTO", "INDUSINDBK", "SBILIFE", "SHRIRANFIN", "HDFCBANK", "SUNPHARMA", "M&M", "EICHERMOT", "AXISBANK"],
-            "BANKING": ["ICICIBANK", "BANKBARODA", "SBIN", "KOTAKBANK", "FEDERALBNK", "INDIANB", "BANKINDIA", "INDUSINBK", "AUBANK", "HDFCBANK", "PNB", "IDFCFIRSTB", "CANBK", "AXISBANK"],
-            "AUTOMOBILE": ["EXIDEIND", "MOTHERSON", "APOLLOTYRE", "MARUTI", "TATAMOTORS", "BOSCHLTD", "HEROMOTOCO", "BALKRISIND", "TVSMOTOR", "SONACOMS", "TITAGARH", "TIINDIA", "BHARATFORG", "MRF", "BAJAJ-AUTO", "M&M", "EICHERMOT"],
-            "FINANCIAL SERVICES": ["ICICIBANK", "IRFC", "ICICIGI", "PFC", "ICICIPRULI", "SBICARD", "MUTHOOTFIN", "SBIN", "LICHSGFIN", "KOTAKBANK", "BAJFINANCE", "HDFCAMC", "POONAWALLA", "LICI", "HDFCLIFE", "HUDCO", "RECLTD", "CDSL", "JIOFIN", "BAJAJFINSV", "CHOLAFIN", "IIFL", "POLICYBZR", "MAXHEALTH", "SBILIFE", "SHRIRAMFIN", "ANGELONE", "BSE", "HDFCBANK", "PAYTM", "AXISBANK"],
-            "FMCG": ["BRITANNIA", "ITC", "HINDUNILVR", "DMART", "NESTLEIND", "COLPAL", "DABUR", "MARICO", "KALYANJIL", "ZOMATO", "VBL", "TATACONSUM", "PATANJALI", "UNITDSPR", "GODREJCP", "NYKAA", "SUPERMEIND"],
-            "INFORMATION TECHNOLOGY": ["TCS", "TECHM", "INFY", "WIPRO", "HCLTECH", "PERSISTENT", "COFORGE", "CAMS", "LTIM", "KPITTECH", "LTTS", "MPHASIS", "CYIENT", "TATAELXSI", "HFCL"],
-            "SENSEX": ["TCS", "NTPC", "ICICIBANK", "ITC", "HINDUNILVR", "BHARTIARTL", "ADANIPORTS", "TECHM", "RELIANCE", "INFY", "NESTLEIND", "SBIN", "ASIANPAINT", "KOTAKBANK", "MARUTI", "HCLTECH", "BAJFINANCE", "TATAMOTORS", "LT", "TITAN", "TATASTEEL", "POWERGRID", "JSWSTEEL", "BAJAJFINSV", "ULTRACEMCO", "INDUSINDBK", "HDFCBANK", "SUNPHARMA", "M&M", "AXISBANK"],
-            "METALS": ["ADANIENT", "JINDALSTEL", "SAIL", "TATASTEEL", "JSWSTEEL", "HINDALCO", "HINDCOPPER", "VEDL", "NATIONALUM", "NMDC", "JSL", "APLAPOLLO"],
-            "PHARMACEUTICALS": ["AUROPHARMA", "ZYDUSLIFE", "GLENMARK", "DRREDDY", "LAURUSLABS", "CIPLA", "LUPIN", "DIVISLAB", "TORNTPHARM", "GRANULES", "ALKEM", "SUNPHARMA", "BIOCON"],
-            "PSU BANKS": ["BANKBARODA", "SBIN", "INDIANB", "BANKINDIA", "UNIONBANK", "PNB", "CANBK"],
-            "PRIVATE BANKS": ["ICICIBANK", "KOTAKBANK", "FEDERALBNK", "RBLBANK", "BANDHANBNK", "INDUSINDBK", "HDFCBANK", "IDFCFIRSTB", "AXISBANK"],
-            "REALTY": ["NCC", "PHOENIXLTD", "PRESTIGE", "OBEROIRLTY", "GODREJPROP", "DLF", "LODHA", "NBCC", "IRB"],
-            "ENERGY": ["NTPC", "COALINDIA", "RELIANCE", "ONGC", "CESE", "SOLARINDS", "TATAPOWER", "TORNTPOWER", "BPCL", "IOC", "ADANIENSOL", "IREDA", "OIL", "POWERGRID", "ATGL", "CGPOWER", "PETRONET", "JSWENERGY", "SJVN", "NHPC", "IGL", "GMRAIRPORT", "ADANIGREEN"],
-            "CEMENT": ["AMBUJACEM", "ACC", "JKCEMENT", "ULTRACEMCO", "DALBHARAT", "SHREECEM", "RAMCOCEM"],
-            "MIDCAP SELECT": ["AUROPHARMA", "HINDUPETRO", "VOLTAS", "UPL", "HDFCAMC", "PERSISTENT", "FEDERALBNK", "POLYCAB", "COFORGE", "LUPIN", "ASTRAL", "PAGEIND", "PIIND", "BHARATFORG", "MRF", "JUBLFOOD", "CONCOR", "INDHOTEL", "GODREJPROP", "AUBANK", "ASHOKLEY", "MPHASIS", "IDFCFIRSTB", "IDEA", "CUMMINSIND"]
-        };
+        // Stock data for all 15 sectors
+const sectorData = {
+    "NIFTY50": ["TRENT", "TCS", "NTPC", "BRITANNIA", "ICICIBANK", "ITC", "HINDUNILVR", "BHARTIARTL", "ADANIPORTS", "TECHM", "COALINDIA", "RELIANCE", "ONGC", "INFY", "NESTLEIND", "SBIN", "ASIANPAINT", "ADANIENT", "KOTAKBANK", "BPCL", "WIPRO", "MARUTI", "HCLTECH", "BAJFINANCE", "TATAMOTORS", "LT", "BEL", "HEROMOTOCO", "HDFCLIFE", "TITAN", "DRREDDY", "TATASTEEL", "CIPLA", "TATACONSUM", "POWERGRID", "JSWSTEEL", "BAJAJFINSV", "GRASIM", "APOLLOHOSP", "HINDALCO", "ULTRACEMCO", "BAJAJ-AUTO", "INDUSINDBK", "SBILIFE", "SHRIRANFIN", "HDFCBANK", "SUNPHARMA", "M&M", "EICHERMOT", "AXISBANK"],
+    "BANKING": ["ICICIBANK", "BANKBARODA", "SBIN", "KOTAKBANK", "FEDERALBNK", "INDIANB", "BANKINDIA", "INDUSINBK", "AUBANK", "HDFCBANK", "PNB", "IDFCFIRSTB", "CANBK", "AXISBANK"],
+    "AUTOMOBILE": ["EXIDEIND", "MOTHERSON", "APOLLOTYRE", "MARUTI", "TATAMOTORS", "BOSCHLTD", "HEROMOTOCO", "BALKRISIND", "TVSMOTOR", "SONACOMS", "TITAGARH", "TIINDIA", "BHARATFORG", "MRF", "BAJAJ-AUTO", "M&M", "EICHERMOT"],
+    "FINANCIAL SERVICES": ["ICICIBANK", "IRFC", "ICICIGI", "PFC", "ICICIPRULI", "SBICARD", "MUTHOOTFIN", "SBIN", "LICHSGFIN", "KOTAKBANK", "BAJFINANCE", "HDFCAMC", "POONAWALLA", "LICI", "HDFCLIFE", "HUDCO", "RECLTD", "CDSL", "JIOFIN", "BAJAJFINSV", "CHOLAFIN", "IIFL", "POLICYBZR", "MAXHEALTH", "SBILIFE", "SHRIRAMFIN", "ANGELONE", "BSE", "HDFCBANK", "PAYTM", "AXISBANK"],
+    "FMCG": ["BRITANNIA", "ITC", "HINDUNILVR", "DMART", "NESTLEIND", "COLPAL", "DABUR", "MARICO", "KALYANJIL", "ZOMATO", "VBL", "TATACONSUM", "PATANJALI", "UNITDSPR", "GODREJCP", "NYKAA", "SUPERMEIND"],
+    "INFORMATION TECHNOLOGY": ["TCS", "TECHM", "INFY", "WIPRO", "HCLTECH", "PERSISTENT", "COFORGE", "CAMS", "LTIM", "KPITTECH", "LTTS", "MPHASIS", "CYIENT", "TATAELXSI", "HFCL"],
+    "SENSEX": ["TCS", "NTPC", "ICICIBANK", "ITC", "HINDUNILVR", "BHARTIARTL", "ADANIPORTS", "TECHM", "RELIANCE", "INFY", "NESTLEIND", "SBIN", "ASIANPAINT", "KOTAKBANK", "MARUTI", "HCLTECH", "BAJFINANCE", "TATAMOTORS", "LT", "TITAN", "TATASTEEL", "POWERGRID", "JSWSTEEL", "BAJAJFINSV", "ULTRACEMCO", "INDUSINDBK", "HDFCBANK", "SUNPHARMA", "M&M", "AXISBANK"],
+    "METALS": ["ADANIENT", "JINDALSTEL", "SAIL", "TATASTEEL", "JSWSTEEL", "HINDALCO", "HINDCOPPER", "VEDL", "NATIONALUM", "NMDC", "JSL", "APLAPOLLO"],
+    "PHARMACEUTICALS": ["AUROPHARMA", "ZYDUSLIFE", "GLENMARK", "DRREDDY", "LAURUSLABS", "CIPLA", "LUPIN", "DIVISLAB", "TORNTPHARM", "GRANULES", "ALKEM", "SUNPHARMA", "BIOCON"],
+    "PSU BANKS": ["BANKBARODA", "SBIN", "INDIANB", "BANKINDIA", "UNIONBANK", "PNB", "CANBK"],
+    "PRIVATE BANKS": ["ICICIBANK", "KOTAKBANK", "FEDERALBNK", "RBLBANK", "BANDHANBNK", "INDUSINDBK", "HDFCBANK", "IDFCFIRSTB", "AXISBANK"],
+    "REALTY": ["NCC", "PHOENIXLTD", "PRESTIGE", "OBEROIRLTY", "GODREJPROP", "DLF", "LODHA", "NBCC", "IRB"],
+    "ENERGY": ["NTPC", "COALINDIA", "RELIANCE", "ONGC", "CESE", "SOLARINDS", "TATAPOWER", "TORNTPOWER", "BPCL", "IOC", "ADANIENSOL", "IREDA", "OIL", "POWERGRID", "ATGL", "CGPOWER", "PETRONET", "JSWENERGY", "SJVN", "NHPC", "IGL", "GMRAIRPORT", "ADANIGREEN"],
+    "CEMENT": ["AMBUJACEM", "ACC", "JKCEMENT", "ULTRACEMCO", "DALBHARAT", "SHREECEM", "RAMCOCEM"],
+    "MIDCAP SELECT": ["AUROPHARMA", "HINDUPETRO", "VOLTAS", "UPL", "HDFCAMC", "PERSISTENT", "FEDERALBNK", "POLYCAB", "COFORGE", "LUPIN", "ASTRAL", "PAGEIND", "PIIND", "BHARATFORG", "MRF", "JUBLFOOD", "CONCOR", "INDHOTEL", "GODREJPROP", "AUBANK", "ASHOKLEY", "MPHASIS", "IDFCFIRSTB", "IDEA", "CUMMINSIND"]
+};
 
         const punchlines = [
             "Catch the Pulse, Ride the Move.",
@@ -468,21 +552,40 @@
         ];
 
         const quotes = [
-            { text: "Opportunities don't happen, you create them.", author: "" },
-            { text: "The market is always right. Never argue with it.", author: "" },
-            { text: "Price is what you pay. Value is what you get.", author: "Benjamin Graham" },
-            { text: "Risk comes from not knowing what you're doing.", author: "Warren Buffett" },
-            { text: "Time is your friend; impulse is your enemy.", author: "" },
-            { text: "Buy when everyone else is selling and hold until everyone else is buying.", author: "Warren Buffett" },
-            { text: "The stock market is filled with individuals who know the price of everything, but the value of nothing.", author: "" },
-            { text: "In investing, what is comfortable is rarely profitable.", author: "" },
-            { text: "The four most dangerous words in investing are: 'This time it's different.'", author: "Sir John Templeton" },
-            { text: "Wide diversification is only required when investors do not understand what they are doing.", author: "Warren Buffett" }
-        ];
+    { text: "Opportunities don't happen, you create them.", author: "" },
+    { text: "The market is always right. Never argue with it.", author: "" },
+    { text: "Price is what you pay. Value is what you get.", author: "Benjamin Graham" },
+    { text: "Risk comes from not knowing what you're doing.", author: "Warren Buffett" },
+    { text: "Time is your friend; impulse is your enemy.", author: "" },
+    { text: "Buy when everyone else is selling and hold until everyone else is buying.", author: "Warren Buffett" },
+    { text: "The stock market is filled with individuals who know the price of everything, but the value of nothing.", author: "" },
+    { text: "In investing, what is comfortable is rarely profitable.", author: "" },
+    { text: "The four most dangerous words in investing are: 'This time it's different.'", author: "Sir John Templeton" },
+    { text: "Wide diversification is only required when investors do not understand what they are doing.", author: "Warren Buffett" },
+    { text: "The individual investor should act consistently as an investor and not as a speculator.", author: "Ben Graham" },
+    { text: "It's not whether you're right or wrong that's important, but how much money you make when you're right and how much you lose when you're wrong.", author: "George Soros" },
+    { text: "The goal of a successful trader is to make the best trades. Money is secondary.", author: "Alexander Elder" },
+    { text: "If you can't control your emotions, you can't control your money.", author: "Warren Buffett" },
+    { text: "The most important quality for an investor is temperament, not intellect.", author: "Warren Buffett" },
+    { text: "Know what you own, and know why you own it.", author: "Peter Lynch" },
+    { text: "The stock market is a device for transferring money from the impatient to the patient.", author: "Warren Buffett" },
+    { text: "The best time to plant a tree was 20 years ago. The second best time is now.", author: "Chinese Proverb" },
+    { text: "Don't look for the needle in the haystack. Just buy the haystack!", author: "John Bogle" },
+    { text: "Someone's sitting in the shade today because someone planted a tree a long time ago.", author: "Warren Buffett" },
+    { text: "It's far better to buy a wonderful company at a fair price than a fair company at a wonderful price.", author: "Warren Buffett" },
+    { text: "Our favorite holding period is forever.", author: "Warren Buffett" },
+    { text: "You get recessions, you have stock market declines. If you don't understand that's going to happen, then you're not ready, you won't do well in the markets.", author: "Peter Lynch" },
+    { text: "The stock market is a no-called-strike game. You don't have to swing at everything—you can wait for your pitch.", author: "Warren Buffett" },
+    { text: "The key to making money in stocks is not to get scared out of them.", author: "Peter Lynch" },
+    { text: "The biggest risk of all is not taking one.", author: "" },
+    { text: "Compound interest is the eighth wonder of the world. He who understands it, earns it; he who doesn't, pays it.", author: "Albert Einstein" },
+    { text: "Do not save what is left after spending, but spend what is left after saving.", author: "Warren Buffett" },
+    { text: "Never depend on a single income. Make investment to create a second source.", author: "Warren Buffett" },
+    { text: "The best investment you can make is in yourself.", author: "Warren Buffett" }
+];
 
         // ===== INITIALIZE PAGE =====
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize all components
             initThemeToggle();
             initDateTime();
             initTagline();
@@ -516,7 +619,6 @@
                 setTheme(!isDark);
             });
             
-            // Check saved theme
             if (localStorage.getItem('theme') === 'light') {
                 setTheme(false);
             }
@@ -534,10 +636,8 @@
                     timeZone: 'Asia/Kolkata'
                 };
                 
-                // Current Date
                 document.getElementById('current-date').textContent = now.toLocaleDateString('en-IN', options);
                 
-                // Current Time
                 const timeOptions = {
                     hour: '2-digit',
                     minute: '2-digit',
@@ -547,19 +647,16 @@
                 };
                 document.getElementById('current-time').textContent = now.toLocaleTimeString('en-IN', timeOptions);
                 
-                // Days remaining in month
                 const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
                 const daysInMonth = lastDayOfMonth.getDate();
                 const daysLeftMonth = daysInMonth - now.getDate();
                 document.getElementById('days-month').textContent = `${daysLeftMonth} days`;
                 
-                // Days remaining in year
                 const lastDayOfYear = new Date(now.getFullYear(), 11, 31);
                 const daysLeftYear = Math.ceil((lastDayOfYear - now) / (1000 * 60 * 60 * 24));
                 document.getElementById('days-year').textContent = `${daysLeftYear} days`;
             }
             
-            // Update immediately and then every second
             updateDateTime();
             setInterval(updateDateTime, 1000);
         }
@@ -574,8 +671,6 @@
         // ===== RANDOM TICKER =====
         function initRandomTicker() {
             const tickerDisplay = document.getElementById('randomTicker');
-            
-            // Get all stocks from all sectors
             const allStocks = [];
             Object.values(sectorData).forEach(stocks => {
                 allStocks.push(...stocks);
@@ -584,10 +679,18 @@
             function updateTicker() {
                 const randomStock = allStocks[Math.floor(Math.random() * allStocks.length)];
                 tickerDisplay.textContent = randomStock;
+                tickerDisplay.dataset.stock = randomStock;
             }
             
+            tickerDisplay.addEventListener('click', function() {
+                const currentStock = this.dataset.stock;
+                if (currentStock) {
+                    window.open(`https://www.tradingview.com/chart/?symbol=NSE:${currentStock}`, '_blank');
+                }
+            });
+            
             updateTicker();
-            setInterval(updateTicker, 10000);
+            setInterval(updateTicker, 15000); // Changed to 15 seconds
         }
 
         // ===== SECTOR GRID =====
@@ -606,7 +709,6 @@
                 const stockList = sectorDiv.querySelector('.stock-list');
                 const pagination = sectorDiv.querySelector('.pagination');
                 
-                // Create pages (10 stocks per page)
                 const pageCount = Math.ceil(stocks.length / 10);
                 for (let i = 0; i < pageCount; i++) {
                     const pageDiv = document.createElement('div');
@@ -617,7 +719,6 @@
                     const endIdx = startIdx + 10;
                     const pageStocks = stocks.slice(startIdx, endIdx);
                     
-                    // Add exactly 10 stock items
                     for (let j = 0; j < 10; j++) {
                         const stockItem = document.createElement('div');
                         stockItem.className = 'stock-item';
@@ -628,7 +729,6 @@
                                 window.open(`https://www.tradingview.com/chart/?symbol=NSE:${pageStocks[j]}`, '_blank');
                             });
                         } else {
-                            // Empty placeholder to maintain layout
                             stockItem.style.visibility = 'hidden';
                         }
                         
@@ -637,20 +737,16 @@
                     
                     stockList.appendChild(pageDiv);
                     
-                    // Only add pagination if needed
                     if (pageCount > 1) {
                         const pageBtn = document.createElement('button');
                         pageBtn.className = `page-btn ${i === 0 ? 'active' : ''}`;
                         pageBtn.textContent = i + 1;
                         pageBtn.addEventListener('click', () => {
-                            // Hide all pages
                             stockList.querySelectorAll('.stock-page').forEach(page => {
                                 page.classList.remove('active');
                             });
-                            // Show selected page
                             pageDiv.classList.add('active');
                             
-                            // Update active pagination button
                             pagination.querySelectorAll('.page-btn').forEach(btn => {
                                 btn.classList.remove('active');
                             });
