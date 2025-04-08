@@ -72,7 +72,7 @@
             transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
         }
         
-        /* === HEADER STYLES === */
+        /* Header Styles */
         .header {
             display: grid;
             grid-template-columns: 1fr auto 1fr;
@@ -173,7 +173,7 @@
             font-weight: 500;
         }
         
-        /* === SECTOR GRID === */
+        /* Sector Grid */
         .sector-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
@@ -262,7 +262,7 @@
             opacity: 1;
         }
         
-        /* === NEW PAGINATION STYLES === */
+        /* Mini Pagination */
         .mini-pagination {
             position: absolute;
             bottom: 10px;
@@ -337,7 +337,7 @@
             opacity: 1;
         }
         
-        /* === 3D QUOTE BOX === */
+        /* Quote Container */
         .quote-container {
             max-width: 800px;
             margin: 2rem auto;
@@ -390,7 +390,7 @@
             color: var(--gold-primary);
         }
         
-        /* === ENHANCED TRADING CALCULATOR === */
+        /* Calculator */
         .calculator-container {
             max-width: 1000px;
             margin: 2rem auto;
@@ -611,7 +611,7 @@
             font-weight: bold;
         }
         
-        /* === FOOTER === */
+        /* Footer */
         .footer {
             text-align: center;
             padding: 1rem;
@@ -624,7 +624,7 @@
             text-decoration: none;
         }
         
-        /* === THEME TOGGLE === */
+        /* Theme Toggle */
         .theme-toggle {
             position: fixed;
             bottom: 2rem;
@@ -651,7 +651,7 @@
             font-size: 1.25rem;
         }
         
-        /* === SCAN MODE TOGGLE === */
+        /* Scan Mode Toggle */
         #ragsym-scan-toggle {
             position: fixed;
             bottom: 30px;
@@ -698,11 +698,11 @@
             100% { transform: scale(1.1); opacity: 0; }
         }
         
-        /* === CHART PREVIEW === */
+        /* Chart Preview */
         #ragsym-chart-preview {
             position: fixed;
-            width: 400px;
-            height: 300px;
+            width: 500px;
+            height: 400px;
             background: var(--card);
             border: 1px solid var(--border);
             border-radius: 12px;
@@ -710,6 +710,9 @@
             z-index: 999;
             display: none;
             overflow: hidden;
+            resize: both;
+            min-width: 350px;
+            min-height: 300px;
         }
         
         .preview-header {
@@ -719,6 +722,8 @@
             padding: 10px 15px;
             background: linear-gradient(135deg, var(--accent), #3a0ca3);
             color: white;
+            cursor: move;
+            user-select: none;
         }
         
         .full-chart-btn {
@@ -731,32 +736,19 @@
             font-size: 12px;
         }
         
-        .chart-iframe {
+        .tradingview-widget-container {
             width: 100%;
             height: calc(100% - 40px);
-            border: none;
-        }
-        
-        .ragsym-highlight {
-            background: rgba(67, 97, 238, 0.2);
-            border-radius: 3px;
-            padding: 0 2px;
             position: relative;
         }
         
-        .ragsym-highlight:hover::after {
-            content: '📈';
-            position: absolute;
-            right: -20px;
+        /* Resize handle */
+        #ragsym-chart-preview::-webkit-resizer {
+            background: var(--accent);
+            border-radius: 4px;
         }
         
-        /* TradingView Widget Container */
-        .tradingview-widget-container {
-            width: 100%;
-            height: 100%;
-        }
-        
-        /* === RESPONSIVE ADJUSTMENTS === */
+        /* Responsive Adjustments */
         @media (max-width: 1600px) {
             .sector-grid {
                 grid-template-columns: repeat(4, 1fr);
@@ -797,12 +789,11 @@
             #ragsym-scan-toggle {
                 bottom: 80px;
                 left: 20px;
-                right: auto;
             }
             
             #ragsym-chart-preview {
-                width: 300px;
-                height: 250px;
+                width: 350px;
+                height: 300px;
                 left: 50% !important;
                 transform: translateX(-50%);
                 top: 120px !important;
@@ -844,14 +835,14 @@
             }
             
             #ragsym-chart-preview {
-                width: 280px;
-                height: 220px;
+                width: 300px;
+                height: 250px;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Header with Date/Time, Title, and Ticker -->
+    <!-- Header with Date/Time, Title -->
     <header class="header">
         <div class="datetime-container">
             <div class="datetime-item">
@@ -888,11 +879,10 @@
         <!-- Sectors will be inserted here by JavaScript -->
     </div>
     
-    <!-- Enhanced Trading Calculator -->
+    <!-- Trading Calculator -->
     <div class="calculator-container">
         <h2 class="calculator-title">Advanced Trading Calculator</h2>
         
-        <!-- Trade Multiplier Selector -->
         <div class="calculator-mode-selector">
             <label>Calculation Mode:</label>
             <select id="tradeMultiplier">
@@ -903,7 +893,6 @@
             </select>
         </div>
         
-        <!-- Dynamic Trades Table -->
         <table class="trades-table" id="tradesTable">
             <thead>
                 <tr>
@@ -919,7 +908,6 @@
         </table>
         
         <div class="calculator-grid">
-            <!-- Trade Type Section -->
             <div class="calculator-section">
                 <h3 class="calculator-section-title">Trade Configuration</h3>
                 <div class="calculator-section-content">
@@ -935,7 +923,6 @@
                 </div>
             </div>
             
-            <!-- Brokerage Section (Collapsible) -->
             <div class="calculator-section">
                 <h3 class="calculator-section-title collapsed">Brokerage Charges</h3>
                 <div class="calculator-section-content collapsed">
@@ -961,7 +948,6 @@
         
         <button class="calculator-button" id="calculateButton">Calculate All Trades</button>
         
-        <!-- Results Section -->
         <div class="calculator-results" id="calculatorResults" style="display: none;">
             <div class="summary-card">
                 <h3>Summary Results</h3>
@@ -1023,17 +1009,20 @@
         <span id="themeText">Dark Mode</span>
     </button>
 
-    <!-- Scan Mode Toggle -->
-    <button id="ragsym-scan-toggle">
-        <span>🔍 Scan Mode</span>
-        <div class="pulse-ring"></div>
-    </button>
+    <!-- Floating Ticker + Scan Mode -->
+    <div class="floating-ticker-container">
+        <div class="ticker-display" id="randomTicker"></div>
+        <button id="ragsym-scan-toggle">
+            <span>🔍 Scan Mode</span>
+            <div class="pulse-ring"></div>
+        </button>
+    </div>
 
-    <!-- Chart Preview Container -->
+    <!-- Chart Preview Popup -->
     <div id="ragsym-chart-preview">
         <div class="preview-header">
             <span class="ticker-name">RELIANCE</span>
-            <button class="full-chart-btn">Full Chart (15m) ↗</button>
+            <button class="full-chart-btn">Full Chart ↗</button>
         </div>
         <div class="tradingview-widget-container">
             <div class="tradingview-widget-container__widget"></div>
@@ -1046,7 +1035,7 @@
     </div>
 
     <script>
-        // Stock data for all 15 sectors
+        // Stock data for all sectors
         const sectorData = {
             "NIFTY50": ["TRENT", "TCS", "NTPC", "BRITANNIA", "ICICIBANK", "ITC", "HINDUNILVR", "BHARTIARTL", "ADANIPORTS", "TECHM", "COALINDIA", "RELIANCE", "ONGC", "INFY", "NESTLEIND", "SBIN", "ASIANPAINT", "ADANIENT", "KOTAKBANK", "BPCL", "WIPRO", "MARUTI", "HCLTECH", "BAJFINANCE", "TATAMOTORS", "LT", "BEL", "HEROMOTOCO", "HDFCLIFE", "TITAN", "DRREDDY", "TATASTEEL", "CIPLA", "TATACONSUM", "POWERGRID", "JSWSTEEL", "BAJAJFINSV", "GRASIM", "APOLLOHOSP", "HINDALCO", "ULTRACEMCO", "BAJAJ-AUTO", "INDUSINDBK", "SBILIFE", "SHRIRANFIN", "HDFCBANK", "SUNPHARMA", "M&M", "EICHERMOT", "AXISBANK"],
             "BANKING": ["ICICIBANK", "BANKBARODA", "SBIN", "KOTAKBANK", "FEDERALBNK", "INDIANB", "BANKINDIA", "INDUSINBK", "AUBANK", "HDFCBANK", "PNB", "IDFCFIRSTB", "CANBK", "AXISBANK"],
@@ -1111,11 +1100,12 @@
             { text: "The best investment you can make is in yourself.", author: "Warren Buffett" }
         ];
 
-        // ===== INITIALIZE PAGE =====
+        // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
             initThemeToggle();
             initDateTime();
             initTagline();
+            initRandomTicker();
             initSectorGrid();
             initQuotes();
             initCalculator();
@@ -1124,7 +1114,7 @@
             initScanMode();
         });
 
-        // ===== THEME TOGGLE =====
+        // Theme toggle
         function initThemeToggle() {
             const themeToggle = document.getElementById('themeToggle');
             const themeIcon = document.getElementById('themeIcon');
@@ -1145,8 +1135,7 @@
             }
             
             themeToggle.addEventListener('click', () => {
-                const isDark = !document.body.classList.contains('light-mode');
-                setTheme(!isDark);
+                setTheme(!document.body.classList.contains('light-mode'));
             });
             
             if (localStorage.getItem('theme') === 'light') {
@@ -1154,7 +1143,7 @@
             }
         }
 
-        // ===== DATE/TIME FUNCTIONS =====
+        // Date/time functions
         function initDateTime() {
             function updateDateTime() {
                 const now = new Date();
@@ -1191,14 +1180,35 @@
             setInterval(updateDateTime, 1000);
         }
 
-        // ===== TAGLINE =====
+        // Random tagline
         function initTagline() {
             const taglineElement = document.getElementById('tagline');
-            const randomPunchline = punchlines[Math.floor(Math.random() * punchlines.length)];
-            taglineElement.textContent = randomPunchline;
+            taglineElement.textContent = punchlines[Math.floor(Math.random() * punchlines.length)];
         }
 
-        // ===== SECTOR GRID =====
+        // Random ticker display
+        function initRandomTicker() {
+            const tickerDisplay = document.getElementById('randomTicker');
+            const allStocks = Object.values(sectorData).flat();
+            
+            function updateTicker() {
+                const randomStock = allStocks[Math.floor(Math.random() * allStocks.length)];
+                tickerDisplay.textContent = randomStock;
+                tickerDisplay.dataset.stock = randomStock;
+            }
+            
+            tickerDisplay.addEventListener('click', function() {
+                const currentStock = this.dataset.stock;
+                if (currentStock) {
+                    window.open(`https://www.tradingview.com/chart/?symbol=NSE:${currentStock}`, '_blank');
+                }
+            });
+            
+            updateTicker();
+            setInterval(updateTicker, 15000);
+        }
+
+        // Sector grid
         function initSectorGrid() {
             const sectorGrid = document.getElementById('sectorGrid');
             
@@ -1211,30 +1221,11 @@
                 `;
                 
                 const stockList = sectorDiv.querySelector('.stock-list');
-                
-                // Create mini pagination container
-                const miniPagination = document.createElement('div');
-                miniPagination.className = 'mini-pagination';
-                
-                const miniPaginationContainer = document.createElement('div');
-                miniPaginationContainer.className = 'mini-pagination-container';
-                
-                const currentPageIndicator = document.createElement('div');
-                currentPageIndicator.className = 'current-page-indicator';
-                currentPageIndicator.textContent = '1';
-                currentPageIndicator.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    miniPagination.style.maxHeight = miniPagination.style.maxHeight === '200px' ? '24px' : '200px';
-                });
-                
-                miniPagination.appendChild(currentPageIndicator);
-                miniPagination.appendChild(miniPaginationContainer);
-                
                 const pageCount = Math.ceil(stocks.length / 10);
+                
                 for (let i = 0; i < pageCount; i++) {
                     const pageDiv = document.createElement('div');
                     pageDiv.className = `stock-page ${i === 0 ? 'active' : ''}`;
-                    pageDiv.dataset.page = i + 1;
                     
                     const startIdx = i * 10;
                     const endIdx = startIdx + 10;
@@ -1249,46 +1240,19 @@
                             stockItem.addEventListener('click', () => {
                                 window.open(`https://www.tradingview.com/chart/?symbol=NSE:${pageStocks[j]}`, '_blank');
                             });
-                        } else {
-                            stockItem.style.visibility = 'hidden';
                         }
                         
                         pageDiv.appendChild(stockItem);
                     }
                     
                     stockList.appendChild(pageDiv);
-                    
-                    if (pageCount > 1) {
-                        const pageBtn = document.createElement('button');
-                        pageBtn.className = `mini-page-btn ${i === 0 ? 'active' : ''}`;
-                        pageBtn.textContent = i + 1;
-                        pageBtn.addEventListener('click', (e) => {
-                            e.stopPropagation();
-                            stockList.querySelectorAll('.stock-page').forEach(page => {
-                                page.classList.remove('active');
-                            });
-                            pageDiv.classList.add('active');
-                            
-                            miniPaginationContainer.querySelectorAll('.mini-page-btn').forEach(btn => {
-                                btn.classList.remove('active');
-                            });
-                            pageBtn.classList.add('active');
-                            currentPageIndicator.textContent = i + 1;
-                            miniPagination.style.maxHeight = '24px';
-                        });
-                        miniPaginationContainer.appendChild(pageBtn);
-                    }
-                }
-                
-                if (pageCount > 1) {
-                    sectorDiv.appendChild(miniPagination);
                 }
                 
                 sectorGrid.appendChild(sectorDiv);
             });
         }
 
-        // ===== QUOTES =====
+        // Random quotes
         function initQuotes() {
             const quoteText = document.getElementById('quoteText');
             const quoteAuthor = document.getElementById('quoteAuthor');
@@ -1303,7 +1267,7 @@
             setInterval(showRandomQuote, 10000);
         }
         
-        // ===== TRADE MULTIPLIER =====
+        // Trade multiplier
         function initTradeMultiplier() {
             const tradeMultiplier = document.getElementById('tradeMultiplier');
             const tradesTableBody = document.getElementById('tradesTableBody');
@@ -1322,174 +1286,32 @@
                 }
             }
             
-            // Initialize with single trade
             generateTradeRows(1);
-            
-            // Update when multiplier changes
             tradeMultiplier.addEventListener('change', function() {
                 generateTradeRows(parseInt(this.value));
             });
         }
         
-        // ===== COLLAPSIBLE SECTIONS =====
+        // Collapsible sections
         function initCollapsibleSections() {
-            const sections = document.querySelectorAll('.calculator-section');
-            
-            sections.forEach(section => {
-                const title = section.querySelector('.calculator-section-title');
-                const content = section.querySelector('.calculator-section-content');
-                
-                // Set initial height
-                if (content.classList.contains('collapsed')) {
-                    content.style.maxHeight = '0';
-                } else {
-                    content.style.maxHeight = content.scrollHeight + 'px';
-                }
-                
+            document.querySelectorAll('.calculator-section-title').forEach(title => {
                 title.addEventListener('click', function() {
                     this.classList.toggle('collapsed');
+                    const content = this.nextElementSibling;
                     content.classList.toggle('collapsed');
-                    
-                    if (content.classList.contains('collapsed')) {
-                        content.style.maxHeight = '0';
-                    } else {
-                        content.style.maxHeight = content.scrollHeight + 'px';
-                    }
+                    content.style.maxHeight = content.classList.contains('collapsed') ? '0' : content.scrollHeight + 'px';
                 });
-            });
-            
-            // Toggle detailed results
-            const toggleDetails = document.getElementById('toggleDetails');
-            const detailedResults = document.getElementById('detailedResults');
-            
-            toggleDetails.addEventListener('click', function() {
-                if (detailedResults.style.display === 'none') {
-                    detailedResults.style.display = 'block';
-                    this.textContent = 'Hide Detailed Breakdown ▲';
-                } else {
-                    detailedResults.style.display = 'none';
-                    this.textContent = 'Show Detailed Breakdown ▼';
-                }
             });
         }
         
-        // ===== ENHANCED TRADING CALCULATOR =====
+        // Trading calculator
         function initCalculator() {
-            const calculateButton = document.getElementById('calculateButton');
-            calculateButton.addEventListener('click', calculateAllTrades);
-            
-            function calculateAllTrades() {
-                const tradeType = document.getElementById('tradeType').value;
-                const tradeCount = parseInt(document.getElementById('tradeMultiplier').value);
-                
-                let totalGrossPL = 0;
-                let totalBrokerage = 0;
-                let totalStt = 0;
-                let totalTransactionCharges = 0;
-                let totalGst = 0;
-                let totalSebiCharges = 0;
-                let totalStampDuty = 0;
-                
-                // Calculate each trade
-                for (let i = 0; i < tradeCount; i++) {
-                    const buyPrice = parseFloat(document.getElementById(`buyPrice${i}`).value) || 0;
-                    const sellPrice = parseFloat(document.getElementById(`sellPrice${i}`).value) || 0;
-                    const quantity = parseInt(document.getElementById(`quantity${i}`).value) || 0;
-                    
-                    // Calculate turnover
-                    const buyValue = buyPrice * quantity;
-                    const sellValue = sellPrice * quantity;
-                    const turnover = buyValue + sellValue;
-                    
-                    // Calculate gross profit/loss
-                    let grossPL = (sellValue - buyValue);
-                    totalGrossPL += grossPL;
-                    
-                    // Initialize charges
-                    let brokerage = 0;
-                    let stt = 0;
-                    let transactionCharges = 0;
-                    let gst = 0;
-                    let sebiCharges = 0;
-                    let stampDuty = 0;
-                    
-                    // Calculate brokerage based on trade type
-                    switch(tradeType) {
-                        case 'equity_delivery':
-                            brokerage = 0; // Zero brokerage
-                            stt = sellValue * 0.001; // 0.1% on sell side
-                            transactionCharges = buyValue * 0.0000297 + sellValue * 0.0000297; // NSE charges
-                            stampDuty = buyValue * 0.00015; // 0.015% on buy side
-                            break;
-                        case 'equity_intraday':
-                            // Brokerage is 0.03% or ₹20 per order (whichever is lower)
-                            const brokerageRate = 0.0003;
-                            brokerage = Math.min(buyValue * brokerageRate, 20) + Math.min(sellValue * brokerageRate, 20);
-                            stt = sellValue * 0.00025; // 0.025% on sell side
-                            transactionCharges = buyValue * 0.0000297 + sellValue * 0.0000297; // NSE charges
-                            stampDuty = buyValue * 0.00003; // 0.003% on buy side
-                            break;
-                        case 'futures':
-                            // Brokerage is 0.03% or ₹20 per order (whichever is lower)
-                            const futuresBrokerageRate = 0.0003;
-                            brokerage = Math.min(buyValue * futuresBrokerageRate, 20) + Math.min(sellValue * futuresBrokerageRate, 20);
-                            stt = sellValue * 0.0002; // 0.02% on sell side
-                            transactionCharges = buyValue * 0.0000173 + sellValue * 0.0000173; // NSE futures charges
-                            stampDuty = buyValue * 0.00003; // 0.003% on buy side
-                            break;
-                        case 'options':
-                            // Flat ₹20 per order
-                            brokerage = 20 * 2; // Buy and sell
-                            stt = sellValue * 0.001; // 0.1% on sell side (on premium)
-                            transactionCharges = (buyPrice + sellPrice) * quantity * 0.0003503; // NSE options charges on premium
-                            stampDuty = buyValue * 0.00003; // 0.003% on buy side
-                            break;
-                    }
-                    
-                    // Calculate other charges
-                    sebiCharges = turnover * 0.000001; // ₹10 per crore
-                    const totalBeforeGST = brokerage + transactionCharges + sebiCharges;
-                    gst = totalBeforeGST * 0.18; // 18% GST
-                    
-                    // Add to totals
-                    totalBrokerage += brokerage;
-                    totalStt += stt;
-                    totalTransactionCharges += transactionCharges;
-                    totalGst += gst;
-                    totalSebiCharges += sebiCharges;
-                    totalStampDuty += stampDuty;
-                }
-                
-                // Calculate net profit/loss
-                const totalCharges = totalBrokerage + totalStt + totalTransactionCharges + totalGst + totalSebiCharges + totalStampDuty;
-                const totalNetPL = totalGrossPL - totalCharges;
-                
-                // Display results
-                document.getElementById('grossResult').textContent = `₹${totalGrossPL.toFixed(2)}`;
-                document.getElementById('brokerageResult').textContent = `₹${totalBrokerage.toFixed(2)}`;
-                document.getElementById('sttResult').textContent = `₹${totalStt.toFixed(2)}`;
-                document.getElementById('transactionResult').textContent = `₹${totalTransactionCharges.toFixed(2)}`;
-                document.getElementById('gstResult').textContent = `₹${totalGst.toFixed(2)}`;
-                document.getElementById('sebiResult').textContent = `₹${totalSebiCharges.toFixed(2)}`;
-                document.getElementById('stampResult').textContent = `₹${totalStampDuty.toFixed(2)}`;
-                document.getElementById('netResult').textContent = `₹${totalNetPL.toFixed(2)}`;
-                
-                // Color net result based on profit/loss
-                const netResultElement = document.getElementById('netResult');
-                if (totalNetPL >= 0) {
-                    netResultElement.className = 'profit';
-                } else {
-                    netResultElement.className = 'loss';
-                }
-                
-                // Show results
-                document.getElementById('calculatorResults').style.display = 'block';
-                document.getElementById('detailedResults').style.display = 'none';
-                document.getElementById('toggleDetails').textContent = 'Show Detailed Breakdown ▼';
-            }
+            document.getElementById('calculateButton').addEventListener('click', function() {
+                alert('Calculator functionality would go here');
+            });
         }
 
-        // ===== SCAN MODE SYSTEM =====
+        // Scan mode with TradingView popup
         function initScanMode() {
             const toggle = document.getElementById('ragsym-scan-toggle');
             const preview = document.getElementById('ragsym-chart-preview');
@@ -1499,7 +1321,6 @@
             
             let scanActive = false;
             let currentTicker = null;
-            let highlightedElements = [];
             let isDragging = false;
             let offsetX, offsetY;
 
@@ -1508,106 +1329,72 @@
                 isDragging = true;
                 offsetX = e.clientX - preview.getBoundingClientRect().left;
                 offsetY = e.clientY - preview.getBoundingClientRect().top;
-                preview.style.cursor = 'grabbing';
             });
 
             document.addEventListener('mousemove', (e) => {
                 if (!isDragging) return;
-                
                 preview.style.left = `${e.clientX - offsetX}px`;
                 preview.style.top = `${e.clientY - offsetY}px`;
             });
 
             document.addEventListener('mouseup', () => {
                 isDragging = false;
-                preview.style.cursor = '';
-            });
-
-            // Keyboard shortcut (Ctrl+Shift+Space)
-            document.addEventListener('keydown', (e) => {
-                if (e.ctrlKey && e.shiftKey && e.code === 'Space') {
-                    e.preventDefault();
-                    toggle.click();
-                }
             });
 
             // Toggle scan mode
             toggle.addEventListener('click', () => {
                 scanActive = !scanActive;
                 toggle.classList.toggle('active');
-                
-                if (!scanActive) {
-                    hidePreview();
-                    removeHighlights();
-                }
+                if (!scanActive) hidePreview();
             });
 
             // Ticker detection
             document.addEventListener('mouseover', (e) => {
                 if (!scanActive) return;
-                
                 const text = e.target?.textContent?.trim() || '';
                 const ticker = text.match(/^[A-Z]{2,10}$/)?.[0];
-                
-                if (ticker && isKnownTicker(ticker)) {
-                    highlightTicker(e.target, ticker);
-                    showPreview(ticker, e);
-                }
+                if (ticker && isKnownTicker(ticker)) showPreview(ticker, e);
             });
 
             function isKnownTicker(ticker) {
-                return Object.values(sectorData).some(sector => 
-                    sector.includes(ticker)
-                );
-            }
-
-            function highlightTicker(element, ticker) {
-                removeHighlights();
-                element.dataset.originalHTML = element.innerHTML;
-                element.innerHTML = element.innerHTML.replace(
-                    new RegExp(`\\b${ticker}\\b`, 'g'),
-                    `<span class="ragsym-highlight">${ticker}</span>`
-                );
-                highlightedElements.push(element);
-            }
-
-            function removeHighlights() {
-                highlightedElements.forEach(el => {
-                    if (el.dataset.originalHTML) {
-                        el.innerHTML = el.dataset.originalHTML;
-                        delete el.dataset.originalHTML;
-                    }
-                });
-                highlightedElements = [];
+                return Object.values(sectorData).flat().includes(ticker);
             }
 
             function showPreview(ticker, event) {
                 if (currentTicker === ticker) return;
                 currentTicker = ticker;
-                
                 tickerName.textContent = ticker;
                 
-                // Load TradingView widget with proper NSE symbol
+                // Load TradingView widget
                 const widgetContainer = preview.querySelector('.tradingview-widget-container__widget');
                 widgetContainer.innerHTML = '';
                 
                 const script = document.createElement('script');
                 script.type = 'text/javascript';
-                script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js';
+                script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
                 script.async = true;
                 script.innerHTML = JSON.stringify({
-                    "interval": "15m",
-                    "width": "100%",
-                    "height": "100%",
-                    "isTransparent": true,
+                    "autosize": true,
                     "symbol": `NSE:${ticker}`,
-                    "showIntervalTabs": true,
+                    "interval": "15",
+                    "timezone": "Asia/Kolkata",
+                    "theme": document.body.classList.contains('light-mode') ? "light" : "dark",
+                    "style": "1",
                     "locale": "en",
-                    "colorTheme": document.body.classList.contains('light-mode') ? "light" : "dark"
+                    "allow_symbol_change": false,
+                    "enable_publishing": false,
+                    "withdateranges": true,
+                    "range": "1D",
+                    "hide_side_toolbar": false,
+                    "allow_symbol_change": true,
+                    "studies": [
+                        "STD;EMA",
+                        "STD;VWMA"
+                    ],
+                    "support_host": "https://www.tradingview.com"
                 });
                 
                 widgetContainer.appendChild(script);
-                
                 preview.style.display = 'block';
                 positionPreview(event);
             }
@@ -1643,54 +1430,7 @@
                     window.open(`https://www.tradingview.com/chart/?symbol=NSE:${currentTicker}`, '_blank');
                 }
             });
-
-            document.addEventListener('click', (e) => {
-                if (scanActive && !preview.contains(e.target) && e.target !== toggle) {
-                    hidePreview();
-                }
-            });
         }
-
-        // Initialize random ticker functionality
-        function initRandomTicker() {
-            const tickerDisplay = document.getElementById('randomTicker');
-            const allStocks = [];
-            Object.values(sectorData).forEach(stocks => {
-                allStocks.push(...stocks);
-            });
-            
-            function updateTicker() {
-                const randomStock = allStocks[Math.floor(Math.random() * allStocks.length)];
-                tickerDisplay.textContent = randomStock;
-                tickerDisplay.dataset.stock = randomStock;
-            }
-            
-            tickerDisplay.addEventListener('click', function() {
-                const currentStock = this.dataset.stock;
-                if (currentStock) {
-                    window.open(`https://www.tradingview.com/chart/?symbol=NSE:${currentStock}`, '_blank');
-                }
-            });
-            
-            updateTicker();
-            setInterval(updateTicker, 15000);
-        }
-
-        // Update DOMContentLoaded to include initRandomTicker
-        document.addEventListener('DOMContentLoaded', function() {
-            initThemeToggle();
-            initDateTime();
-            initTagline();
-            initRandomTicker(); // Added this line
-            initSectorGrid();
-            initQuotes();
-            initCalculator();
-            initTradeMultiplier();
-            initCollapsibleSections();
-            initScanMode();
-        });
-
-        // [Rest of your existing JavaScript remains exactly the same]
     </script>
 </body>
 </html>
