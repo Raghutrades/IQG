@@ -1609,9 +1609,9 @@ function initScanMode() {
     
     let scanActive = false;
     let currentTicker = null;
-    let highlightedElements = []; // Tracks all highlighted elements
+    let highlightedElements = [];
 
-    // NEW: Keyboard shortcut (Ctrl+Shift+Space)
+    // Keyboard shortcut (Ctrl+Shift+Space)
     document.addEventListener('keydown', (e) => {
         if (e.ctrlKey && e.shiftKey && e.code === 'Space') {
             e.preventDefault();
@@ -1626,7 +1626,7 @@ function initScanMode() {
         
         if (!scanActive) {
             hidePreview();
-            removeHighlights(); // Clear all highlights when turning off
+            removeHighlights();
         }
     });
 
@@ -1639,7 +1639,7 @@ function initScanMode() {
         
         if (ticker && isKnownTicker(ticker)) {
             highlightTicker(e.target, ticker);
-            showPreview(ticker, e); // Pass the event for positioning
+            showPreview(ticker, e);
         }
     });
 
@@ -1650,19 +1650,12 @@ function initScanMode() {
     }
 
     function highlightTicker(element, ticker) {
-        // First remove any existing highlights
         removeHighlights();
-        
-        // Save original HTML before modifying
         element.dataset.originalHTML = element.innerHTML;
-        
-        // Apply new highlight
         element.innerHTML = element.innerHTML.replace(
             new RegExp(`\\b${ticker}\\b`, 'g'),
             `<span class="ragsym-highlight">${ticker}</span>`
         );
-        
-        // Track this highlighted element
         highlightedElements.push(element);
     }
 
@@ -1673,7 +1666,7 @@ function initScanMode() {
                 delete el.dataset.originalHTML;
             }
         });
-        highlightedElements = []; // Reset the tracker
+        highlightedElements = [];
     }
 
     function showPreview(ticker, event) {
@@ -1681,7 +1674,8 @@ function initScanMode() {
         currentTicker = ticker;
         
         tickerName.textContent = ticker;
-        iframe.src = `https://www.tradingview.com/embed-widget/technical-analysis/?symbol=NSE:${ticker}&interval=15&locale=en`;
+        // Updated TradingView widget URL
+        iframe.src = `https://www.tradingview.com/embed-widget/mini-symbol-overview/?symbol=NSE:${ticker}&locale=en`;
         
         preview.style.display = 'block';
         positionPreview(event);
@@ -1714,14 +1708,12 @@ function initScanMode() {
         preview.style.top = `${top}px`;
     }
 
-    // Full chart button (15m timeframe)
     fullChartBtn.addEventListener('click', () => {
         if (currentTicker) {
-            window.open(`https://www.tradingview.com/chart/?symbol=NSE:${currentTicker}&interval=15`, '_blank');
+            window.open(`https://www.tradingview.com/chart/?symbol=NSE:${currentTicker}`, '_blank');
         }
     });
 
-    // Close preview when clicking outside
     document.addEventListener('click', (e) => {
         if (scanActive && !preview.contains(e.target) && e.target !== toggle) {
             hidePreview();
