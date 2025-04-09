@@ -1569,6 +1569,7 @@
             let currentTicker = null;
             let currentTimeframe = '15m';
             let highlightedElements = [];
+            let tvWidget = null;
 
             // Toggle scan mode
             toggle.addEventListener('click', () => {
@@ -1625,53 +1626,66 @@
                 currentTicker = ticker;
                 
                 // Format ticker for NSE
-                const formattedTicker = ticker.endsWith('.NS') ? ticker : `${ticker}`;
                 tickerName.textContent = ticker;
                 
                 // Update full chart button with current timeframe
                 fullChartBtn.textContent = `Full Chart (${currentTimeframe}) ↗`;
                 
-                // Load TradingView Advanced Chart
-                const widgetContainer = preview.querySelector('.tradingview-widget-container__widget');
-                widgetContainer.innerHTML = '';
-                
-                // Create timeframe selector
-                const timeframeSelector = document.createElement('div');
-                timeframeSelector.className = 'timeframe-selector';
-                
-                const timeframes = [
-                    { label: '5m', value: '5m' },
-                    { label: '15m', value: '15m' },
-                    { label: '1D', value: '1D' }
-                ];
-                
-                timeframes.forEach(tf => {
-                    const btn = document.createElement('button');
-                    btn.className = `timeframe-btn ${tf.value === currentTimeframe ? 'active' : ''}`;
-                    btn.textContent = tf.label;
-                    btn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        currentTimeframe = tf.value;
-                        showPreview(ticker, event); // Reload with new timeframe
+                // Create timeframe selector if it doesn't exist
+                let timeframeSelector = preview.querySelector('.timeframe-selector');
+                if (!timeframeSelector) {
+                    timeframeSelector = document.createElement('div');
+                    timeframeSelector.className = 'timeframe-selector';
+                    
+                    const timeframes = [
+                        { label: '5m', value: '5m' },
+                        { label: '15m', value: '15m' },
+                        { label: '1D', value: '1D' }
+                    ];
+                    
+                    timeframes.forEach(tf => {
+                        const btn = document.createElement('button');
+                        btn.className = `timeframe-btn ${tf.value === currentTimeframe ? 'active' : ''}`;
+                        btn.textContent = tf.label;
+                        btn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            currentTimeframe = tf.value;
+                            fullChartBtn.textContent = `Full Chart (${currentTimeframe}) ↗`;
+                            loadTradingViewWidget(ticker);
+                        });
+                        timeframeSelector.appendChild(btn);
                     });
-                    timeframeSelector.appendChild(btn);
-                });
-                
-                // Add timeframe selector to header
-                const header = preview.querySelector('.preview-header');
-                if (!header.querySelector('.timeframe-selector')) {
+                    
+                    const header = preview.querySelector('.preview-header');
                     header.appendChild(timeframeSelector);
                 }
                 
                 // Load TradingView widget
+                loadTradingViewWidget(ticker);
+                
+                preview.style.display = 'block';
+                positionPreview(event);
+            }
+
+            function loadTradingViewWidget(ticker) {
+                const widgetContainer = preview.querySelector('.tradingview-widget-container__widget');
+                widgetContainer.innerHTML = '';
+                
+                // Remove previous widget if exists
+                if (tvWidget) {
+                    tvWidget.remove();
+                    tvWidget = null;
+                }
+                
+                // Create new widget
                 const script = document.createElement('script');
                 script.type = 'text/javascript';
                 script.src = 'https://s3.tradingview.com/tv.js';
                 script.async = true;
                 script.onload = function() {
-                    new TradingView.widget({
+                    tvWidget = new TradingView.widget({
                         "autosize": true,
-                        "symbol": `NSE:${formattedTicker.replace('.NS', '')}`,
+                        "symbol": `NSE:${ticker}`,
                         "interval": currentTimeframe,
                         "timezone": "Asia/Kolkata",
                         "theme": document.body.classList.contains('light-mode') ? "light" : "dark",
@@ -1689,15 +1703,16 @@
                     });
                 };
                 
-                widgetContainer.appendChild(script);
-                
-                preview.style.display = 'block';
-                positionPreview(event);
+                document.body.appendChild(script);
             }
 
             function hidePreview() {
                 preview.style.display = 'none';
                 currentTicker = null;
+                if (tvWidget) {
+                    tvWidget.remove();
+                    tvWidget = null;
+                }
             }
 
             function positionPreview(event) {
@@ -1723,7 +1738,7 @@
 
             fullChartBtn.addEventListener('click', () => {
                 if (currentTicker) {
-                    window.open(`https://www.tradingview.com/chart/?symbol=NSE:${currentTicker.replace('.NS', '')}&interval=${currentTimeframe}`, '_blank');
+                    window.open(`https://www.tradingview.com/chart/?symbol=NSE:${currentTicker}&interval=${currentTimeframe}`, '_blank');
                 }
             });
 
@@ -1733,6 +1748,8 @@
                 }
             });
         }
+
+        // [Rest of your existing JavaScript remains exactly the same]
     </script>
 </body>
 </html>
