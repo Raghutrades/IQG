@@ -757,10 +757,34 @@
             font-size: 12px;
         }
         
-        .chart-iframe {
+        /* TradingView Widget Container */
+        .tradingview-widget-container {
             width: 100%;
             height: calc(100% - 40px);
+        }
+        
+        /* Timeframe selector styles */
+        .timeframe-selector {
+            display: flex;
+            gap: 5px;
+            padding: 5px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 4px;
+            margin-left: 10px;
+        }
+        
+        .timeframe-btn {
+            background: rgba(255,255,255,0.1);
             border: none;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .timeframe-btn.active {
+            background: var(--accent);
         }
         
         .ragsym-highlight {
@@ -774,12 +798,6 @@
             content: '📈';
             position: absolute;
             right: -20px;
-        }
-        
-        /* TradingView Widget Container */
-        .tradingview-widget-container {
-            width: 100%;
-            height: 100%;
         }
         
         /* === RESPONSIVE ADJUSTMENTS === */
@@ -1066,11 +1084,6 @@
         </div>
         <div class="tradingview-widget-container">
             <div class="tradingview-widget-container__widget"></div>
-            <div class="tradingview-widget-copyright">
-                <a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank">
-                    <span class="blue-text">Track all markets on TradingView</span>
-                </a>
-            </div>
         </div>
     </div>
 
@@ -1117,27 +1130,7 @@
             { text: "The stock market is filled with individuals who know the price of everything, but the value of nothing.", author: "" },
             { text: "In investing, what is comfortable is rarely profitable.", author: "" },
             { text: "The four most dangerous words in investing are: 'This time it's different.'", author: "Sir John Templeton" },
-            { text: "Wide diversification is only required when investors do not understand what they are doing.", author: "Warren Buffett" },
-            { text: "The individual investor should act consistently as an investor and not as a speculator.", author: "Ben Graham" },
-            { text: "It's not whether you're right or wrong that's important, but how much money you make when you're right and how much you lose when you're wrong.", author: "George Soros" },
-            { text: "The goal of a successful trader is to make the best trades. Money is secondary.", author: "Alexander Elder" },
-            { text: "If you can't control your emotions, you can't control your money.", author: "Warren Buffett" },
-            { text: "The most important quality for an investor is temperament, not intellect.", author: "Warren Buffett" },
-            { text: "Know what you own, and know why you own it.", author: "Peter Lynch" },
-            { text: "The stock market is a device for transferring money from the impatient to the patient.", author: "Warren Buffett" },
-            { text: "The best time to plant a tree was 20 years ago. The second best time is now.", author: "Chinese Proverb" },
-            { text: "Don't look for the needle in the haystack. Just buy the haystack!", author: "John Bogle" },
-            { text: "Someone's sitting in the shade today because someone planted a tree a long time ago.", author: "Warren Buffett" },
-            { text: "It's far better to buy a wonderful company at a fair price than a fair company at a wonderful price.", author: "Warren Buffett" },
-            { text: "Our favorite holding period is forever.", author: "Warren Buffett" },
-            { text: "You get recessions, you have stock market declines. If you don't understand that's going to happen, then you're not ready, you won't do well in the markets.", author: "Peter Lynch" },
-            { text: "The stock market is a no-called-strike game. You don't have to swing at everything—you can wait for your pitch.", author: "Warren Buffett" },
-            { text: "The key to making money in stocks is not to get scared out of them.", author: "Peter Lynch" },
-            { text: "The biggest risk of all is not taking one.", author: "" },
-            { text: "Compound interest is the eighth wonder of the world. He who understands it, earns it; he who doesn't, pays it.", author: "Albert Einstein" },
-            { text: "Do not save what is left after spending, but spend what is left after saving.", author: "Warren Buffett" },
-            { text: "Never depend on a single income. Make investment to create a second source.", author: "Warren Buffett" },
-            { text: "The best investment you can make is in yourself.", author: "Warren Buffett" }
+            { text: "Wide diversification is only required when investors do not understand what they are doing.", author: "Warren Buffett" }
         ];
 
         // ===== INITIALIZE PAGE =====
@@ -1574,15 +1567,8 @@
             
             let scanActive = false;
             let currentTicker = null;
+            let currentTimeframe = '15m';
             let highlightedElements = [];
-
-            // Keyboard shortcut (Ctrl+Shift+Space)
-            document.addEventListener('keydown', (e) => {
-                if (e.ctrlKey && e.shiftKey && e.code === 'Space') {
-                    e.preventDefault();
-                    toggle.click();
-                }
-            });
 
             // Toggle scan mode
             toggle.addEventListener('click', () => {
@@ -1638,28 +1624,70 @@
                 if (currentTicker === ticker) return;
                 currentTicker = ticker;
                 
-                // Ensure Indian tickers have .NS suffix
-                const formattedTicker = ticker.endsWith('.NS') ? ticker : `${ticker}.NS`;
+                // Format ticker for NSE
+                const formattedTicker = ticker.endsWith('.NS') ? ticker : `${ticker}`;
                 tickerName.textContent = ticker;
                 
-                // Load TradingView widget with timeframe controls
+                // Update full chart button with current timeframe
+                fullChartBtn.textContent = `Full Chart (${currentTimeframe}) ↗`;
+                
+                // Load TradingView Advanced Chart
                 const widgetContainer = preview.querySelector('.tradingview-widget-container__widget');
                 widgetContainer.innerHTML = '';
                 
+                // Create timeframe selector
+                const timeframeSelector = document.createElement('div');
+                timeframeSelector.className = 'timeframe-selector';
+                
+                const timeframes = [
+                    { label: '5m', value: '5m' },
+                    { label: '15m', value: '15m' },
+                    { label: '1D', value: '1D' }
+                ];
+                
+                timeframes.forEach(tf => {
+                    const btn = document.createElement('button');
+                    btn.className = `timeframe-btn ${tf.value === currentTimeframe ? 'active' : ''}`;
+                    btn.textContent = tf.label;
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        currentTimeframe = tf.value;
+                        showPreview(ticker, event); // Reload with new timeframe
+                    });
+                    timeframeSelector.appendChild(btn);
+                });
+                
+                // Add timeframe selector to header
+                const header = preview.querySelector('.preview-header');
+                if (!header.querySelector('.timeframe-selector')) {
+                    header.appendChild(timeframeSelector);
+                }
+                
+                // Load TradingView widget
                 const script = document.createElement('script');
                 script.type = 'text/javascript';
-                script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js';
+                script.src = 'https://s3.tradingview.com/tv.js';
                 script.async = true;
-                script.innerHTML = JSON.stringify({
-                    "interval": "15m",
-                    "width": "100%",
-                    "isTransparent": true,
-                    "height": "100%",
-                    "symbol": `NSE:${ticker.replace('.NS', '')}`,
-                    "showIntervalTabs": true,
-                    "locale": "en",
-                    "colorTheme": document.body.classList.contains('light-mode') ? "light" : "dark"
-                });
+                script.onload = function() {
+                    new TradingView.widget({
+                        "autosize": true,
+                        "symbol": `NSE:${formattedTicker.replace('.NS', '')}`,
+                        "interval": currentTimeframe,
+                        "timezone": "Asia/Kolkata",
+                        "theme": document.body.classList.contains('light-mode') ? "light" : "dark",
+                        "style": "1",
+                        "locale": "en",
+                        "toolbar_bg": "#f1f3f6",
+                        "enable_publishing": false,
+                        "hide_top_toolbar": false,
+                        "hide_side_toolbar": false,
+                        "allow_symbol_change": false,
+                        "container_id": "tradingview-widget-container__widget",
+                        "studies": [
+                            "MASimple@tv-basicstudies"
+                        ]
+                    });
+                };
                 
                 widgetContainer.appendChild(script);
                 
@@ -1695,7 +1723,7 @@
 
             fullChartBtn.addEventListener('click', () => {
                 if (currentTicker) {
-                    window.open(`https://www.tradingview.com/chart/?symbol=NSE:${currentTicker.replace('.NS', '')}`, '_blank');
+                    window.open(`https://www.tradingview.com/chart/?symbol=NSE:${currentTicker.replace('.NS', '')}&interval=${currentTimeframe}`, '_blank');
                 }
             });
 
