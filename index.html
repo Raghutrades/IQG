@@ -651,14 +651,14 @@
             font-size: 1.25rem;
         }
         
-        /* === UPDATED SCAN MODE TOGGLE === */
+        /* === SCAN MODE TOGGLE === */
         #ragsym-scan-toggle {
             position: fixed;
-            top: 80px;
-            right: 20px;
+            bottom: 30px;
+            left: 30px;
             background: linear-gradient(135deg, #4361ee, #3a0ca3);
             color: white;
-            padding: 10px 20px;
+            padding: 12px 24px;
             border-radius: 50px;
             border: none;
             font-weight: 600;
@@ -698,31 +698,6 @@
             100% { transform: scale(1.1); opacity: 0; }
         }
         
-        /* === RANDOM TICKER BUTTON === */
-        #random-ticker-btn {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: linear-gradient(135deg, #4cc9f0, #4361ee);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 50px;
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 4px 30px rgba(67, 97, 238, 0.4);
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transition: all 0.3s;
-        }
-        
-        #random-ticker-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 40px rgba(67, 97, 238, 0.6);
-        }
-        
         /* === CHART PREVIEW === */
         #ragsym-chart-preview {
             position: fixed;
@@ -735,7 +710,6 @@
             z-index: 999;
             display: none;
             overflow: hidden;
-            resize: both;
         }
         
         .preview-header {
@@ -757,34 +731,10 @@
             font-size: 12px;
         }
         
-        /* TradingView Widget Container */
-        .tradingview-widget-container {
+        .chart-iframe {
             width: 100%;
             height: calc(100% - 40px);
-        }
-        
-        /* Timeframe selector styles */
-        .timeframe-selector {
-            display: flex;
-            gap: 5px;
-            padding: 5px;
-            background: rgba(0,0,0,0.2);
-            border-radius: 4px;
-            margin-left: 10px;
-        }
-        
-        .timeframe-btn {
-            background: rgba(255,255,255,0.1);
             border: none;
-            color: white;
-            padding: 3px 8px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-        }
-        
-        .timeframe-btn.active {
-            background: var(--accent);
         }
         
         .ragsym-highlight {
@@ -798,6 +748,12 @@
             content: '📈';
             position: absolute;
             right: -20px;
+        }
+        
+        /* TradingView Widget Container */
+        .tradingview-widget-container {
+            width: 100%;
+            height: 100%;
         }
         
         /* === RESPONSIVE ADJUSTMENTS === */
@@ -838,9 +794,10 @@
                 justify-content: center;
             }
             
-            #random-ticker-btn, #ragsym-scan-toggle {
-                font-size: 0.9rem;
-                padding: 8px 15px;
+            #ragsym-scan-toggle {
+                bottom: 80px;
+                left: 20px;
+                right: auto;
             }
             
             #ragsym-chart-preview {
@@ -880,9 +837,10 @@
                 padding: 0.5rem;
             }
             
-            #random-ticker-btn, #ragsym-scan-toggle {
-                padding: 6px 12px;
-                font-size: 0.8rem;
+            #ragsym-scan-toggle {
+                padding: 10px 15px;
+                font-size: 0.9rem;
+                bottom: 70px;
             }
             
             #ragsym-chart-preview {
@@ -1065,11 +1023,6 @@
         <span id="themeText">Dark Mode</span>
     </button>
 
-    <!-- Random Ticker Button -->
-    <button id="random-ticker-btn">
-        <span>🔀 Random Ticker</span>
-    </button>
-
     <!-- Scan Mode Toggle -->
     <button id="ragsym-scan-toggle">
         <span>🔍 Scan Mode</span>
@@ -1084,6 +1037,11 @@
         </div>
         <div class="tradingview-widget-container">
             <div class="tradingview-widget-container__widget"></div>
+            <div class="tradingview-widget-copyright">
+                <a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank">
+                    <span class="blue-text">Track all markets on TradingView</span>
+                </a>
+            </div>
         </div>
     </div>
 
@@ -1130,7 +1088,27 @@
             { text: "The stock market is filled with individuals who know the price of everything, but the value of nothing.", author: "" },
             { text: "In investing, what is comfortable is rarely profitable.", author: "" },
             { text: "The four most dangerous words in investing are: 'This time it's different.'", author: "Sir John Templeton" },
-            { text: "Wide diversification is only required when investors do not understand what they are doing.", author: "Warren Buffett" }
+            { text: "Wide diversification is only required when investors do not understand what they are doing.", author: "Warren Buffett" },
+            { text: "The individual investor should act consistently as an investor and not as a speculator.", author: "Ben Graham" },
+            { text: "It's not whether you're right or wrong that's important, but how much money you make when you're right and how much you lose when you're wrong.", author: "George Soros" },
+            { text: "The goal of a successful trader is to make the best trades. Money is secondary.", author: "Alexander Elder" },
+            { text: "If you can't control your emotions, you can't control your money.", author: "Warren Buffett" },
+            { text: "The most important quality for an investor is temperament, not intellect.", author: "Warren Buffett" },
+            { text: "Know what you own, and know why you own it.", author: "Peter Lynch" },
+            { text: "The stock market is a device for transferring money from the impatient to the patient.", author: "Warren Buffett" },
+            { text: "The best time to plant a tree was 20 years ago. The second best time is now.", author: "Chinese Proverb" },
+            { text: "Don't look for the needle in the haystack. Just buy the haystack!", author: "John Bogle" },
+            { text: "Someone's sitting in the shade today because someone planted a tree a long time ago.", author: "Warren Buffett" },
+            { text: "It's far better to buy a wonderful company at a fair price than a fair company at a wonderful price.", author: "Warren Buffett" },
+            { text: "Our favorite holding period is forever.", author: "Warren Buffett" },
+            { text: "You get recessions, you have stock market declines. If you don't understand that's going to happen, then you're not ready, you won't do well in the markets.", author: "Peter Lynch" },
+            { text: "The stock market is a no-called-strike game. You don't have to swing at everything—you can wait for your pitch.", author: "Warren Buffett" },
+            { text: "The key to making money in stocks is not to get scared out of them.", author: "Peter Lynch" },
+            { text: "The biggest risk of all is not taking one.", author: "" },
+            { text: "Compound interest is the eighth wonder of the world. He who understands it, earns it; he who doesn't, pays it.", author: "Albert Einstein" },
+            { text: "Do not save what is left after spending, but spend what is left after saving.", author: "Warren Buffett" },
+            { text: "Never depend on a single income. Make investment to create a second source.", author: "Warren Buffett" },
+            { text: "The best investment you can make is in yourself.", author: "Warren Buffett" }
         ];
 
         // ===== INITIALIZE PAGE =====
@@ -1144,7 +1122,6 @@
             initTradeMultiplier();
             initCollapsibleSections();
             initScanMode();
-            initRandomTicker();
         });
 
         // ===== THEME TOGGLE =====
@@ -1512,52 +1489,6 @@
             }
         }
 
-        // ===== RANDOM TICKER FUNCTIONALITY =====
-        function initRandomTicker() {
-            const btn = document.getElementById('random-ticker-btn');
-            let allTickers = [];
-            let randomInterval = null;
-            
-            // Flatten all tickers from all sectors
-            Object.values(sectorData).forEach(sector => {
-                allTickers = allTickers.concat(sector);
-            });
-            
-            function showRandomTicker() {
-                if (allTickers.length === 0) return;
-                
-                const randomIndex = Math.floor(Math.random() * allTickers.length);
-                const randomTicker = allTickers[randomIndex];
-                
-                // Create a fake event to position the preview
-                const fakeEvent = {
-                    clientX: window.innerWidth - 450,
-                    clientY: 120,
-                    target: { textContent: randomTicker }
-                };
-                
-                // Activate scan mode if not active
-                if (!document.getElementById('ragsym-scan-toggle').classList.contains('active')) {
-                    document.getElementById('ragsym-scan-toggle').click();
-                }
-                
-                // Show the preview
-                showPreview(randomTicker, fakeEvent);
-            }
-            
-            btn.addEventListener('click', function() {
-                if (randomInterval) {
-                    clearInterval(randomInterval);
-                    randomInterval = null;
-                    btn.innerHTML = '<span>🔀 Random Ticker</span>';
-                } else {
-                    randomInterval = setInterval(showRandomTicker, 15000);
-                    btn.innerHTML = '<span>⏸ Stop Random</span>';
-                    showRandomTicker(); // Show immediately
-                }
-            });
-        }
-
         // ===== SCAN MODE SYSTEM =====
         function initScanMode() {
             const toggle = document.getElementById('ragsym-scan-toggle');
@@ -1567,9 +1498,15 @@
             
             let scanActive = false;
             let currentTicker = null;
-            let currentTimeframe = '15m';
             let highlightedElements = [];
-            let tvWidget = null;
+
+            // Keyboard shortcut (Ctrl+Shift+Space)
+            document.addEventListener('keydown', (e) => {
+                if (e.ctrlKey && e.shiftKey && e.code === 'Space') {
+                    e.preventDefault();
+                    toggle.click();
+                }
+            });
 
             // Toggle scan mode
             toggle.addEventListener('click', () => {
@@ -1625,94 +1562,40 @@
                 if (currentTicker === ticker) return;
                 currentTicker = ticker;
                 
-                // Format ticker for NSE
                 tickerName.textContent = ticker;
                 
-                // Update full chart button with current timeframe
-                fullChartBtn.textContent = `Full Chart (${currentTimeframe}) ↗`;
-                
-                // Create timeframe selector if it doesn't exist
-                let timeframeSelector = preview.querySelector('.timeframe-selector');
-                if (!timeframeSelector) {
-                    timeframeSelector = document.createElement('div');
-                    timeframeSelector.className = 'timeframe-selector';
-                    
-                    const timeframes = [
-                        { label: '5m', value: '5m' },
-                        { label: '15m', value: '15m' },
-                        { label: '1D', value: '1D' }
-                    ];
-                    
-                    timeframes.forEach(tf => {
-                        const btn = document.createElement('button');
-                        btn.className = `timeframe-btn ${tf.value === currentTimeframe ? 'active' : ''}`;
-                        btn.textContent = tf.label;
-                        btn.addEventListener('click', (e) => {
-                            e.stopPropagation();
-                            currentTimeframe = tf.value;
-                            fullChartBtn.textContent = `Full Chart (${currentTimeframe}) ↗`;
-                            loadTradingViewWidget(ticker);
-                        });
-                        timeframeSelector.appendChild(btn);
-                    });
-                    
-                    const header = preview.querySelector('.preview-header');
-                    header.appendChild(timeframeSelector);
-                }
-                
                 // Load TradingView widget
-                loadTradingViewWidget(ticker);
+                const widgetContainer = preview.querySelector('.tradingview-widget-container__widget');
+                widgetContainer.innerHTML = '';
+                
+                const script = document.createElement('script');
+                script.type = 'text/javascript';
+                script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js';
+                script.async = true;
+                script.innerHTML = JSON.stringify({
+                    "symbol": `NSE:${ticker}`,
+                    "width": "100%",
+                    "height": "100%",
+                    "locale": "en",
+                    "dateRange": "1M",
+                    "colorTheme": document.body.classList.contains('light-mode') ? "light" : "dark",
+                    "trendLineColor": "rgba(67, 97, 238, 1)",
+                    "underLineColor": "rgba(67, 97, 238, 0.1)",
+                    "underLineBottomColor": "rgba(67, 97, 238, 0)",
+                    "isTransparent": true,
+                    "autosize": true,
+                    "largeChartUrl": `https://www.tradingview.com/chart/?symbol=NSE:${ticker}`
+                });
+                
+                widgetContainer.appendChild(script);
                 
                 preview.style.display = 'block';
                 positionPreview(event);
             }
 
-            function loadTradingViewWidget(ticker) {
-                const widgetContainer = preview.querySelector('.tradingview-widget-container__widget');
-                widgetContainer.innerHTML = '';
-                
-                // Remove previous widget if exists
-                if (tvWidget) {
-                    tvWidget.remove();
-                    tvWidget = null;
-                }
-                
-                // Create new widget
-                const script = document.createElement('script');
-                script.type = 'text/javascript';
-                script.src = 'https://s3.tradingview.com/tv.js';
-                script.async = true;
-                script.onload = function() {
-                    tvWidget = new TradingView.widget({
-                        "autosize": true,
-                        "symbol": `NSE:${ticker}`,
-                        "interval": currentTimeframe,
-                        "timezone": "Asia/Kolkata",
-                        "theme": document.body.classList.contains('light-mode') ? "light" : "dark",
-                        "style": "1",
-                        "locale": "en",
-                        "toolbar_bg": "#f1f3f6",
-                        "enable_publishing": false,
-                        "hide_top_toolbar": false,
-                        "hide_side_toolbar": false,
-                        "allow_symbol_change": false,
-                        "container_id": "tradingview-widget-container__widget",
-                        "studies": [
-                            "MASimple@tv-basicstudies"
-                        ]
-                    });
-                };
-                
-                document.body.appendChild(script);
-            }
-
             function hidePreview() {
                 preview.style.display = 'none';
                 currentTicker = null;
-                if (tvWidget) {
-                    tvWidget.remove();
-                    tvWidget = null;
-                }
             }
 
             function positionPreview(event) {
@@ -1738,7 +1621,7 @@
 
             fullChartBtn.addEventListener('click', () => {
                 if (currentTicker) {
-                    window.open(`https://www.tradingview.com/chart/?symbol=NSE:${currentTicker}&interval=${currentTimeframe}`, '_blank');
+                    window.open(`https://www.tradingview.com/chart/?symbol=NSE:${currentTicker}`, '_blank');
                 }
             });
 
@@ -1748,8 +1631,6 @@
                 }
             });
         }
-
-        // [Rest of your existing JavaScript remains exactly the same]
     </script>
 </body>
 </html>
