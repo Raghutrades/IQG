@@ -1458,25 +1458,35 @@
         }
 
         // ===== TICKER HEADER =====
-        function initTickerHeader() {
-            const tickerContainer = document.getElementById('tickerContainer');
-            const nifty50Stocks = sectorData["NIFTY50"];
+    function initTickerHeader() {
+        const tickerContainer = document.getElementById('tickerContainer');
+        const nifty50Stocks = sectorData["NIFTY50"];
+
+        nifty50Stocks.forEach(stock => {
+            const tickerItem = document.createElement('div');
+            tickerItem.className = 'ticker-item';
+
+            // Get direction arrow and color
+            const isUp = stock.change >= 0;
+            const arrow = isUp ? '▲' : '▼';
+            const color = isUp ? 'var(--profit-green)' : 'var(--loss-red)';
             
-            // Create ticker items for each Nifty 50 stock
-            nifty50Stocks.forEach(stock => {
-                const tickerItem = document.createElement('div');
-                tickerItem.className = 'ticker-item';
-                tickerItem.textContent = stock;
-                tickerItem.addEventListener('click', () => {
-                    window.open(`https://www.tradingview.com/chart/?symbol=BSE:${stock}`, '_blank');
-                });
-                tickerContainer.appendChild(tickerItem);
-                
-                // Clone each item to create seamless looping
-                const clone = tickerItem.cloneNode(true);
-                tickerContainer.appendChild(clone);
+            // Set ticker text and style
+            tickerItem.innerHTML = `<strong>${stock.symbol}</strong> ₹${stock.price.toFixed(2)} <span style="color: ${color};">${arrow}</span>`;
+            tickerItem.style.color = 'var(--text)';
+            
+            // Click to open TradingView
+            tickerItem.addEventListener('click', () => {
+                window.open(`https://www.tradingview.com/chart/?symbol=NSE:${stock.symbol}`, '_blank');
             });
-        }
-    </script>
+
+            tickerContainer.appendChild(tickerItem);
+
+            // Clone for smooth loop
+            const clone = tickerItem.cloneNode(true);
+            tickerContainer.appendChild(clone);
+        });
+    }
+</script>
 </body>
 </html>
