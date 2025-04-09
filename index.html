@@ -72,6 +72,38 @@
             transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
         }
         
+        /* === TICKER HEADER === */
+        .ticker-header {
+            background: var(--card);
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border);
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        
+        .ticker-container {
+            display: inline-block;
+            animation: ticker-scroll 180s linear infinite;
+
+        }
+        
+        .ticker-item {
+            display: inline-block;
+            margin: 0 20px;
+            color: var(--text);
+            font-weight: 500;
+        }
+        
+        .ticker-item:hover {
+            color: var(--accent);
+            cursor: pointer;
+        }
+        
+        @keyframes ticker-scroll {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        
         /* === HEADER STYLES === */
         .header {
             display: grid;
@@ -688,12 +720,6 @@
             transform: scale(1.05);
         }
         
-        /* TradingView Widget Container */
-        .tradingview-widget-container {
-            width: 100%;
-            height: 100%;
-        }
-        
         /* === RESPONSIVE ADJUSTMENTS === */
         @media (max-width: 1600px) {
             .sector-grid {
@@ -776,6 +802,13 @@
     </style>
 </head>
 <body>
+    <!-- Ticker Header -->
+    <div class="ticker-header">
+        <div class="ticker-container" id="tickerContainer">
+            <!-- Ticker items will be inserted here by JavaScript -->
+        </div>
+    </div>
+
     <!-- Header with Date/Time, Title, and Ticker -->
     <header class="header">
         <div class="datetime-container">
@@ -1031,6 +1064,7 @@
             initTradeMultiplier();
             initCollapsibleSections();
             initRandomTicker();
+            initTickerHeader();
         });
 
         // ===== THEME TOGGLE =====
@@ -1421,6 +1455,27 @@
             
             // Update every 15 seconds
             setInterval(updateRandomTicker, 15000);
+        }
+
+        // ===== TICKER HEADER =====
+        function initTickerHeader() {
+            const tickerContainer = document.getElementById('tickerContainer');
+            const nifty50Stocks = sectorData["NIFTY50"];
+            
+            // Create ticker items for each Nifty 50 stock
+            nifty50Stocks.forEach(stock => {
+                const tickerItem = document.createElement('div');
+                tickerItem.className = 'ticker-item';
+                tickerItem.textContent = stock;
+                tickerItem.addEventListener('click', () => {
+                    window.open(`https://www.tradingview.com/chart/?symbol=BSE:${stock}`, '_blank');
+                });
+                tickerContainer.appendChild(tickerItem);
+                
+                // Clone each item to create seamless looping
+                const clone = tickerItem.cloneNode(true);
+                tickerContainer.appendChild(clone);
+            });
         }
     </script>
 </body>
