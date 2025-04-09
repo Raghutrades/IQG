@@ -745,23 +745,10 @@
     background: var(--dark-card);
     border-bottom: 1px solid var(--border);
     margin-bottom: 1rem;
-    overflow: hidden; /* Ensures no scrollbars appear */
 }
 
 .tradingview-widget-container {
     height: 46px !important;
-    animation: scroll-ticker 180s linear infinite; /* Backup animation */
-}
-
-@keyframes scroll-ticker {
-    0% { transform: translateX(100%); }
-    100% { transform: translateX(-100%); }
-}
-
-/* TradingView's native scrolling will override this */
-.tradingview-widget-container > div {
-    display: inline-block;
-    white-space: nowrap;
 }
 
         /* === BSE SECTORS TOGGLE === */
