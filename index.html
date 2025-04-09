@@ -810,10 +810,12 @@
 <body>
     <!-- Ticker Header -->
     <div class="ticker-header">
-        <div class="ticker-container" id="tickerContainer">
-            <!-- Ticker items will be inserted here by JavaScript -->
-        </div>
+    <div id="tickerContainer" class="ticker-container">
+        <div id="tickerContent" class="ticker-content"></div>
+        <div id="tickerClone" class="ticker-content"></div>
     </div>
+</div>
+
 
     <!-- Header with Date/Time, Title, and Ticker -->
     <header class="header">
@@ -1465,34 +1467,28 @@
 
         // ===== TICKER HEADER =====
     function initTickerHeader() {
-        const tickerContainer = document.getElementById('tickerContainer');
-        const nifty50Stocks = sectorData["NIFTY50"];
+    const tickerContent = document.getElementById('tickerContent');
+    const tickerClone = document.getElementById('tickerClone');
+    const nifty50Stocks = sectorData["NIFTY50"];
 
-        nifty50Stocks.forEach(stock => {
-            const tickerItem = document.createElement('div');
-            tickerItem.className = 'ticker-item';
+    nifty50Stocks.forEach(stock => {
+        const tickerItem = document.createElement('div');
+        tickerItem.className = 'ticker-item';
 
-            // Get direction arrow and color
-            const isUp = stock.change >= 0;
-            const arrow = isUp ? '▲' : '▼';
-            const color = isUp ? 'var(--profit-green)' : 'var(--loss-red)';
-            
-            // Set ticker text and style
-            tickerItem.innerHTML = `<strong>${stock.symbol}</strong> ₹${stock.price.toFixed(2)} <span style="color: ${color};">${arrow}</span>`;
-            tickerItem.style.color = 'var(--text)';
-            
-            // Click to open TradingView
-            tickerItem.addEventListener('click', () => {
-                window.open(`https://www.tradingview.com/chart/?symbol=NSE:${stock.symbol}`, '_blank');
-            });
+        const isUp = stock.change >= 0;
+        const arrow = isUp ? '▲' : '▼';
+        const color = isUp ? 'var(--profit-green)' : 'var(--loss-red)';
 
-            tickerContainer.appendChild(tickerItem);
-
-            // Clone for smooth loop
-            const clone = tickerItem.cloneNode(true);
-            tickerContainer.appendChild(clone);
+        tickerItem.innerHTML = `<strong>${stock.symbol}</strong> ₹${stock.price.toFixed(2)} <span style="color: ${color};">${arrow}</span>`;
+        tickerItem.addEventListener('click', () => {
+            window.open(`https://www.tradingview.com/chart/?symbol=NSE:${stock.symbol}`, '_blank');
         });
-    }
+
+        tickerContent.appendChild(tickerItem);
+        tickerClone.appendChild(tickerItem.cloneNode(true)); // duplicate for seamless scroll
+    });
+}
+
 </script>
 </body>
 </html>
