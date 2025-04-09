@@ -30,6 +30,8 @@
             --gold-secondary: #FFC300;
             --profit-green: #10B981;
             --loss-red: #EF4444;
+            --active-green: #4CAF50;
+            --inactive-red: #F44336;
             
             --bg: var(--dark-bg);
             --card: var(--dark-card);
@@ -687,6 +689,43 @@
             color: var(--accent);
             transform: scale(1.05);
         }
+
+        /* === SCAN MODE TOGGLE === */
+        .scan-mode-toggle {
+            position: fixed;
+            bottom: 6rem;
+            right: 2rem;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            padding: 0.75rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .scan-mode-toggle:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 25px var(--glow);
+        }
+        
+        .scan-icon {
+            font-size: 1.25rem;
+        }
+        
+        .scan-mode-toggle.active {
+            background: var(--active-green);
+            color: white;
+        }
+        
+        .scan-mode-toggle.inactive {
+            background: var(--inactive-red);
+            color: white;
+        }
         
         /* TradingView Widget Container */
         .tradingview-widget-container {
@@ -954,6 +993,12 @@
         <span id="themeText">Dark Mode</span>
     </button>
 
+    <!-- Scan Mode Toggle -->
+    <button class="scan-mode-toggle inactive" id="scanModeToggle">
+        <span class="scan-icon">🔍</span>
+        <span id="scanModeText">Scan Mode: OFF</span>
+    </button>
+
     <script>
         // Stock data for all 15 sectors
         const sectorData = {
@@ -1020,6 +1065,67 @@
             { text: "The best investment you can make is in yourself.", author: "Warren Buffett" }
         ];
 
+        // ===== SCAN MODE INTEGRATION =====
+        let scanModeActive = false;
+        let tradingViewWindow = null;
+        const scanModeToggle = document.getElementById('scanModeToggle');
+        const scanModeText = document.getElementById('scanModeText');
+
+        // Toggle Scan Mode
+        function toggleScanMode() {
+            scanModeActive = !scanModeActive;
+            
+            if (scanModeActive) {
+                scanModeToggle.classList.remove('inactive');
+                scanModeToggle.classList.add('active');
+                scanModeText.textContent = 'Scan Mode: ON';
+            } else {
+                scanModeToggle.classList.remove('active');
+                scanModeToggle.classList.add('inactive');
+                scanModeText.textContent = 'Scan Mode: OFF';
+            }
+            
+            // Store state in localStorage
+            localStorage.setItem('scanModeActive', scanModeActive);
+        }
+
+        // Keyboard Shortcut (Ctrl+Shift+4)
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.shiftKey && e.key === '4') {
+                toggleScanMode();
+            }
+        });
+
+        // Initialize Scan Mode from localStorage
+        if (localStorage.getItem('scanModeActive') === 'true') {
+            scanModeActive = true;
+            scanModeToggle.classList.add('active');
+            scanModeText.textContent = 'Scan Mode: ON';
+        }
+
+        // Click handler for toggle
+        scanModeToggle.addEventListener('click', toggleScanMode);
+
+        // Hover-to-chart functionality (adapted from extension)
+        function setupHoverToChart() {
+            document.querySelectorAll('.stock-item').forEach(item => {
+                const ticker = item.textContent.trim();
+                
+                item.addEventListener('mouseenter', () => {
+                    if (!scanModeActive || !ticker) return;
+                    
+                    const url = `https://www.tradingview.com/chart/?symbol=NSE:${ticker}`;
+                    
+                    if (tradingViewWindow && !tradingViewWindow.closed) {
+                        tradingViewWindow.location.href = url;
+                        tradingViewWindow.focus();
+                    } else {
+                        tradingViewWindow = window.open(url, 'TradingViewChart', 'width=1200,height=800');
+                    }
+                });
+            });
+        }
+
         // ===== INITIALIZE PAGE =====
         document.addEventListener('DOMContentLoaded', function() {
             initThemeToggle();
@@ -1031,6 +1137,9 @@
             initTradeMultiplier();
             initCollapsibleSections();
             initRandomTicker();
+            
+            // Setup hover-to-chart after sector grid loads
+            setTimeout(setupHoverToChart, 1000);
         });
 
         // ===== THEME TOGGLE =====
