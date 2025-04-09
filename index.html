@@ -693,30 +693,32 @@
         /* === SCAN MODE TOGGLE === */
 .scan-mode-toggle {
     position: fixed;
-    top: 20px;
-    left: 20px; /* Changed from right to left */
+    bottom: 6rem;
+    right: 2rem;
     background: linear-gradient(135deg, var(--accent), #3a0ca3);
     border: 1px solid var(--border);
     border-radius: 50px;
-    padding: 0.75rem 1.25rem;
+    padding: 0.75rem;
+    width: 50px;
+    height: 50px;
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    justify-content: center;
     cursor: pointer;
     z-index: 100;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
     transition: all 0.3s ease;
-    color: white;
-    font-weight: 600;
+    animation: pulse-scan 2s infinite;
 }
 
 .scan-mode-toggle:hover {
-    transform: scale(1.05);
+    transform: scale(1.1);
     box-shadow: 0 0 25px var(--glow);
 }
 
 .scan-icon {
-    font-size: 1.25rem;
+    font-size: 1.5rem;
+    color: white;
 }
 
 .scan-mode-toggle.active {
@@ -752,8 +754,8 @@
         /* === BSE SECTORS TOGGLE === */
 .sectors-toggle {
     position: fixed;
-    bottom: 6rem; /* Above theme toggle */
-    right: 2rem;
+    top: 180px; /* Below random ticker box */
+    right: 20px;
     background: linear-gradient(135deg, #7209b7, #3a0ca3);
     border: 1px solid var(--border);
     border-radius: 50px;
@@ -761,24 +763,32 @@
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    cursor: default; /* Change to 'default' if no click action needed */
+    cursor: pointer;
     z-index: 100;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
     color: white;
     font-weight: 600;
-    opacity: 0.9; /* Slightly transparent */
+}
+
+.sectors-toggle:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 25px rgba(114, 9, 183, 0.6);
+}
+
+.sectors-icon {
+    font-size: 1.25rem;
 }
 
 .sectors-widget-container {
     position: fixed;
-    bottom: 10rem; /* Above the button */
-    right: 2rem;
+    top: 230px; /* Below the button */
+    right: 20px;
     z-index: 99;
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     border: 1px solid var(--border);
-    display: block !important; /* Force visible */
 }
 
 .tradingview-widget-container {
@@ -1078,14 +1088,14 @@
         <span class="quote-author" id="quoteAuthor">- Warren Buffett</span>
     </div>
     
-    <!-- BSE Sectors Toggle (Replaces old scan mode position) -->
+    <!-- BSE Sectors Toggle -->
 <button class="sectors-toggle" id="sectorsToggle">
     <span class="sectors-icon">📊</span>
-    <span class="sectors-text">SV</span>
+    <span class="sectors-text">BSE Sectors</span>
 </button>
 
 <!-- BSE Sectors Widget (hidden by default) -->
-<div class="sectors-widget-container" id="sectorsWidget">
+<div class="sectors-widget-container" id="sectorsWidget" style="display: none;">
     <!-- TradingView Widget BEGIN -->
     <div class="tradingview-widget-container">
         <div class="tradingview-widget-container__widget"></div>
@@ -1148,9 +1158,9 @@
         <span id="themeText">Dark Mode</span>
     </button>
 
-    <!-- Scan Mode Toggle (Left of Random Ticker) -->
-<button class="scan-mode-toggle inactive" id="scanModeToggle" title="Scan Mode (Ctrl+Shift+A)">
-    <span class="scan-text">Scan Mode</span>
+    <!-- Scan Mode Toggle -->
+<button class="scan-mode-toggle inactive" id="scanModeToggle" title="Scan Mode (Ctrl+Shift+4)">
+    <span class="scan-icon">🔍</span>
 </button>
 
     <script>
@@ -1243,10 +1253,10 @@
     localStorage.setItem('scanModeActive', scanModeActive);
 }
 
-        // Keyboard Shortcut (Ctrl+Shift+A)
+        // Keyboard Shortcut (Ctrl+Shift+4)
 document.addEventListener('keydown', (e) => {
-    if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'a') {
-        e.preventDefault();
+    if (e.ctrlKey && e.shiftKey && e.key === '4') {
+        e.preventDefault(); // Add this line to prevent browser shortcuts
         toggleScanMode();
     }
 });
@@ -1305,6 +1315,23 @@ let widgetVisible = false;
 sectorsToggle.addEventListener('click', () => {
     widgetVisible = !widgetVisible;
     sectorsWidget.style.display = widgetVisible ? 'block' : 'none';
+    sectorsToggle.style.right = widgetVisible ? '0' : '-35px';
+    sectorsToggle.style.opacity = widgetVisible ? '1' : '0.7';
+    sectorsToggle.style.borderRadius = widgetVisible ? '50px' : '50px 0 0 50px';
+});
+
+// Auto-hide when clicking elsewhere
+document.addEventListener('click', (e) => {
+    if (widgetVisible && 
+        !sectorsWidget.contains(e.target) && 
+        !sectorsToggle.contains(e.target)) {
+        sectorsWidget.style.display = 'none';
+        sectorsToggle.style.right = '-35px';
+        sectorsToggle.style.opacity = '0.7';
+        sectorsToggle.style.borderRadius = '50px 0 0 50px';
+        widgetVisible = false;
+    }
+});
 
         // ===== INITIALIZE PAGE =====
         document.addEventListener('DOMContentLoaded', function() {
