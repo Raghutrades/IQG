@@ -74,35 +74,41 @@
         
         /* === TICKER HEADER === */
         .ticker-header {
-            background: var(--card);
-            padding: 0.5rem 0;
-            border-bottom: 1px solid var(--border);
-            overflow: hidden;
-            white-space: nowrap;
-        }
-        
-        .ticker-container {
-            display: inline-block;
-            animation: ticker-scroll 180s linear infinite;
+    background: var(--card);
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+    white-space: nowrap;
+    position: relative;
+}
 
-        }
-        
-        .ticker-item {
-            display: inline-block;
-            margin: 0 20px;
-            color: var(--text);
-            font-weight: 500;
-        }
-        
-        .ticker-item:hover {
-            color: var(--accent);
-            cursor: pointer;
-        }
-        
-        @keyframes ticker-scroll {
-            0% { transform: translateX(100%); }
-            100% { transform: translateX(-100%); }
-        }
+.ticker-container {
+    display: flex;
+    width: fit-content;
+    animation: ticker-scroll 180s linear infinite;
+}
+
+.ticker-content {
+    display: flex;
+}
+
+.ticker-item {
+    margin: 0 20px;
+    color: var(--text);
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.ticker-item:hover {
+    color: var(--accent);
+    cursor: pointer;
+}
+
+@keyframes ticker-scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
         
         /* === HEADER STYLES === */
         .header {
