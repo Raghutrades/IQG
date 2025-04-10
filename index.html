@@ -691,52 +691,41 @@
         }
 
         /* === SCAN MODE TOGGLE === */
-.scan-mode-toggle {
-    position: fixed;
-    bottom: 6rem;
-    right: 2rem;
-    background: linear-gradient(135deg, var(--accent), #3a0ca3);
-    border: 1px solid var(--border);
-    border-radius: 50px;
-    padding: 0.75rem;
-    width: 50px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 100;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-    transition: all 0.3s ease;
-    animation: pulse-scan 2s infinite;
-}
-
-.scan-mode-toggle:hover {
-    transform: scale(1.1);
-    box-shadow: 0 0 25px var(--glow);
-}
-
-.scan-icon {
-    font-size: 1.5rem;
-    color: white;
-}
-
-.scan-mode-toggle.active {
-    background: linear-gradient(135deg, var(--active-green), #2E7D32);
-    animation: pulse-scan-active 1.5s infinite;
-}
-
-@keyframes pulse-scan {
-    0% { box-shadow: 0 0 0 0 rgba(67, 97, 238, 0.4); }
-    70% { box-shadow: 0 0 0 15px rgba(67, 97, 238, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(67, 97, 238, 0); }
-}
-
-@keyframes pulse-scan-active {
-    0% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.4); }
-    70% { box-shadow: 0 0 0 15px rgba(76, 175, 80, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
-}
+        .scan-mode-toggle {
+            position: fixed;
+            bottom: 6rem;
+            right: 2rem;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            padding: 0.75rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .scan-mode-toggle:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 25px var(--glow);
+        }
+        
+        .scan-icon {
+            font-size: 1.25rem;
+        }
+        
+        .scan-mode-toggle.active {
+            background: var(--active-green);
+            color: white;
+        }
+        
+        .scan-mode-toggle.inactive {
+            background: var(--inactive-red);
+            color: white;
+        }
         
         /* TradingView Widget Container */
         .tradingview-widget-container {
@@ -744,66 +733,6 @@
             height: 100%;
         }
         
-        /* === TICKER TAPE === */
-.ticker-tape-container {
-    width: 100%;
-    padding: 0.5rem 0;
-    background: var(--dark-card);
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 1rem;
-}
-
-.tradingview-widget-container {
-    height: 46px !important;
-}
-
-        /* === BSE SECTORS TOGGLE === */
-.sectors-toggle {
-    position: fixed;
-    bottom: 11rem;
-    right: -35px;
-    background: linear-gradient(135deg, #7209b7, #3a0ca3);
-    border: 1px solid var(--border);
-    border-radius: 50px 0 0 50px;
-    padding: 0.75rem 1.25rem 0.75rem 0.75rem;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    cursor: pointer;
-    z-index: 100;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-    transition: all 0.3s ease;
-    color: white;
-    font-weight: 600;
-    opacity: 0.7;
-}
-
-.sectors-toggle:hover {
-    right: 0;
-    opacity: 1;
-    box-shadow: 0 0 25px rgba(114, 9, 183, 0.6);
-    border-radius: 50px;
-}
-
-.sectors-icon {
-    font-size: 1.25rem;
-}
-
-.sectors-widget-container {
-    position: fixed;
-    bottom: 16rem;
-    right: 2rem;
-    z-index: 99;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    border: 1px solid var(--border);
-    transition: all 0.3s ease;
-}
-
-.tradingview-widget-container {
-    background: var(--dark-card) !important;
-}
         /* === RESPONSIVE ADJUSTMENTS === */
         @media (max-width: 1600px) {
             .sector-grid {
@@ -918,44 +847,6 @@
         </div>
     </header>
     
-    <!-- Ticker Tape Widget -->
-<div class="ticker-tape-container">
-    <!-- TradingView Widget BEGIN -->
-    <div class="tradingview-widget-container">
-        <div class="tradingview-widget-container__widget"></div>
-        <div class="tradingview-widget-copyright">
-            <a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank">
-                <span class="blue-text">Track all markets on TradingView</span>
-            </a>
-        </div>
-        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
-        {
-            "symbols": [
-                { "description": "Sensex", "proName": "BSE:SENSEX" },
-                { "description": "Bankex", "proName": "BSE:BANK" },
-                { "description": "BSE IT", "proName": "BSE:FOCIT" },
-                { "description": "Reliance", "proName": "BSE:RELIANCE" },
-                { "description": "HDFC Bank", "proName": "BSE:HDFCBANK" },
-                { "description": "ICICI Bank", "proName": "BSE:ICICIBANK" },
-                { "description": "Infosys", "proName": "BSE:INFY" },
-                { "description": "L&T", "proName": "BSE:LT" },
-                { "description": "TCS", "proName": "BSE:TCS" },
-                { "description": "SBI", "proName": "BSE:SBIN" },
-                { "description": "ITC", "proName": "BSE:ITC" },
-                { "description": "Airtel", "proName": "BSE:BHARTIARTL" },
-                { "description": "Axis Bank", "proName": "BSE:AXISBANK" }
-            ],
-            "showSymbolLogo": true,
-            "isTransparent": false,
-            "displayMode": "adaptive",
-            "colorTheme": "dark",
-            "locale": "en"
-        }
-        </script>
-    </div>
-    <!-- TradingView Widget END -->
-</div>
-
     <!-- Random Ticker Box -->
     <div class="random-ticker-box">
         <div class="random-ticker-label">Random Ticker</div>
@@ -1090,53 +981,7 @@
         <p class="quote-text" id="quoteText">"The market is a device for transferring money from the impatient to the patient."</p>
         <span class="quote-author" id="quoteAuthor">- Warren Buffett</span>
     </div>
-    <!-- BSE Sectors Toggle -->
-<button class="sectors-toggle" id="sectorsToggle">
-    <span class="sectors-icon">📊</span>
-    <span class="sectors-text">BSE Sectors</span>
-</button>
-
-<!-- BSE Sectors Widget (hidden by default) -->
-<div class="sectors-widget-container" id="sectorsWidget" style="display: none;">
-    <!-- TradingView Widget BEGIN -->
-    <div class="tradingview-widget-container">
-        <div class="tradingview-widget-container__widget"></div>
-        <div class="tradingview-widget-copyright">
-            <a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank">
-                <span class="blue-text">Track all markets on TradingView</span>
-            </a>
-        </div>
-        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-quotes.js" async>
-        {
-            "width": "450",
-            "height": "500",
-            "symbolsGroups": [
-                {
-                    "name": "BSE Heavyweight Sectors",
-                    "originalName": "BSE Heavyweight Sectors",
-                    "symbols": [
-                        {"name": "BSE:SENSEX", "displayName": "Sensex"},
-                        {"name": "BSE:BANK", "displayName": "Bankex"},
-                        {"name": "BSE:FINSER", "displayName": "Financial Services"},
-                        {"name": "BSE:FOCIT", "displayName": "IT"},
-                        {"name": "BSE:HC", "displayName": "Healthcare"},
-                        {"name": "BSE:AUTO", "displayName": "Auto"},
-                        {"name": "BSE:METAL", "displayName": "Metal"},
-                        {"name": "BSE:OILGAS", "displayName": "Oil & Gas"}
-                    ]
-                }
-            ],
-            "showSymbolLogo": false,
-            "isTransparent": false,
-            "colorTheme": "dark",
-            "locale": "en",
-            "backgroundColor": "rgba(26, 29, 46, 0.9)"
-        }
-        </script>
-    </div>
-    <!-- TradingView Widget END -->
-</div>
-
+    
     <!-- Footer -->
     <div class="footer">
         Designed by <a href="https://www.instagram.com/nerdyintruder/" target="_blank">@Nerdyintruder</a>
@@ -1148,10 +993,11 @@
         <span id="themeText">Dark Mode</span>
     </button>
 
-   <!-- Scan Mode Toggle -->
-<button class="scan-mode-toggle inactive" id="scanModeToggle" title="Scan Mode (Ctrl+Shift+4)">
-    <span class="scan-icon">Scan Mode</span>
-</button>
+    <!-- Scan Mode Toggle -->
+    <button class="scan-mode-toggle inactive" id="scanModeToggle">
+        <span class="scan-icon">🔍</span>
+        <span id="scanModeText">Scan Mode: OFF</span>
+    </button>
 
     <script>
         // Stock data for all 15 sectors
@@ -1227,29 +1073,28 @@
 
         // Toggle Scan Mode
         function toggleScanMode() {
-    scanModeActive = !scanModeActive;
-    const scanModeToggle = document.getElementById('scanModeToggle');
-    
-    if (scanModeActive) {
-        scanModeToggle.classList.remove('inactive');
-        scanModeToggle.classList.add('active');
-        scanModeToggle.title = "Scan Mode: ON (Ctrl+Shift+4)";
-    } else {
-        scanModeToggle.classList.remove('active');
-        scanModeToggle.classList.add('inactive');
-        scanModeToggle.title = "Scan Mode: OFF (Ctrl+Shift+4)";
-    }
-    
-    localStorage.setItem('scanModeActive', scanModeActive);
-}
+            scanModeActive = !scanModeActive;
+            
+            if (scanModeActive) {
+                scanModeToggle.classList.remove('inactive');
+                scanModeToggle.classList.add('active');
+                scanModeText.textContent = 'Scan Mode: ON';
+            } else {
+                scanModeToggle.classList.remove('active');
+                scanModeToggle.classList.add('inactive');
+                scanModeText.textContent = 'Scan Mode: OFF';
+            }
+            
+            // Store state in localStorage
+            localStorage.setItem('scanModeActive', scanModeActive);
+        }
 
         // Keyboard Shortcut (Ctrl+Shift+4)
-document.addEventListener('keydown', (e) => {
-    if (e.ctrlKey && e.shiftKey && e.key === '4') {
-        e.preventDefault(); // Add this line to prevent browser shortcuts
-        toggleScanMode();
-    }
-});
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.shiftKey && e.key === '4') {
+                toggleScanMode();
+            }
+        });
 
         // Initialize Scan Mode from localStorage
         if (localStorage.getItem('scanModeActive') === 'true') {
@@ -1263,58 +1108,23 @@ document.addEventListener('keydown', (e) => {
 
         // Hover-to-chart functionality (adapted from extension)
         function setupHoverToChart() {
-    // Add hover detection to all stock items
-    document.querySelectorAll('.stock-item').forEach(item => {
-        const ticker = item.textContent.trim();
-        
-        item.addEventListener('mouseenter', () => {
-            if (!scanModeActive || !ticker) return;
-            openTradingViewWindow(ticker);
-        });
-    });
-
-    // BSE Sectors Widget Toggle
-const sectorsToggle = document.getElementById('sectorsToggle');
-const sectorsWidget = document.getElementById('sectorsWidget');
-let widgetVisible = false;
-
-sectorsToggle.addEventListener('click', () => {
-    widgetVisible = !widgetVisible;
-    sectorsWidget.style.display = widgetVisible ? 'block' : 'none';
-    sectorsToggle.style.right = widgetVisible ? '0' : '-35px';
-    sectorsToggle.style.opacity = widgetVisible ? '1' : '0.7';
-    sectorsToggle.style.borderRadius = widgetVisible ? '50px' : '50px 0 0 50px';
-});
-
-// Auto-hide when clicking elsewhere
-document.addEventListener('click', (e) => {
-    if (widgetVisible && 
-        !sectorsWidget.contains(e.target) && 
-        !sectorsToggle.contains(e.target)) {
-        sectorsWidget.style.display = 'none';
-        sectorsToggle.style.right = '-35px';
-        sectorsToggle.style.opacity = '0.7';
-        sectorsToggle.style.borderRadius = '50px 0 0 50px';
-        widgetVisible = false;
-    }
-});
-
-
-
-function openTradingViewWindow(ticker) {
-    const url = `https://www.tradingview.com/chart/?symbol=NSE:${ticker}`;
-    
-    if (tradingViewWindow && !tradingViewWindow.closed) {
-        tradingViewWindow.location.href = url;
-        tradingViewWindow.focus();
-    } else {
-        tradingViewWindow = window.open(
-            url, 
-            'TradingViewChart', 
-            'width=500,height=500,left=100,top=100'
-        );
-    }
-}
+            document.querySelectorAll('.stock-item').forEach(item => {
+                const ticker = item.textContent.trim();
+                
+                item.addEventListener('mouseenter', () => {
+                    if (!scanModeActive || !ticker) return;
+                    
+                    const url = `https://www.tradingview.com/chart/?symbol=NSE:${ticker}`;
+                    
+                    if (tradingViewWindow && !tradingViewWindow.closed) {
+                        tradingViewWindow.location.href = url;
+                        tradingViewWindow.focus();
+                    } else {
+                        tradingViewWindow = window.open(url, 'TradingViewChart', 'width=1200,height=800');
+                    }
+                });
+            });
+        }
 
         // ===== INITIALIZE PAGE =====
         document.addEventListener('DOMContentLoaded', function() {
