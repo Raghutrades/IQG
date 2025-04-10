@@ -1286,6 +1286,19 @@ sectorsToggle.addEventListener('click', () => {
     sectorsToggle.style.borderRadius = widgetVisible ? '50px' : '50px 0 0 50px';
 });
 
+// Auto-hide when clicking elsewhere
+document.addEventListener('click', (e) => {
+    if (widgetVisible && 
+        !sectorsWidget.contains(e.target) && 
+        !sectorsToggle.contains(e.target)) {
+        sectorsWidget.style.display = 'none';
+        sectorsToggle.style.right = '-35px';
+        sectorsToggle.style.opacity = '0.7';
+        sectorsToggle.style.borderRadius = '50px 0 0 50px';
+        widgetVisible = false;
+    }
+});
+
 
 
 function openTradingViewWindow(ticker) {
