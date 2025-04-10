@@ -642,6 +642,7 @@
             z-index: 100;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             transition: all 0.3s ease;
+            color: var(--text);
         }
         
         .theme-toggle:hover {
@@ -719,6 +720,7 @@
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
     font-weight: 500;
+    color: var(--text);
 }
 
 .scan-mode-toggle:hover {
@@ -743,13 +745,8 @@
         padding: 0.6rem 1rem;
         font-size: 0.9rem;
     }
-}
-
-
-@media (max-width: 600px) {
-    .scan-mode-toggle {
-        bottom: 5rem;
-        right: 1rem;
+    .theme-toggle {
+        bottom: 1.5rem;
     }
 }
         
@@ -1059,9 +1056,9 @@
 
     <!-- Scan Mode Toggle -->
     <button class="scan-mode-toggle" id="scanModeToggle" title="Scan Mode (Ctrl+Shift+S)">
-    <span class="scan-icon">🔍</span>
-    <span>Scan Mode</span>
-</button>
+        <span class="scan-icon">🔍</span>
+        <span>Scan Mode</span>
+    </button>
 
     <script>
         // Stock data for all 15 sectors
@@ -1129,76 +1126,70 @@
             { text: "The best investment you can make is in yourself.", author: "Warren Buffett" }
         ];
 
-        // ===== SCAN MODE INTEGRATION =====
+        // ===== SCAN MODE TOGGLE =====
         let scanModeActive = false;
         let tradingViewWindow = null;
         const scanModeToggle = document.getElementById('scanModeToggle');
-        const scanModeText = document.getElementById('scanModeText');
 
-        // ===== SCAN MODE TOGGLE (UPDATED) =====
-let scanModeActive = false;
-const scanModeToggle = document.getElementById('scanModeToggle');
+        // Toggle function
+        function toggleScanMode() {
+            scanModeActive = !scanModeActive;
+            scanModeToggle.classList.toggle('active', scanModeActive);
+            localStorage.setItem('scanModeActive', scanModeActive);
+        }
 
-// Toggle function
-function toggleScanMode() {
-    scanModeActive = !scanModeActive;
-    scanModeToggle.classList.toggle('active', scanModeActive);
-    localStorage.setItem('scanModeActive', scanModeActive);
-}
-
-// Keyboard shortcut (Ctrl+Shift+S)
-document.addEventListener('keydown', (e) => {
-    if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 's') {
-        e.preventDefault(); // Prevent browser save dialog
-        toggleScanMode();
-    }
-});
-
-// Initialize from localStorage
-if (localStorage.getItem('scanModeActive') === 'true') {
-    scanModeActive = true;
-    scanModeToggle.classList.add('active');
-}
-
-// Click handler
-scanModeToggle.addEventListener('click', toggleScanMode);
-
-        // Hover-to-chart functionality (adapted from extension)
-        function setupHoverToChart() {
-    // Add hover detection to all stock items
-    document.querySelectorAll('.stock-item').forEach(item => {
-        const ticker = item.textContent.trim();
-        
-        item.addEventListener('mouseenter', () => {
-            if (!scanModeActive || !ticker) return;
-            openTradingViewWindow(ticker);
+        // Keyboard shortcut (Ctrl+Shift+S)
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 's') {
+                e.preventDefault(); // Prevent browser save dialog
+                toggleScanMode();
+            }
         });
-    });
 
-    // Add hover detection to random ticker box
-    const randomTickerElement = document.getElementById('randomTicker');
-    randomTickerElement.addEventListener('mouseenter', () => {
-        if (!scanModeActive) return;
-        const ticker = randomTickerElement.textContent.trim();
-        if (ticker) openTradingViewWindow(ticker);
-    });
-}
+        // Initialize from localStorage
+        if (localStorage.getItem('scanModeActive') === 'true') {
+            scanModeActive = true;
+            scanModeToggle.classList.add('active');
+        }
 
-function openTradingViewWindow(ticker) {
-    const url = `https://www.tradingview.com/chart/?symbol=NSE:${ticker}`;
-    
-    if (tradingViewWindow && !tradingViewWindow.closed) {
-        tradingViewWindow.location.href = url;
-        tradingViewWindow.focus();
-    } else {
-        tradingViewWindow = window.open(
-            url, 
-            'TradingViewChart', 
-            'width=500,height=500,left=100,top=100'
-        );
-    }
-}
+        // Click handler
+        scanModeToggle.addEventListener('click', toggleScanMode);
 
+        // Hover-to-chart functionality
+        function setupHoverToChart() {
+            // Add hover detection to all stock items
+            document.querySelectorAll('.stock-item').forEach(item => {
+                const ticker = item.textContent.trim();
+                
+                item.addEventListener('mouseenter', () => {
+                    if (!scanModeActive || !ticker) return;
+                    openTradingViewWindow(ticker);
+                });
+            });
+
+            // Add hover detection to random ticker box
+            const randomTickerElement = document.getElementById('randomTicker');
+            randomTickerElement.addEventListener('mouseenter', () => {
+                if (!scanModeActive) return;
+                const ticker = randomTickerElement.textContent.trim();
+                if (ticker) openTradingViewWindow(ticker);
+            });
+        }
+
+        function openTradingViewWindow(ticker) {
+            const url = `https://www.tradingview.com/chart/?symbol=NSE:${ticker}`;
+            
+            if (tradingViewWindow && !tradingViewWindow.closed) {
+                tradingViewWindow.location.href = url;
+                tradingViewWindow.focus();
+            } else {
+                tradingViewWindow = window.open(
+                    url, 
+                    'TradingViewChart', 
+                    'width=500,height=500,left=100,top=100'
+                );
+            }
+        }
 
         // ===== INITIALIZE PAGE =====
         document.addEventListener('DOMContentLoaded', function() {
