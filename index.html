@@ -744,11 +744,24 @@
             height: 100%;
         }
         
+        /* === TICKER TAPE === */
+.ticker-tape-container {
+    width: 100%;
+    padding: 0.5rem 0;
+    background: var(--dark-card);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 1rem;
+}
+
+.tradingview-widget-container {
+    height: 46px !important;
+}
+
         /* === BSE SECTORS TOGGLE === */
 .sectors-toggle {
     position: fixed;
-    bottom: 11rem;
-    right: 2rem;
+    top: 180px; /* Below random ticker box */
+    right: 20px;
     background: linear-gradient(135deg, #7209b7, #3a0ca3);
     border: 1px solid var(--border);
     border-radius: 50px;
@@ -775,8 +788,8 @@
 
 .sectors-widget-container {
     position: fixed;
-    bottom: 16rem;
-    right: 2rem;
+    top: 230px; /* Below the button */
+    right: 20px;
     z-index: 99;
     border-radius: 12px;
     overflow: hidden;
@@ -902,6 +915,44 @@
         </div>
     </header>
     
+    <!-- Ticker Tape Widget -->
+<div class="ticker-tape-container">
+    <!-- TradingView Widget BEGIN -->
+    <div class="tradingview-widget-container">
+        <div class="tradingview-widget-container__widget"></div>
+        <div class="tradingview-widget-copyright">
+            <a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank">
+                <span class="blue-text">Track all markets on TradingView</span>
+            </a>
+        </div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
+        {
+            "symbols": [
+                { "description": "Sensex", "proName": "BSE:SENSEX" },
+                { "description": "Bankex", "proName": "BSE:BANK" },
+                { "description": "BSE IT", "proName": "BSE:FOCIT" },
+                { "description": "Reliance", "proName": "BSE:RELIANCE" },
+                { "description": "HDFC Bank", "proName": "BSE:HDFCBANK" },
+                { "description": "ICICI Bank", "proName": "BSE:ICICIBANK" },
+                { "description": "Infosys", "proName": "BSE:INFY" },
+                { "description": "L&T", "proName": "BSE:LT" },
+                { "description": "TCS", "proName": "BSE:TCS" },
+                { "description": "SBI", "proName": "BSE:SBIN" },
+                { "description": "ITC", "proName": "BSE:ITC" },
+                { "description": "Airtel", "proName": "BSE:BHARTIARTL" },
+                { "description": "Axis Bank", "proName": "BSE:AXISBANK" }
+            ],
+            "showSymbolLogo": true,
+            "isTransparent": false,
+            "displayMode": "adaptive",
+            "colorTheme": "dark",
+            "locale": "en"
+        }
+        </script>
+    </div>
+    <!-- TradingView Widget END -->
+</div>
+
     <!-- Random Ticker Box -->
     <div class="random-ticker-box">
         <div class="random-ticker-label">Random Ticker</div>
@@ -1039,7 +1090,7 @@
     <!-- BSE Sectors Toggle -->
 <button class="sectors-toggle" id="sectorsToggle">
     <span class="sectors-icon">📊</span>
-    <span class="sectors-text">Live Sectors</span>
+    <span class="sectors-text">BSE Sectors</span>
 </button>
 
 <!-- BSE Sectors Widget (hidden by default) -->
