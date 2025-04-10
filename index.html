@@ -689,7 +689,18 @@
             color: var(--accent);
             transform: scale(1.05);
         }
+/* === TICKER TAPE === */
+.ticker-tape-container {
+    width: 100%;
+    padding: 0.5rem 0;
+    background: var(--dark-card);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 1rem;
+}
 
+.tradingview-widget-container {
+    height: auto !important;
+}
         /* === SCAN MODE TOGGLE === */
 .scan-mode-toggle {
     position: fixed;
@@ -736,6 +747,13 @@
     0% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.4); }
     70% { box-shadow: 0 0 0 15px rgba(76, 175, 80, 0); }
     100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
+}
+
+@media (max-width: 600px) {
+    .scan-mode-toggle {
+        bottom: 5rem;
+        right: 1rem;
+    }
 }
         
         /* TradingView Widget Container */
@@ -858,6 +876,44 @@
         </div>
     </header>
     
+    <!-- Ticker Tape Widget -->
+<div class="ticker-tape-container">
+    <!-- TradingView Widget BEGIN -->
+    <div class="tradingview-widget-container">
+        <div class="tradingview-widget-container__widget"></div>
+        <div class="tradingview-widget-copyright">
+            <a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank">
+                <span class="blue-text">Track all markets on TradingView</span>
+            </a>
+        </div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
+        {
+            "symbols": [
+                { "description": "Sensex", "proName": "BSE:SENSEX" },
+                { "description": "Bankex", "proName": "BSE:BANK" },
+                { "description": "BSE IT", "proName": "BSE:FOCIT" },
+                { "description": "Reliance", "proName": "BSE:RELIANCE" },
+                { "description": "HDFC Bank", "proName": "BSE:HDFCBANK" },
+                { "description": "ICICI Bank", "proName": "BSE:ICICIBANK" },
+                { "description": "Infosys", "proName": "BSE:INFY" },
+                { "description": "L&T", "proName": "BSE:LT" },
+                { "description": "TCS", "proName": "BSE:TCS" },
+                { "description": "SBI", "proName": "BSE:SBIN" },
+                { "description": "ITC", "proName": "BSE:ITC" },
+                { "description": "Airtel", "proName": "BSE:BHARTIARTL" },
+                { "description": "Axis Bank", "proName": "BSE:AXISBANK" }
+            ],
+            "showSymbolLogo": true,
+            "isTransparent": false,
+            "displayMode": "adaptive",
+            "colorTheme": "dark",
+            "locale": "en"
+        }
+        </script>
+    </div>
+    <!-- TradingView Widget END -->
+</div>
+
     <!-- Random Ticker Box -->
     <div class="random-ticker-box">
         <div class="random-ticker-label">Random Ticker</div>
@@ -1152,6 +1208,7 @@ function openTradingViewWindow(ticker) {
         );
     }
 }
+
 
         // ===== INITIALIZE PAGE =====
         document.addEventListener('DOMContentLoaded', function() {
