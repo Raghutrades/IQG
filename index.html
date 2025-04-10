@@ -1335,10 +1335,26 @@ document.addEventListener('keydown', (e) => {
 document.addEventListener('keydown', (e) => {
     if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'a') {
         e.preventDefault();
-        const wp = document.getElementById('watchlistPanel');
-        wp.style.display = wp.style.display === 'none' ? 'block' : 'none';
+        const watchlistPanel = document.getElementById('watchlistPanel');
+        if (watchlistPanel) {
+            watchlistPanel.style.display = 
+                watchlistPanel.style.display === 'none' ? 'block' : 'none';
+            // Save state to localStorage
+            localStorage.setItem(
+                'watchlistVisible', 
+                watchlistPanel.style.display === 'block'
+            );
+        }
     }
 });
+
+// Initialize watchlist visibility from localStorage
+const savedVisibility = localStorage.getItem('watchlistVisible');
+const watchlistPanel = document.getElementById('watchlistPanel');
+if (watchlistPanel) {
+    watchlistPanel.style.display = 
+        savedVisibility === 'false' ? 'none' : 'block';
+}
         // ===== SEARCH FUNCTIONALITY =====
         document.getElementById('tickerSearch').addEventListener('input', function(e) {
             const query = e.target.value.trim().toUpperCase();
