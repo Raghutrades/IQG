@@ -1276,25 +1276,17 @@ document.addEventListener('keydown', (e) => {
     // BSE Sectors Widget Toggle
 const sectorsToggle = document.getElementById('sectorsToggle');
 const sectorsWidget = document.getElementById('sectorsWidget');
+let widgetVisible = false;
 
 sectorsToggle.addEventListener('click', () => {
-    if (sectorsWidget.style.display === 'none') {
-        sectorsWidget.style.display = 'block';
-        sectorsToggle.innerHTML = '<span class="sectors-icon">📊</span> <span class="sectors-text">Hide Sectors</span>';
-    } else {
-        sectorsWidget.style.display = 'none';
-        sectorsToggle.innerHTML = '<span class="sectors-icon">📊</span> <span class="sectors-text">Live Sectors</span>';
-    }
+    widgetVisible = !widgetVisible;
+    sectorsWidget.style.display = widgetVisible ? 'block' : 'none';
+    sectorsToggle.style.right = widgetVisible ? '0' : '-35px';
+    sectorsToggle.style.opacity = widgetVisible ? '1' : '0.7';
+    sectorsToggle.style.borderRadius = widgetVisible ? '50px' : '50px 0 0 50px';
 });
 
-    // Add hover detection to random ticker box
-    const randomTickerElement = document.getElementById('randomTicker');
-    randomTickerElement.addEventListener('mouseenter', () => {
-        if (!scanModeActive) return;
-        const ticker = randomTickerElement.textContent.trim();
-        if (ticker) openTradingViewWindow(ticker);
-    });
-}
+
 
 function openTradingViewWindow(ticker) {
     const url = `https://www.tradingview.com/chart/?symbol=NSE:${ticker}`;
