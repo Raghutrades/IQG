@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Intraday Quick Grabber</title>
     <link rel="icon" href="favicon.png" type="image/png">
     <style>
@@ -72,6 +72,8 @@
             margin: 0;
             padding: 0;
             transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+            touch-action: pan-y;
+            -webkit-overflow-scrolling: touch;
         }
         
         /* === HEADER STYLES === */
@@ -821,6 +823,25 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 12px;
+            position: relative;
+        }
+
+        .close-watchlist {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: var(--loss-red);
+            color: white;
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
 
         .clear-all-btn {
@@ -891,12 +912,18 @@
                 right: 10px;
                 padding: 8px 12px;
             }
+
+            .watchlist-panel {
+                width: 250px;
+                max-height: 400px;
+            }
         }
         
         @media (max-width: 600px) {
             .sector-grid {
                 grid-template-columns: 1fr;
                 padding: 1rem;
+                gap: 1rem;
             }
             
             .header {
@@ -925,6 +952,62 @@
                 position: static;
                 margin: 10px auto;
                 width: fit-content;
+            }
+
+            .watchlist-panel {
+                width: 90%;
+                max-height: 300px;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                right: unset;
+            }
+
+            .theme-toggle, 
+            .scan-mode-toggle {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+                bottom: 1rem;
+            }
+
+            .scan-mode-toggle {
+                bottom: 4rem;
+            }
+
+            .calculator-container {
+                padding: 1rem;
+            }
+
+            .calculator-button {
+                padding: 0.5rem 1rem;
+            }
+
+            .search-container {
+                padding: 0.5rem 1rem;
+            }
+
+            .search-input {
+                padding: 8px;
+            }
+        }
+
+        /* Mobile touch improvements */
+        @media (hover: none) {
+            .stock-item:hover {
+                transform: none;
+                background: none;
+            }
+            
+            .stock-item:hover::after {
+                opacity: 0;
+            }
+            
+            .mini-pagination:hover {
+                max-height: 24px;
+            }
+            
+            .mini-pagination .current-page-indicator {
+                opacity: 1;
             }
         }
     </style>
@@ -1014,6 +1097,7 @@
     
     <!-- Watchlist Panel -->
     <div class="watchlist-panel" id="watchlistPanel" title="Drag to move | Ctrl+Shift+Z to toggle">
+        <button class="close-watchlist" id="closeWatchlist" title="Close Watchlist">×</button>
         <div class="watchlist-header">
             <h3>⭐ Your Watchlist</h3>
             <button class="clear-all-btn" id="clearWatchlist" title="Clear All (Ctrl+Shift+Del)">
@@ -1299,6 +1383,12 @@
             watchlistPanel.style.cursor = 'grab';
         });
 
+        // Close watchlist button
+        document.getElementById('closeWatchlist').addEventListener('click', () => {
+            watchlistPanel.style.display = 'none';
+            localStorage.setItem('watchlistVisible', 'false');
+        });
+
         // Clear All Functionality
         document.getElementById('clearWatchlist').addEventListener('click', () => {
             watchlist = [];
@@ -1318,15 +1408,12 @@
         document.addEventListener('keydown', (e) => {
             if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'z') {
                 e.preventDefault();
-                const watchlistPanel = document.getElementById('watchlistPanel');
-                if (watchlistPanel) {
-                    watchlistPanel.style.display = 
-                        watchlistPanel.style.display === 'none' ? 'block' : 'none';
-                    // Save state to localStorage
-                    localStorage.setItem(
-                        'watchlistVisible', 
-                        watchlistPanel.style.display === 'block'
-                    );
+                if (watchlistPanel.style.display === 'none') {
+                    watchlistPanel.style.display = 'block';
+                    localStorage.setItem('watchlistVisible', 'true');
+                } else {
+                    watchlistPanel.style.display = 'none';
+                    localStorage.setItem('watchlistVisible', 'false');
                 }
             }
         });
@@ -1469,8 +1556,11 @@
 
         // Function to open TradingView window
         function openTradingViewWindow(ticker) {
+            if (!ticker) return;
+            
             if (tradingViewWindow && !tradingViewWindow.closed) {
                 tradingViewWindow.location.href = `https://www.tradingview.com/chart/?symbol=NSE:${ticker}`;
+                tradingViewWindow.focus();
             } else {
                 tradingViewWindow = window.open(`https://www.tradingview.com/chart/?symbol=NSE:${ticker}`, '_blank');
             }
@@ -1623,7 +1713,7 @@
                                 if (e.ctrlKey) { // Hold CTRL to add to watchlist
                                     addToWatchlist(pageStocks[j], sectorName);
                                 } else {
-                                    window.open(`https://www.tradingview.com/chart/?symbol=NSE:${pageStocks[j]}`, '_blank');
+                                    openTradingViewWindow(pageStocks[j]);
                                 }
                             });
                         } else {
@@ -1880,7 +1970,7 @@
                 
                 // Make ticker clickable
                 randomTickerElement.onclick = () => {
-                    window.open(`https://www.tradingview.com/chart/?symbol=NSE:${randomTicker}`, '_blank');
+                    openTradingViewWindow(randomTicker);
                 };
             }
             
@@ -1896,21 +1986,46 @@
             // For sector stocks
             document.querySelectorAll('.stock-item').forEach(item => {
                 const ticker = item.textContent.trim();
+                
+                // Handle hover for scan mode
                 item.addEventListener('mouseenter', () => {
-                    if (scanModeActive && ticker) openTradingViewWindow(ticker);
+                    if (scanModeActive && ticker) {
+                        openTradingViewWindow(ticker);
+                    }
                 });
+                
+                // Handle touch for mobile devices
+                item.addEventListener('touchstart', (e) => {
+                    if (scanModeActive && ticker) {
+                        e.preventDefault();
+                        openTradingViewWindow(ticker);
+                    }
+                }, { passive: false });
             });
 
             // For watchlist items
             document.querySelectorAll('#watchlistBody tr').forEach(row => {
                 const ticker = row.querySelector('td:first-child').textContent;
+                
+                // Handle hover for scan mode
                 row.addEventListener('mouseenter', () => {
-                    if (scanModeActive && ticker) openTradingViewWindow(ticker);
+                    if (scanModeActive && ticker) {
+                        openTradingViewWindow(ticker);
+                    }
                 });
                 
+                // Handle touch for mobile devices
+                row.addEventListener('touchstart', (e) => {
+                    if (scanModeActive && ticker) {
+                        e.preventDefault();
+                        openTradingViewWindow(ticker);
+                    }
+                }, { passive: false });
+                
+                // Click handler for opening in new tab
                 row.addEventListener('click', (e) => {
-                    if (!e.target.classList.contains('remove-watchlist')) {
-                        window.open(`https://www.tradingview.com/chart/?symbol=NSE:${ticker}`, '_blank');
+                    if (!e.target.classList.contains('remove-watchlist') {
+                        openTradingViewWindow(ticker);
                     }
                 });
             });
@@ -1918,7 +2033,9 @@
             // For random ticker
             const randomTickerElement = document.getElementById('randomTicker');
             randomTickerElement.addEventListener('mouseenter', () => {
-                if (scanModeActive) openTradingViewWindow(randomTickerElement.textContent);
+                if (scanModeActive) {
+                    openTradingViewWindow(randomTickerElement.textContent);
+                }
             });
         }
     </script>
