@@ -786,70 +786,79 @@
             filter: brightness(1.5);
         }
 
+        /* Watchlist Styles */
+        .watchlist-panel {
+    position: fixed;
+    top: 150px;
+    right: 20px;
+    width: 300px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 0 15px var(--glow);
+    z-index: 90;
+    max-height: 500px;
+    overflow-y: auto;
+    cursor: grab;
+    transition: all 0.3s ease;
+    animation: glow-pulse 3s infinite;
+}
 
-        /* Draggable Watchlist */
-.watchlist-panel {
-  position: fixed;
-  top: 150px;
-  right: 20px;
-  width: 300px;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-  z-index: 90;
-  max-height: 500px;
-  overflow-y: auto;
-  cursor: grab;
-  transition: transform 0.2s, box-shadow 0.2s;
-  user-select: none;
+@keyframes glow-pulse {
+    0% { box-shadow: 0 0 10px var(--glow); }
+    50% { box-shadow: 0 0 20px var(--accent); }
+    100% { box-shadow: 0 0 10px var(--glow); }
 }
 
 .watchlist-panel:active {
-  cursor: grabbing;
-  box-shadow: 0 8px 30px var(--glow);
+    cursor: grabbing;
+    transform: scale(1.02);
 }
 
-.watchlist-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem;
-  background: linear-gradient(135deg, var(--accent), #3a0ca3);
-  color: white;
-  border-radius: 12px 12px 0 0;
-}
-
-.watchlist-close {
-  background: transparent;
-  border: none;
-  color: white;
-  font-size: 1.5rem;
-  cursor: pointer;
-  padding: 0 0.5rem;
-}
-
-.watchlist-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.watchlist-table th, 
-.watchlist-table td {
-  padding: 8px;
-  border-bottom: 1px solid var(--border);
-  text-align: left;
-}
-
-.watchlist-table tr:last-child td {
-  border-bottom: none;
-}
-
-.remove-watchlist {
-  color: var(--loss-red);
-  cursor: pointer;
-}
+        /* Mobile responsiveness */
+        @media (max-width: 600px) {
+            .scan-mode-toggle {
+                bottom: 5rem;
+                right: 1rem;
+                padding: 0.6rem 1rem;
+                font-size: 0.9rem;
+            }
+            .theme-toggle {
+                bottom: 1.5rem;
+            }
+            .watchlist-panel {
+                width: 250px;
+                right: 10px;
+            }
+        }
         
+
+        .watchlist-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.clear-all-btn {
+    background: var(--loss-red);
+    color: white;
+    border: none;
+    padding: 4px 10px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.clear-all-btn:hover {
+    background: var(--inactive-red);
+    transform: scale(1.05);
+}
         /* TradingView Widget Container */
         .tradingview-widget-container {
             width: 100%;
@@ -1020,24 +1029,25 @@
         <div class="random-ticker-value" id="randomTicker">RELIANCE</div>
     </div>
     
-   
-    <!-- Draggable Watchlist Panel -->
-<div class="watchlist-panel" id="watchlistPanel">
-  <div class="watchlist-header">
+    <!-- Watchlist Panel -->
+    <div class="watchlist-panel" id="watchlistPanel" title="Drag to move | Ctrl+Shift+A to toggle">
+        <div class="watchlist-header">
     <h3>⭐ Your Watchlist</h3>
-    <button class="watchlist-close" title="Toggle Watchlist (Ctrl+Shift+Q)">×</button>
-  </div>
-  <table class="watchlist-table" id="watchlistTable">
-    <thead>
-      <tr>
-        <th>Ticker</th>
-        <th>Sector</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody id="watchlistBody"></tbody>
-  </table>
+    <button class="clear-all-btn" id="clearWatchlist" title="Clear All (Ctrl+Shift+Del)">
+        ✕ Clear All
+    </button>
 </div>
+        <table class="watchlist-table" id="watchlistTable">
+            <thead>
+                <tr>
+                    <th>Ticker</th>
+                    <th>Sector</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="watchlistBody"></tbody>
+        </table>
+    </div>
     
     <!-- Sector Grid -->
     <div class="sector-grid" id="sectorGrid">
@@ -1252,104 +1262,83 @@
         ];
 
         // ===== WATCHLIST FUNCTIONALITY =====
-let watchlist = JSON.parse(localStorage.getItem('watchlist')) || [];
-let isWatchlistVisible = localStorage.getItem('watchlistVisible') !== 'false';
+        let watchlist = JSON.parse(localStorage.getItem('watchlist')) || [];
 
-function toggleWatchlistVisibility() {
-  isWatchlistVisible = !isWatchlistVisible;
-  document.getElementById('watchlistPanel').style.display = isWatchlistVisible ? 'block' : 'none';
-  localStorage.setItem('watchlistVisible', isWatchlistVisible);
-}
+        function addToWatchlist(ticker, sector) {
+            if (!watchlist.some(item => item.ticker === ticker)) {
+                watchlist.push({ ticker, sector });
+                localStorage.setItem('watchlist', JSON.stringify(watchlist));
+                updateWatchlistUI();
+            }
+        }
 
-// Initialize watchlist visibility
-if (!isWatchlistVisible) {
-  document.getElementById('watchlistPanel').style.display = 'none';
-}
+        function removeFromWatchlist(ticker) {
+            watchlist = watchlist.filter(item => item.ticker !== ticker);
+            localStorage.setItem('watchlist', JSON.stringify(watchlist));
+            updateWatchlistUI();
+        }
 
-// Ctrl+Shift+Q shortcut
-document.addEventListener('keydown', (e) => {
-  if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'q') {
-    e.preventDefault();
-    toggleWatchlistVisibility();
-  }
-});
+        function updateWatchlistUI() {
+            const watchlistBody = document.getElementById('watchlistBody');
+            watchlistBody.innerHTML = watchlist.map(item => `
+                <tr>
+                    <td>${item.ticker}</td>
+                    <td>${item.sector}</td>
+                    <td class="remove-watchlist" onclick="removeFromWatchlist('${item.ticker}')">✕</td>
+                </tr>
+            `).join('');
+        }
 
-// Make watchlist draggable
+        // ===== DRAGGABLE WATCHLIST =====
 const watchlistPanel = document.getElementById('watchlistPanel');
 let isDragging = false;
 let offsetX, offsetY;
 
 watchlistPanel.addEventListener('mousedown', (e) => {
-  if (e.target.closest('.watchlist-close, .remove-watchlist')) return;
-  
-  isDragging = true;
-  offsetX = e.clientX - watchlistPanel.getBoundingClientRect().left;
-  offsetY = e.clientY - watchlistPanel.getBoundingClientRect().top;
-  watchlistPanel.style.cursor = 'grabbing';
+    if (e.target.tagName === 'BUTTON' || e.target.classList.contains('remove-watchlist')) return;
+    
+    isDragging = true;
+    offsetX = e.clientX - watchlistPanel.getBoundingClientRect().left;
+    offsetY = e.clientY - watchlistPanel.getBoundingClientRect().top;
+    watchlistPanel.style.cursor = 'grabbing';
 });
 
 document.addEventListener('mousemove', (e) => {
-  if (!isDragging) return;
-  
-  watchlistPanel.style.left = `${e.clientX - offsetX}px`;
-  watchlistPanel.style.top = `${e.clientY - offsetY}px`;
-  watchlistPanel.style.right = 'unset';
+    if (!isDragging) return;
+    
+    watchlistPanel.style.left = `${e.clientX - offsetX}px`;
+    watchlistPanel.style.top = `${e.clientY - offsetY}px`;
+    watchlistPanel.style.right = 'unset';
 });
 
 document.addEventListener('mouseup', () => {
-  isDragging = false;
-  watchlistPanel.style.cursor = 'grab';
+    isDragging = false;
+    watchlistPanel.style.cursor = 'grab';
 });
 
-// Close button
-document.querySelector('.watchlist-close').addEventListener('click', toggleWatchlistVisibility);
-
-// Scan mode integration
-function setupWatchlistHover() {
-  document.querySelectorAll('.watchlist-table td:first-child').forEach(td => {
-    td.addEventListener('mouseenter', () => {
-      if (!scanModeActive) return;
-      const ticker = td.textContent.trim();
-      openTradingViewWindow(ticker);
-    });
-  });
-}
-
-// Rest of watchlist functions remain the same...
-function addToWatchlist(ticker, sector) {
-  if (!watchlist.some(item => item.ticker === ticker)) {
-    watchlist.push({ ticker, sector });
+// Clear All Functionality
+document.getElementById('clearWatchlist').addEventListener('click', () => {
+    watchlist = [];
     localStorage.setItem('watchlist', JSON.stringify(watchlist));
     updateWatchlistUI();
-    setupWatchlistHover(); // Rebind hover events
-  }
-}
+});
 
-function removeFromWatchlist(ticker) {
-  watchlist = watchlist.filter(item => item.ticker !== ticker);
-  localStorage.setItem('watchlist', JSON.stringify(watchlist));
-  updateWatchlistUI();
-}
+// Ctrl+Shift+Del Shortcut
+document.addEventListener('keydown', (e) => {
+    if (e.ctrlKey && e.shiftKey && e.key === 'Delete') {
+        e.preventDefault();
+        document.getElementById('clearWatchlist').click();
+    }
+});
 
-function updateWatchlistUI() {
-  const watchlistBody = document.getElementById('watchlistBody');
-  watchlistBody.innerHTML = watchlist.map(item => `
-    <tr>
-      <td>${item.ticker}</td>
-      <td>${item.sector}</td>
-      <td class="remove-watchlist" onclick="removeFromWatchlist('${item.ticker}')">✕</td>
-    </tr>
-  `).join('');
-  
-  // Make watchlist items clickable
-  document.querySelectorAll('.watchlist-table td:first-child').forEach(td => {
-    td.style.cursor = 'pointer';
-    td.addEventListener('click', () => {
-      window.open(`https://www.tradingview.com/chart/?symbol=NSE:${td.textContent.trim()}`, '_blank');
-    });
-  });
-}
-
+// Toggle Watchlist Visibility (Ctrl+Shift+A)
+document.addEventListener('keydown', (e) => {
+    if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'a') {
+        e.preventDefault();
+        const wp = document.getElementById('watchlistPanel');
+        wp.style.display = wp.style.display === 'none' ? 'block' : 'none';
+    }
+});
         // ===== SEARCH FUNCTIONALITY =====
         document.getElementById('tickerSearch').addEventListener('input', function(e) {
             const query = e.target.value.trim().toUpperCase();
@@ -1421,39 +1410,34 @@ function updateWatchlistUI() {
 
         // Hover-to-chart functionality
         function setupHoverToChart() {
-            // Add hover detection to all stock items
-            document.querySelectorAll('.stock-item').forEach(item => {
-                const ticker = item.textContent.trim();
-                
-                item.addEventListener('mouseenter', () => {
-                    if (!scanModeActive || !ticker) return;
-                    openTradingViewWindow(ticker);
-                });
-            });
+    // For sector stocks
+    document.querySelectorAll('.stock-item').forEach(item => {
+        const ticker = item.textContent.trim();
+        item.addEventListener('mouseenter', () => {
+            if (scanModeActive && ticker) openTradingViewWindow(ticker);
+        });
+    });
 
-            // Add hover detection to random ticker box
-            const randomTickerElement = document.getElementById('randomTicker');
-            randomTickerElement.addEventListener('mouseenter', () => {
-                if (!scanModeActive) return;
-                const ticker = randomTickerElement.textContent.trim();
-                if (ticker) openTradingViewWindow(ticker);
-            });
-        }
-
-        function openTradingViewWindow(ticker) {
-            const url = `https://www.tradingview.com/chart/?symbol=NSE:${ticker}`;
-            
-            if (tradingViewWindow && !tradingViewWindow.closed) {
-                tradingViewWindow.location.href = url;
-                tradingViewWindow.focus();
-            } else {
-                tradingViewWindow = window.open(
-                    url, 
-                    'TradingViewChart', 
-                    'width=500,height=500,left=100,top=100'
-                );
+    // For watchlist items
+    document.querySelectorAll('#watchlistBody tr').forEach(row => {
+        const ticker = row.querySelector('td:first-child').textContent;
+        row.addEventListener('mouseenter', () => {
+            if (scanModeActive && ticker) openTradingViewWindow(ticker);
+        });
+        
+        row.addEventListener('click', (e) => {
+            if (!e.target.classList.contains('remove-watchlist')) {
+                window.open(`https://www.tradingview.com/chart/?symbol=NSE:${ticker}`, '_blank');
             }
-        }
+        });
+    });
+
+    // For random ticker
+    const randomTickerElement = document.getElementById('randomTicker');
+    randomTickerElement.addEventListener('mouseenter', () => {
+        if (scanModeActive) openTradingViewWindow(randomTickerElement.textContent);
+    });
+}
 
         // ===== INITIALIZE PAGE =====
         document.addEventListener('DOMContentLoaded', function() {
@@ -1467,13 +1451,11 @@ function updateWatchlistUI() {
             initCollapsibleSections();
             initRandomTicker();
             updateWatchlistUI();
+            setupHoverToChart(); // Refresh hover events
             
-            // Setup all hover interactions after load
-setTimeout(() => {
-  setupHoverToChart();      // For sector grid items
-  setupWatchlistHover();    // For watchlist items
-}, 1000);
-        
+            // Setup hover-to-chart after sector grid loads
+            setTimeout(setupHoverToChart, 1000);
+        });
 
         // ===== THEME TOGGLE =====
         function initThemeToggle() {
