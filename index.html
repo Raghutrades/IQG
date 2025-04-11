@@ -7,7 +7,8 @@
     <link rel="icon" href="favicon.png" type="image/png">
     <!-- Added CDNs for export functionality -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
         @font-face {
             font-family: 'Quenton';
             src: url('quenton.otf') format('opentype');
@@ -1072,22 +1073,6 @@
                 opacity: 1;
             }
         }
-
-        
-/* Fix table layout */
-.trades-table {
-  table-layout: fixed;
-}
-.trades-table th, 
-.trades-table td {
-  padding: 10px;
-  word-wrap: break-word;
-}
-.trades-table th:nth-child(1) { width: 8%; }  /* # */
-.trades-table th:nth-child(2) { width: 20%; } /* Ticker */
-.trades-table th:nth-child(3), 
-.trades-table th:nth-child(4) { width: 25%; } /* Buy/Sell Price */
-.trades-table th:nth-child(5) { width: 15%; } /* Qty */
     </style>
 </head>
 <body>
@@ -1679,33 +1664,16 @@
         scanModeToggle.addEventListener('click', toggleScanMode);
 
         // Function to open TradingView window
-        let scanModePopup = null; // Stores the hover popup window
-
-function openTradingViewWindow(ticker, isHover = false) {
-  if (!ticker) return;
-
-  // HOVER BEHAVIOR (Scan Mode ON)
-  if (isHover && scanModeActive) {
-    const url = `https://www.tradingview.com/chart/?symbol=NSE:${ticker}`;
-    
-    if (scanModePopup && !scanModePopup.closed) {
-      // Update existing popup
-      scanModePopup.location.href = url;
-      scanModePopup.focus();
-    } else {
-      // Open new popup (600x500)
-      scanModePopup = window.open(
-        url,
-        "ScanModePopup",
-        "width=600,height=500,left=100,top=100"
-      );
-    }
-  } 
-  // CLICK BEHAVIOR (Always opens new tab)
-  else {
-    window.open(`https://www.tradingview.com/chart/?symbol=NSE:${ticker}`, "_blank");
-  }
-}
+        function openTradingViewWindow(ticker) {
+            if (!ticker) return;
+            
+            if (tradingViewWindow && !tradingViewWindow.closed) {
+                tradingViewWindow.location.href = `https://www.tradingview.com/chart/?symbol=NSE:${ticker}`;
+                tradingViewWindow.focus();
+            } else {
+                tradingViewWindow = window.open(`https://www.tradingview.com/chart/?symbol=NSE:${ticker}`, '_blank');
+            }
+        }
 
         // ===== EXPORT FUNCTIONALITY =====
         function exportTradeData(format) {
@@ -1727,12 +1695,11 @@ function openTradingViewWindow(ticker, isHover = false) {
                 const buyPrice = document.getElementById(`buyPrice${i}`).value;
                 if (buyPrice) {
                     data.trades.push({
-  number: i + 1,
-  ticker: document.getElementById(`ticker${i}`).value || "N/A",
-  buyPrice: document.getElementById(`buyPrice${i}`).value || "N/A",
-  sellPrice: document.getElementById(`sellPrice${i}`).value || "N/A",
-  quantity: document.getElementById(`quantity${i}`).value || "N/A",
-});
+                        number: i + 1,
+                        buyPrice: buyPrice,
+                        sellPrice: document.getElementById(`sellPrice${i}`).value || 'N/A',
+                        quantity: document.getElementById(`quantity${i}`).value || 'N/A'
+                    });
                 }
             }
 
@@ -1775,58 +1742,45 @@ function openTradingViewWindow(ticker, isHover = false) {
 
         // PDF Export
         function exportAsPDF(data) {
-  // Check if jsPDF is loaded
-  if (typeof window.jspdf !== 'object') {
-    alert("Error: PDF library failed to load. Please refresh the page.");
-    return;
-  }
-  
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-
-  // Title
-  doc.setFontSize(18);
-  doc.setTextColor(40);
-  doc.text("TRADE REPORT", 105, 20, { align: "center" });
-
-  // Metadata
-  doc.setFontSize(12);
-  doc.text(`Date: ${data.timestamp}`, 20, 30);
-  doc.text(`Trade Type: ${data.tradeType}`, 20, 38);
-
-  // Trades Table
-  doc.autoTable({
-    startY: 50,
-    head: [["#", "Ticker", "Buy Price (₹)", "Sell Price (₹)", "Qty"]],
-    body: data.trades.map(trade => [
-      trade.number,
-      trade.ticker || "N/A",
-      trade.buyPrice || "N/A",
-      trade.sellPrice || "N/A",
-      trade.quantity || "N/A"
-    ]),
-    headStyles: { fillColor: [67, 97, 238] }, // Blue header
-    styles: { fontSize: 10 }
-  });
-
-  // Notes
-  doc.setFontSize(14);
-  doc.text("NOTES", 20, doc.lastAutoTable.finalY + 20);
-  doc.setFontSize(10);
-  doc.text(`Entry Reason: ${data.entryReason || "N/A"}`, 20, doc.lastAutoTable.finalY + 30);
-  doc.text(`Exit Reason: ${data.exitReason || "N/A"}`, 20, doc.lastAutoTable.finalY + 40);
-  doc.text(`Lessons: ${data.lessonsLearned || "N/A"}`, 20, doc.lastAutoTable.finalY + 50);
-
-  // Results
-  doc.setFontSize(14);
-  doc.text("RESULTS", 20, doc.lastAutoTable.finalY + 70);
-  doc.setFontSize(12);
-  doc.text(`Net P/L: ${data.netResult}`, 20, doc.lastAutoTable.finalY + 80);
-  doc.text(`Brokerage: ${data.brokerage}`, 20, doc.lastAutoTable.finalY + 90);
-
-  // Save PDF
-  doc.save(`TradeReport_${new Date().toISOString().slice(0, 10)}.pdf`);
-}
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Title
+            doc.setFontSize(18);
+            doc.text('TRADE REPORT', 105, 15, { align: 'center' });
+            
+            // Metadata
+            doc.setFontSize(12);
+            doc.text(`Generated: ${data.timestamp}`, 14, 25);
+            doc.text(`Trade Type: ${data.tradeType}`, 14, 32);
+            
+            // Trades Table
+            doc.setFontSize(14);
+            doc.text('TRADE DETAILS', 14, 45);
+            doc.autoTable({
+                startY: 50,
+                head: [['#', 'Buy Price', 'Sell Price', 'Qty']],
+                body: data.trades.map(trade => [trade.number, trade.buyPrice, trade.sellPrice, trade.quantity]),
+                styles: { fontSize: 10 }
+            });
+            
+            // Notes Section
+            doc.setFontSize(14);
+            doc.text('TRADE NOTES', 14, doc.autoTable.previous.finalY + 15);
+            doc.setFontSize(10);
+            doc.text(`Entry Reason: ${data.entryReason || 'N/A'}`, 14, doc.autoTable.previous.finalY + 25);
+            doc.text(`Exit Reason: ${data.exitReason || 'N/A'}`, 14, doc.autoTable.previous.finalY + 35);
+            doc.text(`Lessons Learned: ${data.lessonsLearned || 'N/A'}`, 14, doc.autoTable.previous.finalY + 45);
+            
+            // Results
+            doc.setFontSize(14);
+            doc.text('RESULTS SUMMARY', 14, doc.autoTable.previous.finalY + 60);
+            doc.setFontSize(12);
+            doc.text(`Net Profit/Loss: ${data.netResult}`, 14, doc.autoTable.previous.finalY + 70);
+            doc.text(`Total Brokerage: ${data.brokerage}`, 14, doc.autoTable.previous.finalY + 80);
+            
+            doc.save(`TradeReport_${new Date().toISOString().slice(0,10)}.pdf`);
+        }
 
         // Excel Export
         function exportAsExcel(data) {
@@ -2073,12 +2027,11 @@ function openTradingViewWindow(ticker, isHover = false) {
                 for (let i = 0; i < count; i++) {
                     const row = document.createElement('tr');
                     row.innerHTML = `
-  <td>${i + 1}</td>
-  <td><input type="text" class="trade-input" id="ticker${i}" placeholder="Ticker"></td>
-  <td><input type="number" class="trade-input" id="buyPrice${i}" placeholder="Buy (₹)"></td>
-  <td><input type="number" class="trade-input" id="sellPrice${i}" placeholder="Sell (₹)"></td>
-  <td><input type="number" class="trade-input" id="quantity${i}" placeholder="Qty"></td>
-`;
+                        <td>Trade ${i + 1}</td>
+                        <td><input type="number" class="trade-input" id="buyPrice${i}" placeholder="Buy Price"></td>
+                        <td><input type="number" class="trade-input" id="sellPrice${i}" placeholder="Sell Price"></td>
+                        <td><input type="number" class="trade-input" id="quantity${i}" placeholder="Quantity"></td>
+                    `;
                     tradesTableBody.appendChild(row);
                 }
             }
@@ -2277,54 +2230,61 @@ function openTradingViewWindow(ticker, isHover = false) {
 
         // ===== HOVER TO CHART FUNCTIONALITY =====
         function setupHoverToChart() {
-  // For sector stocks
-  document.querySelectorAll(".stock-item").forEach((item) => {
-    const ticker = item.textContent.trim();
+            // For sector stocks
+            document.querySelectorAll('.stock-item').forEach(item => {
+                const ticker = item.textContent.trim();
+                
+                // Handle hover for scan mode
+                item.addEventListener('mouseenter', () => {
+                    if (scanModeActive && ticker) {
+                        openTradingViewWindow(ticker);
+                    }
+                });
+                
+                // Handle touch for mobile devices
+                item.addEventListener('touchstart', (e) => {
+                    if (scanModeActive && ticker) {
+                        e.preventDefault();
+                        openTradingViewWindow(ticker);
+                    }
+                }, { passive: false });
+            });
 
-    // Hover: Opens popup (Scan Mode only)
-    item.addEventListener("mouseenter", () => {
-      if (scanModeActive && ticker) {
-        openTradingViewWindow(ticker, true); // true = isHover
-      }
-    });
+            // For watchlist items
+            document.querySelectorAll('#watchlistBody tr').forEach(row => {
+                const ticker = row.querySelector('td:first-child').textContent;
+                
+                // Handle hover for scan mode
+                row.addEventListener('mouseenter', () => {
+                    if (scanModeActive && ticker) {
+                        openTradingViewWindow(ticker);
+                    }
+                });
+                
+                // Handle touch for mobile devices
+                row.addEventListener('touchstart', (e) => {
+                    if (scanModeActive && ticker) {
+                        e.preventDefault();
+                        openTradingViewWindow(ticker);
+                    }
+                }, { passive: false });
+                
+                // Click handler for opening in new tab
+                row.addEventListener('click', (e) => {
+                    if (!e.target.classList.contains('remove-watchlist')) {
+                        openTradingViewWindow(ticker);
+                    }
+                });
+            });
 
-    // Click: Opens ONE new tab (prevent double-trigger)
-    item.addEventListener("click", (e) => {
-      e.preventDefault(); // Stop default behavior
-      e.stopPropagation(); // Prevent event bubbling
-      if (ticker && !e.ctrlKey) {
-        window.open(`https://www.tradingview.com/chart/?symbol=NSE:${ticker}`, "_blank");
-      }
-    });
-  });
-
-  // For watchlist items
-  document.querySelectorAll("#watchlistBody tr").forEach((row) => {
-    const ticker = row.querySelector("td:first-child").textContent.trim();
-
-    // Hover in scan mode
-    row.addEventListener("mouseenter", () => {
-      if (scanModeActive && ticker) {
-        window.open(`https://www.tradingview.com/chart/?symbol=NSE:${ticker}`, "_blank");
-      }
-    });
-
-    // Click opens in new tab
-    row.addEventListener("click", (e) => {
-      if (!e.target.classList.contains("remove-watchlist") && ticker) {
-        window.open(`https://www.tradingview.com/chart/?symbol=NSE:${ticker}`, "_blank");
-      }
-    });
-  });
-
-  // For random ticker
-  const randomTickerElement = document.getElementById("randomTicker");
-  randomTickerElement.addEventListener("mouseenter", () => {
-    if (scanModeActive) {
-      window.open(`https://www.tradingview.com/chart/?symbol=NSE:${randomTickerElement.textContent}`, "_blank");
-    }
-  });
-}
+            // For random ticker
+            const randomTickerElement = document.getElementById('randomTicker');
+            randomTickerElement.addEventListener('mouseenter', () => {
+                if (scanModeActive) {
+                    openTradingViewWindow(randomTickerElement.textContent);
+                }
+            });
+        }
 
         // ===== CHARACTER COUNTERS =====
         function initCharCounters() {
