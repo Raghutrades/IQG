@@ -1299,22 +1299,30 @@
     <script>
         // Stock data for all 15 sectors
         const sectorData = {
-            "NIFTY50": ["TRENT", "TCS", "NTPC", "BRITANNIA", "ICICIBANK", "ITC", "HINDUNILVR", "BHARTIARTL", "ADANIPORTS", "TECHM", "COALINDIA", "RELIANCE", "ONGC", "INFY", "NESTLEIND", "SBIN", "ASIANPAINT", "ADANIENT", "KOTAKBANK", "BPCL", "WIPRO", "MARUTI", "HCLTECH", "BAJFINANCE", "TATAMOTORS", "LT", "BEL", "HEROMOTOCO", "HDFCLIFE", "TITAN", "DRREDDY", "TATASTEEL", "CIPLA", "TATACONSUM", "POWERGRID", "JSWSTEEL", "BAJAJFINSV", "GRASIM", "APOLLOHOSP", "HINDALCO", "ULTRACEMCO", "BAJAJ-AUTO", "INDUSINDBK", "SBILIFE", "SHRIRANFIN", "HDFCBANK", "SUNPHARMA", "M&M", "EICHERMOT", "AXISBANK"],
-            "BANKING": ["ICICIBANK", "BANKBARODA", "SBIN", "KOTAKBANK", "FEDERALBNK", "INDIANB", "BANKINDIA", "INDUSINBK", "AUBANK", "HDFCBANK", "PNB", "IDFCFIRSTB", "CANBK", "AXISBANK"],
-            "AUTOMOBILE": ["EXIDEIND", "MOTHERSON", "APOLLOTYRE", "MARUTI", "TATAMOTORS", "BOSCHLTD", "HEROMOTOCO", "BALKRISIND", "TVSMOTOR", "SONACOMS", "TITAGARH", "TIINDIA", "BHARATFORG", "MRF", "BAJAJ-AUTO", "M&M", "EICHERMOT"],
-            "FINANCIAL SERVICES": ["ICICIBANK", "IRFC", "ICICIGI", "PFC", "ICICIPRULI", "SBICARD", "MUTHOOTFIN", "SBIN", "LICHSGFIN", "KOTAKBANK", "BAJFINANCE", "HDFCAMC", "POONAWALLA", "LICI", "HDFCLIFE", "HUDCO", "RECLTD", "CDSL", "JIOFIN", "BAJAJFINSV", "CHOLAFIN", "IIFL", "POLICYBZR", "MAXHEALTH", "SBILIFE", "SHRIRAMFIN", "ANGELONE", "BSE", "HDFCBANK", "PAYTM", "AXISBANK"],
-            "FMCG": ["BRITANNIA", "ITC", "HINDUNILVR", "DMART", "NESTLEIND", "COLPAL", "DABUR", "MARICO", "KALYANJIL", "ZOMATO", "VBL", "TATACONSUM", "PATANJALI", "UNITDSPR", "GODREJCP", "NYKAA", "SUPERMEIND"],
-            "INFORMATION TECHNOLOGY": ["TCS", "TECHM", "INFY", "WIPRO", "HCLTECH", "PERSISTENT", "COFORGE", "CAMS", "LTIM", "KPITTECH", "LTTS", "MPHASIS", "CYIENT", "TATAELXSI", "HFCL"],
-            "SENSEX": ["TCS", "NTPC", "ICICIBANK", "ITC", "HINDUNILVR", "BHARTIARTL", "ADANIPORTS", "TECHM", "RELIANCE", "INFY", "NESTLEIND", "SBIN", "ASIANPAINT", "KOTAKBANK", "MARUTI", "HCLTECH", "BAJFINANCE", "TATAMOTORS", "LT", "TITAN", "TATASTEEL", "POWERGRID", "JSWSTEEL", "BAJAJFINSV", "ULTRACEMCO", "INDUSINDBK", "HDFCBANK", "SUNPHARMA", "M&M", "AXISBANK"],
-            "METALS": ["ADANIENT", "JINDALSTEL", "SAIL", "TATASTEEL", "JSWSTEEL", "HINDALCO", "HINDCOPPER", "VEDL", "NATIONALUM", "NMDC", "JSL", "APLAPOLLO"],
-            "PHARMACEUTICALS": ["AUROPHARMA", "ZYDUSLIFE", "GLENMARK", "DRREDDY", "LAURUSLABS", "CIPLA", "LUPIN", "DIVISLAB", "TORNTPHARM", "GRANULES", "ALKEM", "SUNPHARMA", "BIOCON"],
-            "PSU BANKS": ["BANKBARODA", "SBIN", "INDIANB", "BANKINDIA", "UNIONBANK", "PNB", "CANBK"],
-            "PRIVATE BANKS": ["ICICIBANK", "KOTAKBANK", "FEDERALBNK", "RBLBANK", "BANDHANBNK", "INDUSINDBK", "HDFCBANK", "IDFCFIRSTB", "AXISBANK"],
-            "REALTY": ["NCC", "PHOENIXLTD", "PRESTIGE", "OBEROIRLTY", "GODREJPROP", "DLF", "LODHA", "NBCC", "IRB"],
-            "ENERGY": ["NTPC", "COALINDIA", "RELIANCE", "ONGC", "CESE", "SOLARINDS", "TATAPOWER", "TORNTPOWER", "BPCL", "IOC", "ADANIENSOL", "IREDA", "OIL", "POWERGRID", "ATGL", "CGPOWER", "PETRONET", "JSWENERGY", "SJVN", "NHPC", "IGL", "GMRAIRPORT", "ADANIGREEN"],
-            "CEMENT": ["AMBUJACEM", "ACC", "JKCEMENT", "ULTRACEMCO", "DALBHARAT", "SHREECEM", "RAMCOCEM"],
-            "MIDCAP SELECT": ["AUROPHARMA", "HINDUPETRO", "VOLTAS", "UPL", "HDFCAMC", "PERSISTENT", "FEDERALBNK", "POLYCAB", "COFORGE", "LUPIN", "ASTRAL", "PAGEIND", "PIIND", "BHARATFORG", "MRF", "JUBLFOOD", "CONCOR", "INDHOTEL", "GODREJPROP", "AUBANK", "ASHOKLEY", "MPHASIS", "IDFCFIRSTB", "IDEA", "CUMMINSIND"]
-        };
+    "NIFTY50": ["TRENT", "TCS", "NTPC", "BRITANNIA", "ICICIBANK", "ITC", "HINDUNILVR", "BHARTIARTL", "ADANIPORTS", "TECHM", "COALINDIA", "RELIANCE", "ONGC", "INFY", "NESTLEIND", "SBIN", "ASIANPAINT", "ADANIENT", "KOTAKBANK", "BPCL", "WIPRO", "MARUTI", "HCLTECH", "BAJFINANCE", "TATAMOTORS", "LT", "BEL", "HEROMOTOCO", "HDFCLIFE", "TITAN", "DRREDDY", "TATASTEEL", "CIPLA", "TATACONSUM", "POWERGRID", "JSWSTEEL", "BAJAJFINSV", "GRASIM", "APOLLOHOSP", "HINDALCO", "ULTRACEMCO", "BAJAJ-AUTO", "INDUSINDBK", "SBILIFE", "SHRIRANFIN", "HDFCBANK", "SUNPHARMA", "M&M", "EICHERMOT", "AXISBANK"],
+    "BANKING": ["ICICIBANK", "BANKBARODA", "SBIN", "KOTAKBANK", "FEDERALBNK", "INDIANB", "BANKINDIA", "INDUSINBK", "AUBANK", "HDFCBANK", "PNB", "IDFCFIRSTB", "CANBK", "AXISBANK"],
+    "AUTOMOBILE": ["EXIDEIND", "MOTHERSON", "APOLLOTYRE", "MARUTI", "TATAMOTORS", "BOSCHLTD", "HEROMOTOCO", "BALKRISIND", "TVSMOTOR", "SONACOMS", "TITAGARH", "TIINDIA", "BHARATFORG", "MRF", "BAJAJ-AUTO", "M&M", "EICHERMOT"],
+    "FINANCIAL SERVICES": ["ICICIBANK", "IRFC", "ICICIGI", "PFC", "ICICIPRULI", "SBICARD", "MUTHOOTFIN", "SBIN", "LICHSGFIN", "KOTAKBANK", "BAJFINANCE", "HDFCAMC", "POONAWALLA", "LICI", "HDFCLIFE", "HUDCO", "RECLTD", "CDSL", "JIOFIN", "BAJAJFINSV", "CHOLAFIN", "IIFL", "POLICYBZR", "MAXHEALTH", "SBILIFE", "SHRIRAMFIN", "ANGELONE", "BSE", "HDFCBANK", "PAYTM", "AXISBANK"],
+    "FMCG": ["BRITANNIA", "ITC", "HINDUNILVR", "DMART", "NESTLEIND", "COLPAL", "DABUR", "MARICO", "KALYANJIL", "ZOMATO", "VBL", "TATACONSUM", "PATANJALI", "UNITDSPR", "GODREJCP", "NYKAA", "SUPERMEIND"],
+    "INFORMATION TECHNOLOGY": ["TCS", "TECHM", "INFY", "WIPRO", "HCLTECH", "PERSISTENT", "COFORGE", "CAMS", "LTIM", "KPITTECH", "LTTS", "MPHASIS", "CYIENT", "TATAELXSI", "HFCL"],
+    "SENSEX": ["TCS", "NTPC", "ICICIBANK", "ITC", "HINDUNILVR", "BHARTIARTL", "ADANIPORTS", "TECHM", "RELIANCE", "INFY", "NESTLEIND", "SBIN", "ASIANPAINT", "KOTAKBANK", "MARUTI", "HCLTECH", "BAJFINANCE", "TATAMOTORS", "LT", "TITAN", "TATASTEEL", "POWERGRID", "JSWSTEEL", "BAJAJFINSV", "ULTRACEMCO", "INDUSINDBK", "HDFCBANK", "SUNPHARMA", "M&M", "AXISBANK"],
+    "METALS": ["ADANIENT", "JINDALSTEL", "SAIL", "TATASTEEL", "JSWSTEEL", "HINDALCO", "HINDCOPPER", "VEDL", "NATIONALUM", "NMDC", "JSL", "APLAPOLLO"],
+    "PHARMACEUTICALS": ["AUROPHARMA", "ZYDUSLIFE", "GLENMARK", "DRREDDY", "LAURUSLABS", "CIPLA", "LUPIN", "DIVISLAB", "TORNTPHARM", "GRANULES", "ALKEM", "SUNPHARMA", "BIOCON"],
+    "PSU BANKS": ["BANKBARODA", "SBIN", "INDIANB", "BANKINDIA", "UNIONBANK", "PNB", "CANBK"],
+    "PRIVATE BANKS": ["ICICIBANK", "KOTAKBANK", "FEDERALBNK", "RBLBANK", "BANDHANBNK", "INDUSINDBK", "HDFCBANK", "IDFCFIRSTB", "AXISBANK"],
+    "REALTY": ["NCC", "PHOENIXLTD", "PRESTIGE", "OBEROIRLTY", "GODREJPROP", "DLF", "LODHA", "NBCC", "IRB"],
+    "ENERGY": ["NTPC", "COALINDIA", "RELIANCE", "ONGC", "CESE", "SOLARINDS", "TATAPOWER", "TORNTPOWER", "BPCL", "IOC", "ADANIENSOL", "IREDA", "OIL", "POWERGRID", "ATGL", "CGPOWER", "PETRONET", "JSWENERGY", "SJVN", "NHPC", "IGL", "GMRAIRPORT", "ADANIGREEN"],
+    "CEMENT": ["AMBUJACEM", "ACC", "JKCEMENT", "ULTRACEMCO", "DALBHARAT", "SHREECEM", "RAMCOCEM"],
+    "MIDCAP SELECT": [
+        "ABB", "AARTIIND", "ABCAPITAL", "ABFRL", "BSOFT", "BHEL", "CESC", "CHAMBLFERT", "CROMPTON", "DEEPAKNTR", 
+        "DELHIVERY", "DIXON", "ETERNAL", "ESCORTS", "GAIL", "HAL", "HAVELLS", "HINDZINC", "IEX", "IRCTC", 
+        "INDUSTOWER", "NAUKRI", "INOXWIND", "INDIGO", "KEI", "LTF", "MGL", "M&MFIN", "MANAPPURAM", "MFSL", 
+        "MCX", "OFSS", "PNBHOUSING", "PIDILITIND", "PEL", "SRF", "SIEMENS", "SYNGENE", "TATACHEM", 
+        "TATACOMM", "TATATECH", "YESBANK", "AUROPHARMA", "HINDUPETRO", "VOLTAS", "UPL", "HDFCAMC", "PERSISTENT", "FEDERALBNK", "POLYCAB", 
+        "COFORGE", "LUPIN", "ASTRAL", "PAGEIND", "PIIND", "BHARATFORG", "MRF", "JUBLFOOD", "CONCOR", 
+        "INDHOTEL", "GODREJPROP", "AUBANK", "ASHOKLEY", "MPHASIS", "IDFCFIRSTB", "IDEA", "CUMMINSIND"
+    ]
+};
 
         const punchlines = [
             "Catch the Pulse, Ride the Move.",
@@ -1694,100 +1702,102 @@
 
         // ===== SECTOR GRID =====
         function initSectorGrid() {
-            const sectorGrid = document.getElementById('sectorGrid');
+    const sectorGrid = document.getElementById('sectorGrid');
+    
+    Object.entries(sectorData).forEach(([sectorName, stocks]) => {
+        const sectorDiv = document.createElement('div');
+        sectorDiv.className = 'sector-table';
+        sectorDiv.innerHTML = `
+            <div class="sector-header">
+                <span class="sector-number">${Object.keys(sectorData).indexOf(sectorName) + 1}.</span> 
+                ${sectorName}
+            </div>
+            <div class="stock-list" id="${sectorName}-stocks"></div>
+        `;
+        
+        const stockList = sectorDiv.querySelector('.stock-list');
+        const isMidcap = sectorName === "MIDCAP SELECT";
+        const itemsPerPage = isMidcap ? 15 : 10; // Show 15 for MIDCAP, 10 for others
+        
+        // Create mini pagination container
+        const miniPagination = document.createElement('div');
+        miniPagination.className = 'mini-pagination';
+        
+        const miniPaginationContainer = document.createElement('div');
+        miniPaginationContainer.className = 'mini-pagination-container';
+        
+        const currentPageIndicator = document.createElement('div');
+        currentPageIndicator.className = 'current-page-indicator';
+        currentPageIndicator.textContent = '1';
+        currentPageIndicator.addEventListener('click', function(e) {
+            e.stopPropagation();
+            miniPagination.style.maxHeight = miniPagination.style.maxHeight === '200px' ? '24px' : '200px';
+        });
+        
+        miniPagination.appendChild(currentPageIndicator);
+        miniPagination.appendChild(miniPaginationContainer);
+        
+        const pageCount = Math.ceil(stocks.length / itemsPerPage);
+        for (let i = 0; i < pageCount; i++) {
+            const pageDiv = document.createElement('div');
+            pageDiv.className = `stock-page ${i === 0 ? 'active' : ''}`;
+            pageDiv.dataset.page = i + 1;
             
-            Object.entries(sectorData).forEach(([sectorName, stocks]) => {
-                const sectorDiv = document.createElement('div');
-                sectorDiv.className = 'sector-table';
-                sectorDiv.innerHTML = `
-                    <div class="sector-header">
-                        <span class="sector-number">${Object.keys(sectorData).indexOf(sectorName) + 1}.</span> 
-                        ${sectorName}
-                    </div>
-                    <div class="stock-list" id="${sectorName}-stocks"></div>
-                `;
+            const startIdx = i * itemsPerPage;
+            const endIdx = startIdx + itemsPerPage;
+            const pageStocks = stocks.slice(startIdx, endIdx);
+            
+            for (let j = 0; j < itemsPerPage; j++) {
+                const stockItem = document.createElement('div');
+                stockItem.className = 'stock-item';
                 
-                const stockList = sectorDiv.querySelector('.stock-list');
-                
-                // Create mini pagination container
-                const miniPagination = document.createElement('div');
-                miniPagination.className = 'mini-pagination';
-                
-                const miniPaginationContainer = document.createElement('div');
-                miniPaginationContainer.className = 'mini-pagination-container';
-                
-                const currentPageIndicator = document.createElement('div');
-                currentPageIndicator.className = 'current-page-indicator';
-                currentPageIndicator.textContent = '1';
-                currentPageIndicator.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    miniPagination.style.maxHeight = miniPagination.style.maxHeight === '200px' ? '24px' : '200px';
-                });
-                
-                miniPagination.appendChild(currentPageIndicator);
-                miniPagination.appendChild(miniPaginationContainer);
-                
-                const pageCount = Math.ceil(stocks.length / 10);
-                for (let i = 0; i < pageCount; i++) {
-                    const pageDiv = document.createElement('div');
-                    pageDiv.className = `stock-page ${i === 0 ? 'active' : ''}`;
-                    pageDiv.dataset.page = i + 1;
-                    
-                    const startIdx = i * 10;
-                    const endIdx = startIdx + 10;
-                    const pageStocks = stocks.slice(startIdx, endIdx);
-                    
-                    for (let j = 0; j < 10; j++) {
-                        const stockItem = document.createElement('div');
-                        stockItem.className = 'stock-item';
-                        
-                        if (j < pageStocks.length) {
-                            stockItem.textContent = pageStocks[j];
-                            stockItem.addEventListener('click', (e) => {
-                                if (e.ctrlKey) { // Hold CTRL to add to watchlist
-                                    addToWatchlist(pageStocks[j], sectorName);
-                                } else {
-                                    openTradingViewWindow(pageStocks[j]);
-                                }
-                            });
+                if (j < pageStocks.length) {
+                    stockItem.textContent = pageStocks[j];
+                    stockItem.addEventListener('click', (e) => {
+                        if (e.ctrlKey) { // Hold CTRL to add to watchlist
+                            addToWatchlist(pageStocks[j], sectorName);
                         } else {
-                            stockItem.style.visibility = 'hidden';
+                            openTradingViewWindow(pageStocks[j]);
                         }
-                        
-                        pageDiv.appendChild(stockItem);
-                    }
-                    
-                    stockList.appendChild(pageDiv);
-                    
-                    if (pageCount > 1) {
-                        const pageBtn = document.createElement('button');
-                        pageBtn.className = `mini-page-btn ${i === 0 ? 'active' : ''}`;
-                        pageBtn.textContent = i + 1;
-                        pageBtn.addEventListener('click', (e) => {
-                            e.stopPropagation();
-                            stockList.querySelectorAll('.stock-page').forEach(page => {
-                                page.classList.remove('active');
-                            });
-                            pageDiv.classList.add('active');
-                            
-                            miniPaginationContainer.querySelectorAll('.mini-page-btn').forEach(btn => {
-                                btn.classList.remove('active');
-                            });
-                            pageBtn.classList.add('active');
-                            currentPageIndicator.textContent = i + 1;
-                            miniPagination.style.maxHeight = '24px';
-                        });
-                        miniPaginationContainer.appendChild(pageBtn);
-                    }
+                    });
+                } else {
+                    stockItem.style.visibility = 'hidden';
                 }
                 
-                if (pageCount > 1) {
-                    sectorDiv.appendChild(miniPagination);
-                }
-                
-                sectorGrid.appendChild(sectorDiv);
-            });
+                pageDiv.appendChild(stockItem);
+            }
+            
+            stockList.appendChild(pageDiv);
+            
+            if (pageCount > 1) {
+                const pageBtn = document.createElement('button');
+                pageBtn.className = `mini-page-btn ${i === 0 ? 'active' : ''}`;
+                pageBtn.textContent = i + 1;
+                pageBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    stockList.querySelectorAll('.stock-page').forEach(page => {
+                        page.classList.remove('active');
+                    });
+                    pageDiv.classList.add('active');
+                    
+                    miniPaginationContainer.querySelectorAll('.mini-page-btn').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    pageBtn.classList.add('active');
+                    currentPageIndicator.textContent = i + 1;
+                    miniPagination.style.maxHeight = '24px';
+                });
+                miniPaginationContainer.appendChild(pageBtn);
+            }
         }
+        
+        if (pageCount > 1) {
+            sectorDiv.appendChild(miniPagination);
+        }
+        
+        sectorGrid.appendChild(sectorDiv);
+    });
+}
 
         // ===== QUOTES =====
         function initQuotes() {
