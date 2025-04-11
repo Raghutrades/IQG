@@ -1202,43 +1202,6 @@
                 </div>
             </div>
             
-            <!-- ===== ENHANCED TRADING CALCULATOR ===== -->
-<div class="calculator-container">
-    <!-- [Previous calculator HTML remains identical until trades table] -->
-    
-    <!-- NEW: Trade Notes Section -->
-    <div class="calculator-section">
-        <h3 class="calculator-section-title">Trade Notes</h3>
-        <div class="calculator-section-content">
-            <div class="calculator-input-group">
-                <label class="calculator-label">Entry Reason (Max 300 chars)</label>
-                <textarea class="calculator-input" id="entryReason" maxlength="300" 
-                          placeholder="Why are you entering this trade?"></textarea>
-            </div>
-
-            <!-- Repeat for Exit Reason & Lessons Learned -->
-            <div class="calculator-input-group">
-                <label class="calculator-label">Exit Reason (Max 300 chars)</label>
-                <textarea class="calculator-input" id="exitReason" maxlength="300" 
-                          placeholder="Why did you exit this trade?"></textarea>
-            </div>
-            <div class="calculator-input-group">
-                <label class="calculator-label">Lessons Learned (Max 300 chars)</label>
-                <textarea class="calculator-input" id="lessonsLearned" maxlength="300" 
-                          placeholder="What did you learn from this trade?"></textarea>
-            </div>
-        </div>
-    </div>
-    
-    <!-- NEW: Export Buttons -->
-    <div class="export-buttons">
-        <button class="calculator-button secondary" id="exportText">📝 Export as Text</button>
-        <button class="calculator-button secondary" id="exportPDF">📄 Export as PDF</button>
-        <button class="calculator-button secondary" id="exportExcel">📊 Export as Excel</button>
-    </div>
-</div>
-
-
             <!-- Brokerage Section (Collapsible) -->
             <div class="calculator-section">
                 <h3 class="calculator-section-title collapsed">Brokerage Charges</h3>
@@ -2036,72 +1999,6 @@
                 document.getElementById('toggleDetails').textContent = 'Show Detailed Breakdown ▼';
             }
         }
-
-
-        <script>
-// ===== EXPORT FUNCTIONALITY =====
-function exportTradeData(format) {
-    const data = {
-        timestamp: new Date().toLocaleString('en-IN', {timeZone: 'Asia/Kolkata'}),
-        tradeType: document.getElementById('tradeType').value,
-        entryReason: document.getElementById('entryReason').value,
-        exitReason: document.getElementById('exitReason').value,
-        lessons: document.getElementById('lessonsLearned').value,
-        trades: [],
-        results: {
-            gross: parseFloat(document.getElementById('grossResult').textContent.replace('₹','')),
-            net: parseFloat(document.getElementById('netResult').textContent.replace('₹',''))
-        }
-    };
-    
-    // Collect entered trades only
-    const tradeCount = parseInt(document.getElementById('tradeMultiplier').value);
-    for (let i = 0; i < tradeCount; i++) {
-        const buyPrice = document.getElementById(`buyPrice${i}`).value;
-        if (buyPrice) { // Only export if trade has data
-            data.trades.push({
-                buyPrice: buyPrice,
-                sellPrice: document.getElementById(`sellPrice${i}`).value || '-',
-                quantity: document.getElementById(`quantity${i}`).value || '-'
-            });
-        }
-    }
-    
-    // Format-specific export logic
-    switch(format) {
-        case 'text': exportAsText(data); break;
-        case 'pdf': exportAsPDF(data); break;
-        case 'excel': exportAsExcel(data); break;
-    }
-}
-
-// PDF Export using jsPDF
-function exportAsPDF(data) {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    
-    doc.setFontSize(18);
-    doc.text('Trade Report', 105, 15, null, null, 'center');
-    
-    // Add metadata
-    doc.setFontSize(12);
-    doc.text(`Date: ${data.timestamp}`, 14, 25);
-    doc.text(`Trade Type: ${data.tradeType.toUpperCase()}`, 14, 32);
-    
-    // [Rest of PDF formatting...]
-    doc.save(`TradeReport_${new Date().toISOString().slice(0,10)}.pdf`);
-}
-
-// Excel Export using SheetJS
-function exportAsExcel(data) {
-    const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.json_to_sheet(data.trades);
-    XLSX.utils.book_append_sheet(wb, ws, "Trades");
-    XLSX.writeFile(wb, `TradeReport_${new Date().toISOString().slice(0,10)}.xlsx`);
-}
-</script>
-
-
 
         // ===== RANDOM TICKER BOX =====
         function initRandomTicker() {
