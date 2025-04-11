@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Intraday Quick Grabber</title>
     <link rel="icon" href="favicon.png" type="image/png">
     <style>
@@ -73,6 +73,7 @@
             padding: 0;
             transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
             touch-action: pan-y;
+            -webkit-overflow-scrolling: touch;
         }
         
         /* === HEADER STYLES === */
@@ -269,6 +270,7 @@
             position: relative;
             scrollbar-width: none;
             -webkit-overflow-scrolling: touch;
+            touch-action: pan-y;
         }
         
         .stock-list::-webkit-scrollbar {
@@ -800,6 +802,18 @@
             z-index: 90;
             cursor: grab;
             transition: all 0.3s ease;
+            animation: glow-pulse 3s infinite;
+        }
+
+        @keyframes glow-pulse {
+            0% { box-shadow: 0 0 10px var(--glow); }
+            50% { box-shadow: 0 0 20px var(--accent); }
+            100% { box-shadow: 0 0 10px var(--glow); }
+        }
+
+        .watchlist-panel:active {
+            cursor: grabbing;
+            transform: scale(1.02);
         }
 
         .watchlist-header {
@@ -826,7 +840,6 @@
             cursor: pointer;
             z-index: 1;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            font-weight: bold;
         }
 
         .clear-all-btn {
@@ -846,6 +859,44 @@
         .clear-all-btn:hover {
             background: var(--inactive-red);
             transform: scale(1.05);
+        }
+        
+        .watchlist-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .watchlist-table th {
+            text-align: left;
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.9rem;
+        }
+        
+        .watchlist-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.9rem;
+        }
+        
+        .watchlist-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .watchlist-table tr:hover {
+            background: rgba(67, 97, 238, 0.05);
+        }
+        
+        .remove-watchlist {
+            color: var(--loss-red);
+            cursor: pointer;
+            font-weight: bold;
+            text-align: center;
+            padding: 0 8px;
+        }
+        
+        .remove-watchlist:hover {
+            transform: scale(1.2);
         }
         
         /* TradingView Widget Container */
@@ -899,7 +950,7 @@
             }
 
             .watchlist-panel {
-                width: 280px;
+                width: 250px;
             }
         }
         
@@ -908,7 +959,6 @@
                 grid-template-columns: 1fr;
                 padding: 1rem;
                 gap: 1rem;
-                margin-top: 20px;
             }
             
             .header {
@@ -972,6 +1022,26 @@
 
             .search-input {
                 padding: 8px;
+            }
+        }
+
+        /* Mobile touch improvements */
+        @media (hover: none) {
+            .stock-item:hover {
+                transform: none;
+                background: none;
+            }
+            
+            .stock-item:hover::after {
+                opacity: 0;
+            }
+            
+            .mini-pagination:hover {
+                max-height: 24px;
+            }
+            
+            .mini-pagination .current-page-indicator {
+                opacity: 1;
             }
         }
     </style>
@@ -1060,11 +1130,11 @@
     </div>
     
     <!-- Watchlist Panel -->
-    <div class="watchlist-panel" id="watchlistPanel">
+    <div class="watchlist-panel" id="watchlistPanel" title="Drag to move | Ctrl+Shift+Z to toggle">
         <button class="close-watchlist" id="closeWatchlist" title="Close Watchlist">×</button>
         <div class="watchlist-header">
             <h3>⭐ Your Watchlist</h3>
-            <button class="clear-all-btn" id="clearWatchlist" title="Clear All">
+            <button class="clear-all-btn" id="clearWatchlist" title="Clear All (Ctrl+Shift+Del)">
                 ✕ Clear All
             </button>
         </div>
@@ -1221,7 +1291,7 @@
     </button>
 
     <!-- Scan Mode Toggle -->
-    <button class="scan-mode-toggle" id="scanModeToggle" title="Scan Mode">
+    <button class="scan-mode-toggle" id="scanModeToggle" title="Scan Mode (Ctrl+Shift+S)">
         <span class="scan-icon">🔍</span>
         <span>Scan Mode</span>
     </button>
@@ -1269,7 +1339,27 @@
             { text: "The stock market is filled with individuals who know the price of everything, but the value of nothing.", author: "" },
             { text: "In investing, what is comfortable is rarely profitable.", author: "" },
             { text: "The four most dangerous words in investing are: 'This time it's different.'", author: "Sir John Templeton" },
-            { text: "Wide diversification is only required when investors do not understand what they are doing.", author: "Warren Buffett" }
+            { text: "Wide diversification is only required when investors do not understand what they are doing.", author: "Warren Buffett" },
+            { text: "The individual investor should act consistently as an investor and not as a speculator.", author: "Ben Graham" },
+            { text: "It's not whether you're right or wrong that's important, but how much money you make when you're right and how much you lose when you're wrong.", author: "George Soros" },
+            { text: "The goal of a successful trader is to make the best trades. Money is secondary.", author: "Alexander Elder" },
+            { text: "If you can't control your emotions, you can't control your money.", author: "Warren Buffett" },
+            { text: "The most important quality for an investor is temperament, not intellect.", author: "Warren Buffett" },
+            { text: "Know what you own, and know why you own it.", author: "Peter Lynch" },
+            { text: "The stock market is a device for transferring money from the impatient to the patient.", author: "Warren Buffett" },
+            { text: "The best time to plant a tree was 20 years ago. The second best time is now.", author: "Chinese Proverb" },
+            { text: "Don't look for the needle in the haystack. Just buy the haystack!", author: "John Bogle" },
+            { text: "Someone's sitting in the shade today because someone planted a tree a long time ago.", author: "Warren Buffett" },
+            { text: "It's far better to buy a wonderful company at a fair price than a fair company at a wonderful price.", author: "Warren Buffett" },
+            { text: "Our favorite holding period is forever.", author: "Warren Buffett" },
+            { text: "You get recessions, you have stock market declines. If you don't understand that's going to happen, then you're not ready, you won't do well in the markets.", author: "Peter Lynch" },
+            { text: "The stock market is a no-called-strike game. You don't have to swing at everything—you can wait for your pitch.", author: "Warren Buffett" },
+            { text: "The key to making money in stocks is not to get scared out of them.", author: "Peter Lynch" },
+            { text: "The biggest risk of all is not taking one.", author: "" },
+            { text: "Compound interest is the eighth wonder of the world. He who understands it, earns it; he who doesn't, pays it.", author: "Albert Einstein" },
+            { text: "Do not save what is left after spending, but spend what is left after saving.", author: "Warren Buffett" },
+            { text: "Never depend on a single income. Make investment to create a second source.", author: "Warren Buffett" },
+            { text: "The best investment you can make is in yourself.", author: "Warren Buffett" }
         ];
 
         // ===== WATCHLIST FUNCTIONALITY =====
@@ -1340,6 +1430,35 @@
             updateWatchlistUI();
         });
 
+        // Ctrl+Shift+Del Shortcut
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.shiftKey && e.key === 'Delete') {
+                e.preventDefault();
+                document.getElementById('clearWatchlist').click();
+            }
+        });
+
+        // Toggle Watchlist Visibility (Ctrl+Shift+Z)
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'z') {
+                e.preventDefault();
+                if (watchlistPanel.style.display === 'none') {
+                    watchlistPanel.style.display = 'block';
+                    localStorage.setItem('watchlistVisible', 'true');
+                } else {
+                    watchlistPanel.style.display = 'none';
+                    localStorage.setItem('watchlistVisible', 'false');
+                }
+            }
+        });
+
+        // Initialize watchlist visibility from localStorage
+        const savedVisibility = localStorage.getItem('watchlistVisible');
+        if (watchlistPanel) {
+            watchlistPanel.style.display = 
+                savedVisibility === 'false' ? 'none' : 'block';
+        }
+
         // ===== SEARCH FUNCTIONALITY =====
         const tickerSearch = document.getElementById('tickerSearch');
         const searchResults = document.getElementById('searchResults');
@@ -1388,6 +1507,50 @@
             }
         });
 
+        // Handle keyboard navigation in search results
+        tickerSearch.addEventListener('keydown', function(e) {
+            if (!searchResults.style.display || searchResults.style.display === 'none') return;
+            
+            const resultItems = searchResults.querySelectorAll('.search-result-item');
+            
+            switch(e.key) {
+                case 'ArrowDown':
+                    e.preventDefault();
+                    selectedResultIndex = Math.min(selectedResultIndex + 1, resultItems.length - 1);
+                    updateSelectedResult();
+                    break;
+                case 'ArrowUp':
+                    e.preventDefault();
+                    selectedResultIndex = Math.max(selectedResultIndex - 1, -1);
+                    updateSelectedResult();
+                    break;
+                case 'Enter':
+                    e.preventDefault();
+                    if (selectedResultIndex >= 0 && selectedResultIndex < resultItems.length) {
+                        const item = resultItems[selectedResultIndex];
+                        const ticker = item.querySelector('strong').textContent;
+                        const sector = item.textContent.match(/\((.*?)\)/)[1];
+                        addToWatchlist(ticker, sector);
+                        tickerSearch.value = '';
+                        searchResults.style.display = 'none';
+                        selectedResultIndex = -1;
+                    }
+                    break;
+            }
+        });
+
+        function updateSelectedResult() {
+            const resultItems = searchResults.querySelectorAll('.search-result-item');
+            resultItems.forEach((item, index) => {
+                if (index === selectedResultIndex) {
+                    item.classList.add('selected');
+                    item.scrollIntoView({ block: 'nearest' });
+                } else {
+                    item.classList.remove('selected');
+                }
+            });
+        }
+
         // Close search results when clicking outside
         document.addEventListener('click', (e) => {
             if (!e.target.closest('.search-container')) {
@@ -1408,6 +1571,20 @@
             localStorage.setItem('scanModeActive', scanModeActive);
         }
 
+        // Keyboard shortcut (Ctrl+Shift+S)
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 's') {
+                e.preventDefault(); // Prevent browser save dialog
+                toggleScanMode();
+            }
+        });
+
+        // Initialize from localStorage
+        if (localStorage.getItem('scanModeActive') === 'true') {
+            scanModeActive = true;
+            scanModeToggle.classList.add('active');
+        }
+
         // Click handler
         scanModeToggle.addEventListener('click', toggleScanMode);
 
@@ -1425,7 +1602,24 @@
 
         // ===== INITIALIZE PAGE =====
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize theme toggle
+            initThemeToggle();
+            initDateTime();
+            initTagline();
+            initSectorGrid();
+            initQuotes();
+            initCalculator();
+            initTradeMultiplier();
+            initCollapsibleSections();
+            initRandomTicker();
+            updateWatchlistUI();
+            setupHoverToChart();
+            
+            // Ensure sector grid is visible
+            document.getElementById('sectorGrid').style.display = 'grid';
+        });
+
+        // ===== THEME TOGGLE =====
+        function initThemeToggle() {
             const themeToggle = document.getElementById('themeToggle');
             const themeIcon = document.getElementById('themeIcon');
             const themeText = document.getElementById('themeText');
@@ -1452,8 +1646,10 @@
             if (localStorage.getItem('theme') === 'light') {
                 setTheme(false);
             }
+        }
 
-            // Initialize date/time
+        // ===== DATE/TIME FUNCTIONS =====
+        function initDateTime() {
             function updateDateTime() {
                 const now = new Date();
                 const options = { 
@@ -1487,13 +1683,17 @@
             
             updateDateTime();
             setInterval(updateDateTime, 1000);
+        }
 
-            // Initialize tagline
+        // ===== TAGLINE =====
+        function initTagline() {
             const taglineElement = document.getElementById('tagline');
             const randomPunchline = punchlines[Math.floor(Math.random() * punchlines.length)];
             taglineElement.textContent = randomPunchline;
+        }
 
-            // Initialize sector grid
+        // ===== SECTOR GRID =====
+        function initSectorGrid() {
             const sectorGrid = document.getElementById('sectorGrid');
             
             Object.entries(sectorData).forEach(([sectorName, stocks]) => {
@@ -1544,7 +1744,7 @@
                         if (j < pageStocks.length) {
                             stockItem.textContent = pageStocks[j];
                             stockItem.addEventListener('click', (e) => {
-                                if (e.ctrlKey) {
+                                if (e.ctrlKey) { // Hold CTRL to add to watchlist
                                     addToWatchlist(pageStocks[j], sectorName);
                                 } else {
                                     openTradingViewWindow(pageStocks[j]);
@@ -1587,8 +1787,10 @@
                 
                 sectorGrid.appendChild(sectorDiv);
             });
+        }
 
-            // Initialize quotes
+        // ===== QUOTES =====
+        function initQuotes() {
             const quoteText = document.getElementById('quoteText');
             const quoteAuthor = document.getElementById('quoteAuthor');
             
@@ -1600,8 +1802,80 @@
             
             showRandomQuote();
             setInterval(showRandomQuote, 10000);
-
-            // Initialize calculator
+        }
+        
+        // ===== TRADE MULTIPLIER =====
+        function initTradeMultiplier() {
+            const tradeMultiplier = document.getElementById('tradeMultiplier');
+            const tradesTableBody = document.getElementById('tradesTableBody');
+            
+            function generateTradeRows(count) {
+                tradesTableBody.innerHTML = '';
+                for (let i = 0; i < count; i++) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>Trade ${i + 1}</td>
+                        <td><input type="number" class="trade-input" id="buyPrice${i}" placeholder="Buy Price"></td>
+                        <td><input type="number" class="trade-input" id="sellPrice${i}" placeholder="Sell Price"></td>
+                        <td><input type="number" class="trade-input" id="quantity${i}" placeholder="Quantity"></td>
+                    `;
+                    tradesTableBody.appendChild(row);
+                }
+            }
+            
+            // Initialize with single trade
+            generateTradeRows(1);
+            
+            // Update when multiplier changes
+            tradeMultiplier.addEventListener('change', function() {
+                generateTradeRows(parseInt(this.value));
+            });
+        }
+        
+        // ===== COLLAPSIBLE SECTIONS =====
+        function initCollapsibleSections() {
+            const sections = document.querySelectorAll('.calculator-section');
+            
+            sections.forEach(section => {
+                const title = section.querySelector('.calculator-section-title');
+                const content = section.querySelector('.calculator-section-content');
+                
+                // Set initial height
+                if (content.classList.contains('collapsed')) {
+                    content.style.maxHeight = '0';
+                } else {
+                    content.style.maxHeight = content.scrollHeight + 'px';
+                }
+                
+                title.addEventListener('click', function() {
+                    this.classList.toggle('collapsed');
+                    content.classList.toggle('collapsed');
+                    
+                    if (content.classList.contains('collapsed')) {
+                        content.style.maxHeight = '0';
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                    }
+                });
+            });
+            
+            // Toggle detailed results
+            const toggleDetails = document.getElementById('toggleDetails');
+            const detailedResults = document.getElementById('detailedResults');
+            
+            toggleDetails.addEventListener('click', function() {
+                if (detailedResults.style.display === 'none') {
+                    detailedResults.style.display = 'block';
+                    this.textContent = 'Hide Detailed Breakdown ▲';
+                } else {
+                    detailedResults.style.display = 'none';
+                    this.textContent = 'Show Detailed Breakdown ▼';
+                }
+            });
+        }
+        
+        // ===== ENHANCED TRADING CALCULATOR =====
+        function initCalculator() {
             const calculateButton = document.getElementById('calculateButton');
             calculateButton.addEventListener('click', calculateAllTrades);
             
@@ -1714,8 +1988,10 @@
                 document.getElementById('detailedResults').style.display = 'none';
                 document.getElementById('toggleDetails').textContent = 'Show Detailed Breakdown ▼';
             }
+        }
 
-            // Initialize random ticker
+        // ===== RANDOM TICKER BOX =====
+        function initRandomTicker() {
             const randomTickerElement = document.getElementById('randomTicker');
             
             function updateRandomTicker() {
@@ -1737,25 +2013,65 @@
             
             // Update every 15 seconds
             setInterval(updateRandomTicker, 15000);
+        }
 
-            // Initialize watchlist
-            updateWatchlistUI();
+        // ===== HOVER TO CHART FUNCTIONALITY =====
+        function setupHoverToChart() {
+            // For sector stocks
+            document.querySelectorAll('.stock-item').forEach(item => {
+                const ticker = item.textContent.trim();
+                
+                // Handle hover for scan mode
+                item.addEventListener('mouseenter', () => {
+                    if (scanModeActive && ticker) {
+                        openTradingViewWindow(ticker);
+                    }
+                });
+                
+                // Handle touch for mobile devices
+                item.addEventListener('touchstart', (e) => {
+                    if (scanModeActive && ticker) {
+                        e.preventDefault();
+                        openTradingViewWindow(ticker);
+                    }
+                }, { passive: false });
+            });
 
-            // Initialize from localStorage
-            if (localStorage.getItem('scanModeActive') === 'true') {
-                scanModeActive = true;
-                scanModeToggle.classList.add('active');
-            }
+            // For watchlist items
+            document.querySelectorAll('#watchlistBody tr').forEach(row => {
+                const ticker = row.querySelector('td:first-child').textContent;
+                
+                // Handle hover for scan mode
+                row.addEventListener('mouseenter', () => {
+                    if (scanModeActive && ticker) {
+                        openTradingViewWindow(ticker);
+                    }
+                });
+                
+                // Handle touch for mobile devices
+                row.addEventListener('touchstart', (e) => {
+                    if (scanModeActive && ticker) {
+                        e.preventDefault();
+                        openTradingViewWindow(ticker);
+                    }
+                }, { passive: false });
+                
+                // Click handler for opening in new tab
+                row.addEventListener('click', (e) => {
+                    if (!e.target.classList.contains('remove-watchlist')) {
+                        openTradingViewWindow(ticker);
+                    }
+                });
+            });
 
-            const savedVisibility = localStorage.getItem('watchlistVisible');
-            if (watchlistPanel) {
-                watchlistPanel.style.display = 
-                    savedVisibility === 'false' ? 'none' : 'block';
-            }
-
-            // Ensure sector grid is visible
-            document.getElementById('sectorGrid').style.display = 'grid';
-        });
+            // For random ticker
+            const randomTickerElement = document.getElementById('randomTicker');
+            randomTickerElement.addEventListener('mouseenter', () => {
+                if (scanModeActive) {
+                    openTradingViewWindow(randomTickerElement.textContent);
+                }
+            });
+        }
     </script>
 </body>
 </html>
