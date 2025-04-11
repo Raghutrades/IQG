@@ -485,45 +485,63 @@
             border: 1px solid var(--border);
         }
         
-        .trades-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 1.5rem;
-            background: var(--card);
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 0 20px var(--glow);
-        }
-        
-        .trades-table th {
-            background: linear-gradient(135deg, var(--accent), #3a0ca3);
-            color: white;
-            padding: 0.75rem;
-            text-align: left;
-            font-weight: 600;
-        }
-        
-        .trades-table td {
-            padding: 0.75rem;
-            border-bottom: 1px solid var(--border);
-        }
-        
-        .trades-table tr:last-child td {
-            border-bottom: none;
-        }
-        
-        .trades-table tr:hover {
-            background: rgba(67, 97, 238, 0.05);
-        }
-        
-        .trade-input {
-            width: 100%;
-            padding: 0.5rem;
-            border-radius: 4px;
-            border: 1px solid var(--border);
-            background: var(--bg);
-            color: var(--text);
-        }
+        /* Calculator Table Styling */
+.trades-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  background: var(--card);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.trades-table th {
+  background: linear-gradient(135deg, var(--accent), #3a0ca3);
+  color: white;
+  padding: 12px 10px;
+  text-align: left;
+  font-weight: 600;
+}
+
+.trades-table td {
+  padding: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.trades-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* Column Widths */
+.trades-table th:nth-child(1), 
+.trades-table td:nth-child(1) { width: 8%; }  /* Trade # */
+.trades-table th:nth-child(2), 
+.trades-table td:nth-child(2) { width: 20%; } /* Scrip */
+.trades-table th:nth-child(3), 
+.trades-table td:nth-child(3) { width: 22%; } /* Buy */
+.trades-table th:nth-child(4), 
+.trades-table td:nth-child(4) { width: 22%; } /* Sell */
+.trades-table th:nth-child(5), 
+.trades-table td:nth-child(5) { width: 15%; } /* Qty */
+
+/* Input Styling */
+.trade-input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 13px;
+}
+
+.trade-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--glow);
+}
+
         
         .calculator-grid {
             display: grid;
@@ -1219,13 +1237,14 @@
         <!-- Dynamic Trades Table -->
         <table class="trades-table" id="tradesTable">
             <thead>
-                <tr>
-                    <th>Trade</th>
-                    <th>Buy Price (₹)</th>
-                    <th>Sell Price (₹)</th>
-                    <th>Quantity</th>
-                </tr>
-            </thead>
+  <tr>
+    <th>Trade</th>
+    <th>Scrip</th>
+    <th>Buy Price (₹)</th>
+    <th>Sell Price (₹)</th>
+    <th>Quantity</th>
+  </tr>
+</thead>
             <tbody id="tradesTableBody">
                 <!-- Rows will be inserted here by JavaScript -->
             </tbody>
@@ -2071,19 +2090,21 @@ function openTradingViewWindow(ticker, isHover = false) {
             const tradesTableBody = document.getElementById('tradesTableBody');
             
             function generateTradeRows(count) {
-                tradesTableBody.innerHTML = '';
-                for (let i = 0; i < count; i++) {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-  <td>${i + 1}</td>
-  <td><input type="text" class="trade-input" id="ticker${i}" placeholder="Ticker"></td>
-  <td><input type="number" class="trade-input" id="buyPrice${i}" placeholder="Buy (₹)"></td>
-  <td><input type="number" class="trade-input" id="sellPrice${i}" placeholder="Sell (₹)"></td>
-  <td><input type="number" class="trade-input" id="quantity${i}" placeholder="Qty"></td>
-`;
-                    tradesTableBody.appendChild(row);
-                }
-            }
+  const tradesTableBody = document.getElementById('tradesTableBody');
+  tradesTableBody.innerHTML = '';
+  
+  for (let i = 0; i < count; i++) {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${i + 1}</td>
+      <td><input type="text" class="trade-input" id="ticker${i}" placeholder="e.g. RELIANCE"></td>
+      <td><input type="number" class="trade-input" id="buyPrice${i}" placeholder="0.00"></td>
+      <td><input type="number" class="trade-input" id="sellPrice${i}" placeholder="0.00"></td>
+      <td><input type="number" class="trade-input" id="quantity${i}" placeholder="0"></td>
+    `;
+    tradesTableBody.appendChild(row);
+  }
+}
             
             // Initialize with single trade
             generateTradeRows(1);
