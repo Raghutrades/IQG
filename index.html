@@ -1073,24 +1073,21 @@
             }
         }
 
-        /* ===== Trade Calculator Table Fixes ===== */
+        
+/* Fix table layout */
 .trades-table {
-  table-layout: fixed; /* Makes columns respect width settings */
-  width: 100%; /* Ensures table uses full container width */
+  table-layout: fixed;
 }
 .trades-table th, 
 .trades-table td {
-  padding: 10px; /* Adds consistent spacing */
-  word-wrap: break-word; /* Prevents text overflow */
-  text-align: left; /* Aligns content to left */
+  padding: 10px;
+  word-wrap: break-word;
 }
-.trades-table th:nth-child(1) { width: 8%; }   /* Trade # column */
-.trades-table th:nth-child(2) { width: 20%; }  /* Ticker column */
+.trades-table th:nth-child(1) { width: 8%; }  /* # */
+.trades-table th:nth-child(2) { width: 20%; } /* Ticker */
 .trades-table th:nth-child(3), 
-.trades-table th:nth-child(4) { width: 25%; }  /* Buy/Sell Price columns */
-.trades-table th:nth-child(5) { width: 15%; }  /* Quantity column */
-
-
+.trades-table th:nth-child(4) { width: 25%; } /* Buy/Sell Price */
+.trades-table th:nth-child(5) { width: 15%; } /* Qty */
     </style>
 </head>
 <body>
