@@ -1664,16 +1664,33 @@
         scanModeToggle.addEventListener('click', toggleScanMode);
 
         // Function to open TradingView window
-        function openTradingViewWindow(ticker) {
-            if (!ticker) return;
-            
-            if (tradingViewWindow && !tradingViewWindow.closed) {
-                tradingViewWindow.location.href = `https://www.tradingview.com/chart/?symbol=NSE:${ticker}`;
-                tradingViewWindow.focus();
-            } else {
-                tradingViewWindow = window.open(`https://www.tradingview.com/chart/?symbol=NSE:${ticker}`, '_blank');
-            }
-        }
+        let scanModePopup = null; // Stores the hover popup window
+
+function openTradingViewWindow(ticker, isHover = false) {
+  if (!ticker) return;
+
+  // HOVER BEHAVIOR (Scan Mode ON)
+  if (isHover && scanModeActive) {
+    const url = `https://www.tradingview.com/chart/?symbol=NSE:${ticker}`;
+    
+    if (scanModePopup && !scanModePopup.closed) {
+      // Update existing popup
+      scanModePopup.location.href = url;
+      scanModePopup.focus();
+    } else {
+      // Open new popup (600x500)
+      scanModePopup = window.open(
+        url,
+        "ScanModePopup",
+        "width=600,height=500,left=100,top=100"
+      );
+    }
+  } 
+  // CLICK BEHAVIOR (Always opens new tab)
+  else {
+    window.open(`https://www.tradingview.com/chart/?symbol=NSE:${ticker}`, "_blank");
+  }
+}
 
         // ===== EXPORT FUNCTIONALITY =====
         function exportTradeData(format) {
@@ -2249,17 +2266,17 @@
   document.querySelectorAll(".stock-item").forEach((item) => {
     const ticker = item.textContent.trim();
 
-    // Handle hover (opens in new tab if scan mode is ON)
+    // HOVER: Opens in popup (only if Scan Mode ON)
     item.addEventListener("mouseenter", () => {
       if (scanModeActive && ticker) {
-        window.open(`https://www.tradingview.com/chart/?symbol=NSE:${ticker}`, "_blank");
+        openTradingViewWindow(ticker, true); // true = isHover
       }
     });
 
-    // Handle click (always opens in new tab)
+    // CLICK: Always opens in new tab
     item.addEventListener("click", (e) => {
-      if (!scanModeActive && ticker && !e.ctrlKey) {
-        window.open(`https://www.tradingview.com/chart/?symbol=NSE:${ticker}`, "_blank");
+      if (ticker && !e.ctrlKey) {
+        openTradingViewWindow(ticker, false); // false = not hover
       }
     });
   });
