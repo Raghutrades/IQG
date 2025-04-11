@@ -1049,6 +1049,17 @@
 <body>
     <!-- Header with Date/Time, Title, and Ticker -->
     <header class="header">
+        <button id="googleLogin" style="
+  background: #4285F4;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-left: 20px;
+">
+  Sign in with Google
+</button>
         <div class="datetime-container">
             <div class="datetime-item">
                 <span class="datetime-label">Date:</span>
@@ -2073,5 +2084,38 @@
             });
         }
     </script>
+    <!-- Firebase Auth -->
+<script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+
+<!-- Your Firebase Config -->
+<script>
+  const firebaseConfig = {
+  apiKey: "AIzaSyCpNEce4E9apDritPfXGC_2KCLC9K6QcVw",
+  authDomain: "intraday-quick-grabber.firebaseapp.com",
+  projectId: "intraday-quick-grabber",
+  storageBucket: "intraday-quick-grabber.firebasestorage.app",
+  messagingSenderId: "140219197070",
+  appId: "1:140219197070:web:144ee068626ac885a30bdf"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+
+// ===== GOOGLE LOGIN ===== //
+document.getElementById("googleLogin").addEventListener("click", () => {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  firebase.auth().signInWithPopup(provider)
+    .then((result) => {
+      const user = result.user;
+      alert(`Welcome, ${user.displayName}! 🎉`);
+      document.getElementById("googleLogin").style.display = "none"; // Hides button after login
+    })
+    .catch((error) => {
+      console.error("Login failed:", error);
+      alert("Login failed. Try again!");
+    });
+});
+</script>
 </body>
 </html>
