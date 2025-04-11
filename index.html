@@ -2279,53 +2279,50 @@ function openTradingViewWindow(ticker, isHover = false) {
 
         // ===== HOVER TO CHART FUNCTIONALITY =====
         function setupHoverToChart() {
+  // Remove all old event listeners first (critical fix)
+  document.querySelectorAll(".stock-item, #watchlistBody tr, .random-ticker-value").forEach(el => {
+    el.replaceWith(el.cloneNode(true)); // This wipes all old event listeners
+  });
+
   // For sector stocks
-  document.querySelectorAll(".stock-item").forEach((item) => {
+  document.querySelectorAll(".stock-item").forEach(item => {
     const ticker = item.textContent.trim();
 
-    // Hover: Opens popup (Scan Mode only)
+    // Hover behavior (Scan Mode only)
     item.addEventListener("mouseenter", () => {
       if (scanModeActive && ticker) {
-        openTradingViewWindow(ticker, true); // true = isHover
+        openTradingViewWindow(ticker, true);
       }
     });
 
-    // Click: Opens ONE new tab (prevent double-trigger)
-    item.addEventListener("click", (e) => {
-      e.preventDefault(); // Stop default behavior
-      e.stopPropagation(); // Prevent event bubbling
+    // Click behavior (single tab)
+    item.addEventListener("click", e => {
       if (ticker && !e.ctrlKey) {
-        window.open(`https://www.tradingview.com/chart/?symbol=NSE:${ticker}`, "_blank");
+        e.stopImmediatePropagation(); // Block all other click handlers
+        window.open(`https://www.tradingview.com/chart/?symbol=NSE:${ticker}`, "TradingViewTab");
       }
-    });
+    }, { once: true }); // Ensures listener only fires once
   });
 
   // For watchlist items
-  document.querySelectorAll("#watchlistBody tr").forEach((row) => {
-    const ticker = row.querySelector("td:first-child").textContent.trim();
+  document.querySelectorAll("#watchlistBody tr").forEach(row => {
+    const ticker = row.querySelector("td:first-child")?.textContent.trim();
+    if (!ticker) return;
 
-    // Hover in scan mode
-    row.addEventListener("mouseenter", () => {
-      if (scanModeActive && ticker) {
-        window.open(`https://www.tradingview.com/chart/?symbol=NSE:${ticker}`, "_blank");
+    row.addEventListener("click", e => {
+      if (!e.target.classList.contains("remove-watchlist")) {
+        e.stopImmediatePropagation();
+        window.open(`https://www.tradingview.com/chart/?symbol=NSE:${ticker}`, "TradingViewTab");
       }
-    });
-
-    // Click opens in new tab
-    row.addEventListener("click", (e) => {
-      if (!e.target.classList.contains("remove-watchlist") && ticker) {
-        window.open(`https://www.tradingview.com/chart/?symbol=NSE:${ticker}`, "_blank");
-      }
-    });
+    }, { once: true });
   });
 
-  // For random ticker
-  const randomTickerElement = document.getElementById("randomTicker");
-  randomTickerElement.addEventListener("mouseenter", () => {
-    if (scanModeActive) {
-      window.open(`https://www.tradingview.com/chart/?symbol=NSE:${randomTickerElement.textContent}`, "_blank");
-    }
-  });
+  // For random ticker box
+  const randomTicker = document.getElementById("randomTicker");
+  randomTicker.addEventListener("click", e => {
+    e.stopImmediatePropagation();
+    window.open(`https://www.tradingview.com/chart/?symbol=NSE:${randomTicker.textContent}`, "TradingViewTab");
+  }, { once: true });
 }
 
         // ===== CHARACTER COUNTERS =====
