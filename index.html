@@ -77,36 +77,6 @@
         }
         
         /* === HEADER STYLES === */
-
-        /* === GOOGLE LOGIN BUTTON === */
-#googleLogin {
-  background: #4285F4;
-  color: white;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: 500;
-  margin-left: auto; /* Pushes button to the right */
-  transition: all 0.2s ease;
-}
-
-#googleLogin:hover {
-  background: #3367D6;
-  transform: translateY(-1px);
-}
-
-/* Google "G" logo */
-#googleLogin::before {
-  content: "";
-  display: inline-block;
-  width: 18px;
-  height: 18px;
-  background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj48cGF0aCBkPSJNMTcuNiA5LjJsLS4xLTEuOEg5djMuNGg0LjhDMTMuNiAxMiAxMyAxMyAxMiAxMy42djIuMmgzYTguOCA4LjggMCAwIDAgMi42LTYuNnoiIGZpbGw9IiM0Mjg1RjQiIGZpbGwtcnVsZT0ibm9uemVybyIvPjxwYXRoIGQ9Ik05IDE4YzIuNCAwIDQuNS0uOCA2LTIuMmwtMy0yLjJhNS40IDUuNCAwIDAgMS04LTIuOUgxVjEzYTkgOSAwIDAgMCA4IDV6IiBmaWxsPSIjMzRBODUzIiBmaWxsLXJ1bGU9Im5vbnplcm8iLz48cGF0aCBkPSJNNSAxMC4xYTUuNCA1LjQgMCAwIDEgMC0zLjRWNUgxYTkgOSAwIDAgMCAwIDhsNC0yLjh6IiBmaWxsPSIjRkJCQzA1IiBmaWxsLXJ1bGU9Im5vbnplcm8iLz48cGF0aCBkPSJNOSAzLjZjMS4zIDAgMi41LjQgMy40IDEuM0wxNSAyLjNBOSA5IDAgMCAwIDEgNWw0IDIuNGE1LjQgNS40IDAgMCAxIDQtMy42eiIgZmlsbD0iI0VBNDMzNSIgZmlsbC1ydWxlPSJub256ZXJvIi8+PHBhdGggZD0iTTAgMGgxOHYxOEgweiIvPjwvZz48L3N2Zz4=');
-  background-size: contain;
-  margin-right: 8px;
-}
         .header {
             display: grid;
             grid-template-columns: 1fr auto 1fr;
@@ -1079,17 +1049,6 @@
 <body>
     <!-- Header with Date/Time, Title, and Ticker -->
     <header class="header">
-        <button id="googleLogin" style="
-  background: #4285F4;
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-left: 20px;
-">
-  Sign in with Google
-</button>
         <div class="datetime-container">
             <div class="datetime-item">
                 <span class="datetime-label">Date:</span>
@@ -2114,38 +2073,5 @@
             });
         }
     </script>
-    <!-- Replace your current Firebase scripts with these -->
-<script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
-
-<script>
-  // Your Firebase Config (same as yours)
-  const firebaseConfig = {
-  apiKey: "AIzaSyCpNEce4E9apDritPfXGC_2KCLC9K6QcVw",
-  authDomain: "intraday-quick-grabber.firebaseapp.com",
-  projectId: "intraday-quick-grabber",
-  storageBucket: "intraday-quick-grabber.firebasestorage.app",
-  messagingSenderId: "140219197070",
-  appId: "1:140219197070:web:144ee068626ac885a30bdf"
-};
-
-  // Initialize Firebase
-  const app = firebase.initializeApp(firebaseConfig);
-
-  // ===== GOOGLE LOGIN ===== //
-  document.getElementById("googleLogin").addEventListener("click", () => {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    firebase.auth().signInWithPopup(provider)
-      .then((result) => {
-        const user = result.user;
-        alert(`Welcome, ${user.displayName}! 🎉`);
-        document.getElementById("googleLogin").style.display = "none";
-      })
-      .catch((error) => {
-        console.error("Login failed:", error);
-        alert("Login failed. Try again!");
-      });
-  });
-</script>
 </body>
 </html>
