@@ -5,13 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Intraday Quick Grabber</title>
     <link rel="icon" href="favicon.png" type="image/png">
-    <!-- Replace this line -->
-   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-   
-   <!-- With this (updated CDN) -->
-   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
-
+    <!-- Added CDNs for export functionality -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
         @font-face {
             font-family: 'Quenton';
             src: url('quenton.otf') format('opentype');
@@ -1779,39 +1775,45 @@ function openTradingViewWindow(ticker, isHover = false) {
 
         // PDF Export
         function exportAsPDF(data) {
-  // Check if jsPDF is loaded (UMD format)
-  if (typeof window.jspdf !== 'object') {
-    alert("Error: PDF library not loaded. Please refresh the page.");
-    return;
-  }
-
-  const { jsPDF } = window.jspdf; // Destructure from UMD global
-  const doc = new jsPDF();
-
-  // Title
-  doc.setFontSize(18);
-  doc.text("TRADE REPORT", 105, 20, { align: "center" });
-
-  // Trades Table (AutoTable v5 syntax)
-  doc.autoTable({
-    head: [["#", "Ticker", "Buy Price (₹)", "Sell Price (₹)", "Qty"]],
-    body: data.trades.map(trade => [
-      trade.number,
-      trade.ticker || "N/A",
-      trade.buyPrice || "N/A",
-      trade.sellPrice || "N/A",
-      trade.quantity || "N/A"
-    ]),
-    startY: 30,
-    headStyles: { 
-      fillColor: [67, 97, 238], // Blue header
-      textColor: 255 // White text
-    }
-  });
-
-  // Save PDF
-  doc.save(`TradeReport_${new Date().toISOString().slice(0, 10)}.pdf`);
-}
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Title
+            doc.setFontSize(18);
+            doc.text('TRADE REPORT', 105, 15, { align: 'center' });
+            
+            // Metadata
+            doc.setFontSize(12);
+            doc.text(`Generated: ${data.timestamp}`, 14, 25);
+            doc.text(`Trade Type: ${data.tradeType}`, 14, 32);
+            
+            // Trades Table
+            doc.setFontSize(14);
+            doc.text('TRADE DETAILS', 14, 45);
+            doc.autoTable({
+                startY: 50,
+                head: [['#', 'Buy Price', 'Sell Price', 'Qty']],
+                body: data.trades.map(trade => [trade.number, trade.buyPrice, trade.sellPrice, trade.quantity]),
+                styles: { fontSize: 10 }
+            });
+            
+            // Notes Section
+            doc.setFontSize(14);
+            doc.text('TRADE NOTES', 14, doc.autoTable.previous.finalY + 15);
+            doc.setFontSize(10);
+            doc.text(`Entry Reason: ${data.entryReason || 'N/A'}`, 14, doc.autoTable.previous.finalY + 25);
+            doc.text(`Exit Reason: ${data.exitReason || 'N/A'}`, 14, doc.autoTable.previous.finalY + 35);
+            doc.text(`Lessons Learned: ${data.lessonsLearned || 'N/A'}`, 14, doc.autoTable.previous.finalY + 45);
+            
+            // Results
+            doc.setFontSize(14);
+            doc.text('RESULTS SUMMARY', 14, doc.autoTable.previous.finalY + 60);
+            doc.setFontSize(12);
+            doc.text(`Net Profit/Loss: ${data.netResult}`, 14, doc.autoTable.previous.finalY + 70);
+            doc.text(`Total Brokerage: ${data.brokerage}`, 14, doc.autoTable.previous.finalY + 80);
+            
+            doc.save(`TradeReport_${new Date().toISOString().slice(0,10)}.pdf`);
+        }
 
         // Excel Export
         function exportAsExcel(data) {
