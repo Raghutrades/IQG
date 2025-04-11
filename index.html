@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Intraday Quick Grabber</title>
     <link rel="icon" href="favicon.png" type="image/png">
+    <!-- Added CDNs for export functionality -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         @font-face {
             font-family: 'Quenton';
@@ -566,6 +569,7 @@
         
         .calculator-input-group {
             margin-bottom: 1rem;
+            position: relative;
         }
         
         .calculator-label {
@@ -582,6 +586,20 @@
             background: var(--bg);
             color: var(--text);
             font-size: 1rem;
+        }
+        
+        textarea.calculator-input {
+            min-height: 80px;
+            resize: vertical;
+        }
+        
+        .char-counter {
+            position: absolute;
+            right: 10px;
+            bottom: 10px;
+            font-size: 0.8rem;
+            color: var(--text);
+            opacity: 0.7;
         }
         
         .calculator-select {
@@ -661,6 +679,13 @@
         .loss {
             color: var(--loss-red);
             font-weight: bold;
+        }
+        
+        .export-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 1.5rem;
         }
         
         /* === FOOTER === */
@@ -918,6 +943,10 @@
             }
             
             .calculator-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .export-buttons {
                 grid-template-columns: 1fr;
             }
         }
@@ -1226,7 +1255,45 @@
             </div>
         </div>
         
+        <!-- NEW: Trade Notes Section -->
+        <div class="calculator-section">
+            <h3 class="calculator-section-title">Trade Notes</h3>
+            <div class="calculator-section-content">
+                <div class="calculator-input-group">
+                    <label class="calculator-label">Entry Reason (Max 300 chars)</label>
+                    <textarea class="calculator-input" id="entryReason" maxlength="300" 
+                              placeholder="Why are you entering this trade?"></textarea>
+                    <div class="char-counter"><span id="entryChars">0</span>/300</div>
+                </div>
+                <div class="calculator-input-group">
+                    <label class="calculator-label">Exit Reason (Max 300 chars)</label>
+                    <textarea class="calculator-input" id="exitReason" maxlength="300"
+                              placeholder="Why did you exit this trade?"></textarea>
+                    <div class="char-counter"><span id="exitChars">0</span>/300</div>
+                </div>
+                <div class="calculator-input-group">
+                    <label class="calculator-label">Lessons Learned (Max 300 chars)</label>
+                    <textarea class="calculator-input" id="lessonsLearned" maxlength="300"
+                              placeholder="What did you learn from this trade?"></textarea>
+                    <div class="char-counter"><span id="lessonsChars">0</span>/300</div>
+                </div>
+            </div>
+        </div>
+        
         <button class="calculator-button" id="calculateButton">Calculate All Trades</button>
+        
+        <!-- NEW: Export Buttons -->
+        <div class="export-buttons">
+            <button class="calculator-button secondary" onclick="exportTradeData('text')">
+                📝 Export as Text
+            </button>
+            <button class="calculator-button secondary" onclick="exportTradeData('pdf')">
+                📄 Export as PDF
+            </button>
+            <button class="calculator-button secondary" onclick="exportTradeData('excel')">
+                📊 Export as Excel
+            </button>
+        </div>
         
         <!-- Results Section -->
         <div class="calculator-results" id="calculatorResults" style="display: none;">
@@ -1299,30 +1366,30 @@
     <script>
         // Stock data for all 15 sectors
         const sectorData = {
-    "NIFTY50": ["TRENT", "TCS", "NTPC", "BRITANNIA", "ICICIBANK", "ITC", "HINDUNILVR", "BHARTIARTL", "ADANIPORTS", "TECHM", "COALINDIA", "RELIANCE", "ONGC", "INFY", "NESTLEIND", "SBIN", "ASIANPAINT", "ADANIENT", "KOTAKBANK", "BPCL", "WIPRO", "MARUTI", "HCLTECH", "BAJFINANCE", "TATAMOTORS", "LT", "BEL", "HEROMOTOCO", "HDFCLIFE", "TITAN", "DRREDDY", "TATASTEEL", "CIPLA", "TATACONSUM", "POWERGRID", "JSWSTEEL", "BAJAJFINSV", "GRASIM", "APOLLOHOSP", "HINDALCO", "ULTRACEMCO", "BAJAJ-AUTO", "INDUSINDBK", "SBILIFE", "SHRIRANFIN", "HDFCBANK", "SUNPHARMA", "M&M", "EICHERMOT", "AXISBANK"],
-    "BANKING": ["ICICIBANK", "BANKBARODA", "SBIN", "KOTAKBANK", "FEDERALBNK", "INDIANB", "BANKINDIA", "INDUSINBK", "AUBANK", "HDFCBANK", "PNB", "IDFCFIRSTB", "CANBK", "AXISBANK"],
-    "AUTOMOBILE": ["EXIDEIND", "MOTHERSON", "APOLLOTYRE", "MARUTI", "TATAMOTORS", "BOSCHLTD", "HEROMOTOCO", "BALKRISIND", "TVSMOTOR", "SONACOMS", "TITAGARH", "TIINDIA", "BHARATFORG", "MRF", "BAJAJ-AUTO", "M&M", "EICHERMOT"],
-    "FINANCIAL SERVICES": ["ICICIBANK", "IRFC", "ICICIGI", "PFC", "ICICIPRULI", "SBICARD", "MUTHOOTFIN", "SBIN", "LICHSGFIN", "KOTAKBANK", "BAJFINANCE", "HDFCAMC", "POONAWALLA", "LICI", "HDFCLIFE", "HUDCO", "RECLTD", "CDSL", "JIOFIN", "BAJAJFINSV", "CHOLAFIN", "IIFL", "POLICYBZR", "MAXHEALTH", "SBILIFE", "SHRIRAMFIN", "ANGELONE", "BSE", "HDFCBANK", "PAYTM", "AXISBANK"],
-    "FMCG": ["BRITANNIA", "ITC", "HINDUNILVR", "DMART", "NESTLEIND", "COLPAL", "DABUR", "MARICO", "KALYANJIL", "ZOMATO", "VBL", "TATACONSUM", "PATANJALI", "UNITDSPR", "GODREJCP", "NYKAA", "SUPERMEIND"],
-    "INFORMATION TECHNOLOGY": ["TCS", "TECHM", "INFY", "WIPRO", "HCLTECH", "PERSISTENT", "COFORGE", "CAMS", "LTIM", "KPITTECH", "LTTS", "MPHASIS", "CYIENT", "TATAELXSI", "HFCL"],
-    "SENSEX": ["TCS", "NTPC", "ICICIBANK", "ITC", "HINDUNILVR", "BHARTIARTL", "ADANIPORTS", "TECHM", "RELIANCE", "INFY", "NESTLEIND", "SBIN", "ASIANPAINT", "KOTAKBANK", "MARUTI", "HCLTECH", "BAJFINANCE", "TATAMOTORS", "LT", "TITAN", "TATASTEEL", "POWERGRID", "JSWSTEEL", "BAJAJFINSV", "ULTRACEMCO", "INDUSINDBK", "HDFCBANK", "SUNPHARMA", "M&M", "AXISBANK"],
-    "METALS": ["ADANIENT", "JINDALSTEL", "SAIL", "TATASTEEL", "JSWSTEEL", "HINDALCO", "HINDCOPPER", "VEDL", "NATIONALUM", "NMDC", "JSL", "APLAPOLLO"],
-    "PHARMACEUTICALS": ["AUROPHARMA", "ZYDUSLIFE", "GLENMARK", "DRREDDY", "LAURUSLABS", "CIPLA", "LUPIN", "DIVISLAB", "TORNTPHARM", "GRANULES", "ALKEM", "SUNPHARMA", "BIOCON"],
-    "PSU BANKS": ["BANKBARODA", "SBIN", "INDIANB", "BANKINDIA", "UNIONBANK", "PNB", "CANBK"],
-    "PRIVATE BANKS": ["ICICIBANK", "KOTAKBANK", "FEDERALBNK", "RBLBANK", "BANDHANBNK", "INDUSINDBK", "HDFCBANK", "IDFCFIRSTB", "AXISBANK"],
-    "REALTY": ["NCC", "PHOENIXLTD", "PRESTIGE", "OBEROIRLTY", "GODREJPROP", "DLF", "LODHA", "NBCC", "IRB"],
-    "ENERGY": ["NTPC", "COALINDIA", "RELIANCE", "ONGC", "CESE", "SOLARINDS", "TATAPOWER", "TORNTPOWER", "BPCL", "IOC", "ADANIENSOL", "IREDA", "OIL", "POWERGRID", "ATGL", "CGPOWER", "PETRONET", "JSWENERGY", "SJVN", "NHPC", "IGL", "GMRAIRPORT", "ADANIGREEN"],
-    "CEMENT": ["AMBUJACEM", "ACC", "JKCEMENT", "ULTRACEMCO", "DALBHARAT", "SHREECEM", "RAMCOCEM"],
-    "MIDCAP SELECT": [
-        "ABB", "AARTIIND", "ABCAPITAL", "ABFRL", "BSOFT", "BHEL", "CESC", "CHAMBLFERT", "CROMPTON", "DEEPAKNTR", 
-        "DELHIVERY", "DIXON", "ETERNAL", "ESCORTS", "GAIL", "HAL", "HAVELLS", "HINDZINC", "IEX", "IRCTC", 
-        "INDUSTOWER", "NAUKRI", "INOXWIND", "INDIGO", "KEI", "LTF", "MGL", "M&MFIN", "MANAPPURAM", "MFSL", 
-        "MCX", "OFSS", "PNBHOUSING", "PIDILITIND", "PEL", "SRF", "SIEMENS", "SYNGENE", "TATACHEM", 
-        "TATACOMM", "TATATECH", "YESBANK", "AUROPHARMA", "HINDUPETRO", "VOLTAS", "UPL", "HDFCAMC", "PERSISTENT", "FEDERALBNK", "POLYCAB", 
-        "COFORGE", "LUPIN", "ASTRAL", "PAGEIND", "PIIND", "BHARATFORG", "MRF", "JUBLFOOD", "CONCOR", 
-        "INDHOTEL", "GODREJPROP", "AUBANK", "ASHOKLEY", "MPHASIS", "IDFCFIRSTB", "IDEA", "CUMMINSIND"
-    ]
-};
+            "NIFTY50": ["TRENT", "TCS", "NTPC", "BRITANNIA", "ICICIBANK", "ITC", "HINDUNILVR", "BHARTIARTL", "ADANIPORTS", "TECHM", "COALINDIA", "RELIANCE", "ONGC", "INFY", "NESTLEIND", "SBIN", "ASIANPAINT", "ADANIENT", "KOTAKBANK", "BPCL", "WIPRO", "MARUTI", "HCLTECH", "BAJFINANCE", "TATAMOTORS", "LT", "BEL", "HEROMOTOCO", "HDFCLIFE", "TITAN", "DRREDDY", "TATASTEEL", "CIPLA", "TATACONSUM", "POWERGRID", "JSWSTEEL", "BAJAJFINSV", "GRASIM", "APOLLOHOSP", "HINDALCO", "ULTRACEMCO", "BAJAJ-AUTO", "INDUSINDBK", "SBILIFE", "SHRIRANFIN", "HDFCBANK", "SUNPHARMA", "M&M", "EICHERMOT", "AXISBANK"],
+            "BANKING": ["ICICIBANK", "BANKBARODA", "SBIN", "KOTAKBANK", "FEDERALBNK", "INDIANB", "BANKINDIA", "INDUSINBK", "AUBANK", "HDFCBANK", "PNB", "IDFCFIRSTB", "CANBK", "AXISBANK"],
+            "AUTOMOBILE": ["EXIDEIND", "MOTHERSON", "APOLLOTYRE", "MARUTI", "TATAMOTORS", "BOSCHLTD", "HEROMOTOCO", "BALKRISIND", "TVSMOTOR", "SONACOMS", "TITAGARH", "TIINDIA", "BHARATFORG", "MRF", "BAJAJ-AUTO", "M&M", "EICHERMOT"],
+            "FINANCIAL SERVICES": ["ICICIBANK", "IRFC", "ICICIGI", "PFC", "ICICIPRULI", "SBICARD", "MUTHOOTFIN", "SBIN", "LICHSGFIN", "KOTAKBANK", "BAJFINANCE", "HDFCAMC", "POONAWALLA", "LICI", "HDFCLIFE", "HUDCO", "RECLTD", "CDSL", "JIOFIN", "BAJAJFINSV", "CHOLAFIN", "IIFL", "POLICYBZR", "MAXHEALTH", "SBILIFE", "SHRIRAMFIN", "ANGELONE", "BSE", "HDFCBANK", "PAYTM", "AXISBANK"],
+            "FMCG": ["BRITANNIA", "ITC", "HINDUNILVR", "DMART", "NESTLEIND", "COLPAL", "DABUR", "MARICO", "KALYANJIL", "ZOMATO", "VBL", "TATACONSUM", "PATANJALI", "UNITDSPR", "GODREJCP", "NYKAA", "SUPERMEIND"],
+            "INFORMATION TECHNOLOGY": ["TCS", "TECHM", "INFY", "WIPRO", "HCLTECH", "PERSISTENT", "COFORGE", "CAMS", "LTIM", "KPITTECH", "LTTS", "MPHASIS", "CYIENT", "TATAELXSI", "HFCL"],
+            "SENSEX": ["TCS", "NTPC", "ICICIBANK", "ITC", "HINDUNILVR", "BHARTIARTL", "ADANIPORTS", "TECHM", "RELIANCE", "INFY", "NESTLEIND", "SBIN", "ASIANPAINT", "KOTAKBANK", "MARUTI", "HCLTECH", "BAJFINANCE", "TATAMOTORS", "LT", "TITAN", "TATASTEEL", "POWERGRID", "JSWSTEEL", "BAJAJFINSV", "ULTRACEMCO", "INDUSINDBK", "HDFCBANK", "SUNPHARMA", "M&M", "AXISBANK"],
+            "METALS": ["ADANIENT", "JINDALSTEL", "SAIL", "TATASTEEL", "JSWSTEEL", "HINDALCO", "HINDCOPPER", "VEDL", "NATIONALUM", "NMDC", "JSL", "APLAPOLLO"],
+            "PHARMACEUTICALS": ["AUROPHARMA", "ZYDUSLIFE", "GLENMARK", "DRREDDY", "LAURUSLABS", "CIPLA", "LUPIN", "DIVISLAB", "TORNTPHARM", "GRANULES", "ALKEM", "SUNPHARMA", "BIOCON"],
+            "PSU BANKS": ["BANKBARODA", "SBIN", "INDIANB", "BANKINDIA", "UNIONBANK", "PNB", "CANBK"],
+            "PRIVATE BANKS": ["ICICIBANK", "KOTAKBANK", "FEDERALBNK", "RBLBANK", "BANDHANBNK", "INDUSINDBK", "HDFCBANK", "IDFCFIRSTB", "AXISBANK"],
+            "REALTY": ["NCC", "PHOENIXLTD", "PRESTIGE", "OBEROIRLTY", "GODREJPROP", "DLF", "LODHA", "NBCC", "IRB"],
+            "ENERGY": ["NTPC", "COALINDIA", "RELIANCE", "ONGC", "CESE", "SOLARINDS", "TATAPOWER", "TORNTPOWER", "BPCL", "IOC", "ADANIENSOL", "IREDA", "OIL", "POWERGRID", "ATGL", "CGPOWER", "PETRONET", "JSWENERGY", "SJVN", "NHPC", "IGL", "GMRAIRPORT", "ADANIGREEN"],
+            "CEMENT": ["AMBUJACEM", "ACC", "JKCEMENT", "ULTRACEMCO", "DALBHARAT", "SHREECEM", "RAMCOCEM"],
+            "MIDCAP SELECT": [
+                "ABB", "AARTIIND", "ABCAPITAL", "ABFRL", "BSOFT", "BHEL", "CESC", "CHAMBLFERT", "CROMPTON", "DEEPAKNTR", 
+                "DELHIVERY", "DIXON", "ETERNAL", "ESCORTS", "GAIL", "HAL", "HAVELLS", "HINDZINC", "IEX", "IRCTC", 
+                "INDUSTOWER", "NAUKRI", "INOXWIND", "INDIGO", "KEI", "LTF", "MGL", "M&MFIN", "MANAPPURAM", "MFSL", 
+                "MCX", "OFSS", "PNBHOUSING", "PIDILITIND", "PEL", "SRF", "SIEMENS", "SYNGENE", "TATACHEM", 
+                "TATACOMM", "TATATECH", "YESBANK", "AUROPHARMA", "HINDUPETRO", "VOLTAS", "UPL", "HDFCAMC", "PERSISTENT", "FEDERALBNK", "POLYCAB", 
+                "COFORGE", "LUPIN", "ASTRAL", "PAGEIND", "PIIND", "BHARATFORG", "MRF", "JUBLFOOD", "CONCOR", 
+                "INDHOTEL", "GODREJPROP", "AUBANK", "ASHOKLEY", "MPHASIS", "IDFCFIRSTB", "IDEA", "CUMMINSIND"
+            ]
+        };
 
         const punchlines = [
             "Catch the Pulse, Ride the Move.",
@@ -1608,7 +1675,142 @@
             }
         }
 
-        // ===== INITIALIZE PAGE =====
+        // ===== EXPORT FUNCTIONALITY =====
+        function exportTradeData(format) {
+            // 1. Collect all trade data
+            const data = {
+                timestamp: new Date().toLocaleString('en-IN', {timeZone: 'Asia/Kolkata'}),
+                tradeType: document.getElementById('tradeType').value.replace(/_/g, ' ').toUpperCase(),
+                entryReason: document.getElementById('entryReason').value,
+                exitReason: document.getElementById('exitReason').value,
+                lessonsLearned: document.getElementById('lessonsLearned').value,
+                trades: [],
+                brokerage: document.getElementById('brokerageResult').textContent,
+                netResult: document.getElementById('netResult').textContent
+            };
+
+            // 2. Only export entered trades
+            const tradeCount = parseInt(document.getElementById('tradeMultiplier').value);
+            for (let i = 0; i < tradeCount; i++) {
+                const buyPrice = document.getElementById(`buyPrice${i}`).value;
+                if (buyPrice) {
+                    data.trades.push({
+                        number: i + 1,
+                        buyPrice: buyPrice,
+                        sellPrice: document.getElementById(`sellPrice${i}`).value || 'N/A',
+                        quantity: document.getElementById(`quantity${i}`).value || 'N/A'
+                    });
+                }
+            }
+
+            // 3. Format-specific export
+            switch(format) {
+                case 'text': exportAsText(data); break;
+                case 'pdf': exportAsPDF(data); break;
+                case 'excel': exportAsExcel(data); break;
+            }
+        }
+
+        // Text Export
+        function exportAsText(data) {
+            let textContent = `=== TRADE REPORT ===\n`;
+            textContent += `Date: ${data.timestamp}\n`;
+            textContent += `Trade Type: ${data.tradeType}\n\n`;
+            
+            textContent += `=== TRADES ===\n`;
+            data.trades.forEach(trade => {
+                textContent += `Trade ${trade.number}: Buy ${trade.buyPrice} | Sell ${trade.sellPrice} | Qty ${trade.quantity}\n`;
+            });
+            
+            textContent += `\n=== NOTES ===\n`;
+            textContent += `Entry Reason: ${data.entryReason || 'N/A'}\n`;
+            textContent += `Exit Reason: ${data.exitReason || 'N/A'}\n`;
+            textContent += `Lessons: ${data.lessonsLearned || 'N/A'}\n\n`;
+            
+            textContent += `=== RESULTS ===\n`;
+            textContent += `Net P/L: ${data.netResult}\n`;
+            textContent += `Total Brokerage: ${data.brokerage}`;
+
+            // Download as .txt file
+            const blob = new Blob([textContent], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `TradeReport_${new Date().toISOString().slice(0,10)}.txt`;
+            a.click();
+        }
+
+        // PDF Export
+        function exportAsPDF(data) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Title
+            doc.setFontSize(18);
+            doc.text('TRADE REPORT', 105, 15, { align: 'center' });
+            
+            // Metadata
+            doc.setFontSize(12);
+            doc.text(`Generated: ${data.timestamp}`, 14, 25);
+            doc.text(`Trade Type: ${data.tradeType}`, 14, 32);
+            
+            // Trades Table
+            doc.setFontSize(14);
+            doc.text('TRADE DETAILS', 14, 45);
+            doc.autoTable({
+                startY: 50,
+                head: [['#', 'Buy Price', 'Sell Price', 'Qty']],
+                body: data.trades.map(trade => [trade.number, trade.buyPrice, trade.sellPrice, trade.quantity]),
+                styles: { fontSize: 10 }
+            });
+            
+            // Notes Section
+            doc.setFontSize(14);
+            doc.text('TRADE NOTES', 14, doc.autoTable.previous.finalY + 15);
+            doc.setFontSize(10);
+            doc.text(`Entry Reason: ${data.entryReason || 'N/A'}`, 14, doc.autoTable.previous.finalY + 25);
+            doc.text(`Exit Reason: ${data.exitReason || 'N/A'}`, 14, doc.autoTable.previous.finalY + 35);
+            doc.text(`Lessons Learned: ${data.lessonsLearned || 'N/A'}`, 14, doc.autoTable.previous.finalY + 45);
+            
+            // Results
+            doc.setFontSize(14);
+            doc.text('RESULTS SUMMARY', 14, doc.autoTable.previous.finalY + 60);
+            doc.setFontSize(12);
+            doc.text(`Net Profit/Loss: ${data.netResult}`, 14, doc.autoTable.previous.finalY + 70);
+            doc.text(`Total Brokerage: ${data.brokerage}`, 14, doc.autoTable.previous.finalY + 80);
+            
+            doc.save(`TradeReport_${new Date().toISOString().slice(0,10)}.pdf`);
+        }
+
+        // Excel Export
+        function exportAsExcel(data) {
+            // Prepare worksheet data
+            const wsData = [
+                ['Trade Report', '', '', ''],
+                ['Generated:', data.timestamp, '', ''],
+                ['Trade Type:', data.tradeType, '', ''],
+                ['', '', '', ''],
+                ['TRADE DETAILS', '', '', ''],
+                ['#', 'Buy Price', 'Sell Price', 'Quantity'],
+                ...data.trades.map(trade => [trade.number, trade.buyPrice, trade.sellPrice, trade.quantity]),
+                ['', '', '', ''],
+                ['TRADE NOTES', '', '', ''],
+                ['Entry Reason:', data.entryReason || 'N/A', '', ''],
+                ['Exit Reason:', data.exitReason || 'N/A', '', ''],
+                ['Lessons Learned:', data.lessonsLearned || 'N/A', '', ''],
+                ['', '', '', ''],
+                ['RESULTS SUMMARY', '', '', ''],
+                ['Net Profit/Loss:', data.netResult, '', ''],
+                ['Total Brokerage:', data.brokerage, '', '']
+            ];
+
+            const ws = XLSX.utils.aoa_to_sheet(wsData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Trade Report");
+            XLSX.writeFile(wb, `TradeReport_${new Date().toISOString().slice(0,10)}.xlsx`);
+        }
+
+                // ===== INITIALIZE PAGE =====
         document.addEventListener('DOMContentLoaded', function() {
             initThemeToggle();
             initDateTime();
@@ -1621,6 +1823,7 @@
             initRandomTicker();
             updateWatchlistUI();
             setupHoverToChart();
+            initCharCounters();
             
             // Ensure sector grid is visible
             document.getElementById('sectorGrid').style.display = 'grid';
@@ -1702,102 +1905,102 @@
 
         // ===== SECTOR GRID =====
         function initSectorGrid() {
-    const sectorGrid = document.getElementById('sectorGrid');
-    
-    Object.entries(sectorData).forEach(([sectorName, stocks]) => {
-        const sectorDiv = document.createElement('div');
-        sectorDiv.className = 'sector-table';
-        sectorDiv.innerHTML = `
-            <div class="sector-header">
-                <span class="sector-number">${Object.keys(sectorData).indexOf(sectorName) + 1}.</span> 
-                ${sectorName}
-            </div>
-            <div class="stock-list" id="${sectorName}-stocks"></div>
-        `;
-        
-        const stockList = sectorDiv.querySelector('.stock-list');
-        const isMidcap = sectorName === "MIDCAP SELECT";
-        const itemsPerPage = isMidcap ? 15 : 10; // Show 15 for MIDCAP, 10 for others
-        
-        // Create mini pagination container
-        const miniPagination = document.createElement('div');
-        miniPagination.className = 'mini-pagination';
-        
-        const miniPaginationContainer = document.createElement('div');
-        miniPaginationContainer.className = 'mini-pagination-container';
-        
-        const currentPageIndicator = document.createElement('div');
-        currentPageIndicator.className = 'current-page-indicator';
-        currentPageIndicator.textContent = '1';
-        currentPageIndicator.addEventListener('click', function(e) {
-            e.stopPropagation();
-            miniPagination.style.maxHeight = miniPagination.style.maxHeight === '200px' ? '24px' : '200px';
-        });
-        
-        miniPagination.appendChild(currentPageIndicator);
-        miniPagination.appendChild(miniPaginationContainer);
-        
-        const pageCount = Math.ceil(stocks.length / itemsPerPage);
-        for (let i = 0; i < pageCount; i++) {
-            const pageDiv = document.createElement('div');
-            pageDiv.className = `stock-page ${i === 0 ? 'active' : ''}`;
-            pageDiv.dataset.page = i + 1;
+            const sectorGrid = document.getElementById('sectorGrid');
             
-            const startIdx = i * itemsPerPage;
-            const endIdx = startIdx + itemsPerPage;
-            const pageStocks = stocks.slice(startIdx, endIdx);
-            
-            for (let j = 0; j < itemsPerPage; j++) {
-                const stockItem = document.createElement('div');
-                stockItem.className = 'stock-item';
+            Object.entries(sectorData).forEach(([sectorName, stocks]) => {
+                const sectorDiv = document.createElement('div');
+                sectorDiv.className = 'sector-table';
+                sectorDiv.innerHTML = `
+                    <div class="sector-header">
+                        <span class="sector-number">${Object.keys(sectorData).indexOf(sectorName) + 1}.</span> 
+                        ${sectorName}
+                    </div>
+                    <div class="stock-list" id="${sectorName}-stocks"></div>
+                `;
                 
-                if (j < pageStocks.length) {
-                    stockItem.textContent = pageStocks[j];
-                    stockItem.addEventListener('click', (e) => {
-                        if (e.ctrlKey) { // Hold CTRL to add to watchlist
-                            addToWatchlist(pageStocks[j], sectorName);
+                const stockList = sectorDiv.querySelector('.stock-list');
+                const isMidcap = sectorName === "MIDCAP SELECT";
+                const itemsPerPage = isMidcap ? 15 : 10; // Show 15 for MIDCAP, 10 for others
+                
+                // Create mini pagination container
+                const miniPagination = document.createElement('div');
+                miniPagination.className = 'mini-pagination';
+                
+                const miniPaginationContainer = document.createElement('div');
+                miniPaginationContainer.className = 'mini-pagination-container';
+                
+                const currentPageIndicator = document.createElement('div');
+                currentPageIndicator.className = 'current-page-indicator';
+                currentPageIndicator.textContent = '1';
+                currentPageIndicator.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    miniPagination.style.maxHeight = miniPagination.style.maxHeight === '200px' ? '24px' : '200px';
+                });
+                
+                miniPagination.appendChild(currentPageIndicator);
+                miniPagination.appendChild(miniPaginationContainer);
+                
+                const pageCount = Math.ceil(stocks.length / itemsPerPage);
+                for (let i = 0; i < pageCount; i++) {
+                    const pageDiv = document.createElement('div');
+                    pageDiv.className = `stock-page ${i === 0 ? 'active' : ''}`;
+                    pageDiv.dataset.page = i + 1;
+                    
+                    const startIdx = i * itemsPerPage;
+                    const endIdx = startIdx + itemsPerPage;
+                    const pageStocks = stocks.slice(startIdx, endIdx);
+                    
+                    for (let j = 0; j < itemsPerPage; j++) {
+                        const stockItem = document.createElement('div');
+                        stockItem.className = 'stock-item';
+                        
+                        if (j < pageStocks.length) {
+                            stockItem.textContent = pageStocks[j];
+                            stockItem.addEventListener('click', (e) => {
+                                if (e.ctrlKey) { // Hold CTRL to add to watchlist
+                                    addToWatchlist(pageStocks[j], sectorName);
+                                } else {
+                                    openTradingViewWindow(pageStocks[j]);
+                                }
+                            });
                         } else {
-                            openTradingViewWindow(pageStocks[j]);
+                            stockItem.style.visibility = 'hidden';
                         }
-                    });
-                } else {
-                    stockItem.style.visibility = 'hidden';
+                        
+                        pageDiv.appendChild(stockItem);
+                    }
+                    
+                    stockList.appendChild(pageDiv);
+                    
+                    if (pageCount > 1) {
+                        const pageBtn = document.createElement('button');
+                        pageBtn.className = `mini-page-btn ${i === 0 ? 'active' : ''}`;
+                        pageBtn.textContent = i + 1;
+                        pageBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            stockList.querySelectorAll('.stock-page').forEach(page => {
+                                page.classList.remove('active');
+                            });
+                            pageDiv.classList.add('active');
+                            
+                            miniPaginationContainer.querySelectorAll('.mini-page-btn').forEach(btn => {
+                                btn.classList.remove('active');
+                            });
+                            pageBtn.classList.add('active');
+                            currentPageIndicator.textContent = i + 1;
+                            miniPagination.style.maxHeight = '24px';
+                        });
+                        miniPaginationContainer.appendChild(pageBtn);
+                    }
                 }
                 
-                pageDiv.appendChild(stockItem);
-            }
-            
-            stockList.appendChild(pageDiv);
-            
-            if (pageCount > 1) {
-                const pageBtn = document.createElement('button');
-                pageBtn.className = `mini-page-btn ${i === 0 ? 'active' : ''}`;
-                pageBtn.textContent = i + 1;
-                pageBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    stockList.querySelectorAll('.stock-page').forEach(page => {
-                        page.classList.remove('active');
-                    });
-                    pageDiv.classList.add('active');
-                    
-                    miniPaginationContainer.querySelectorAll('.mini-page-btn').forEach(btn => {
-                        btn.classList.remove('active');
-                    });
-                    pageBtn.classList.add('active');
-                    currentPageIndicator.textContent = i + 1;
-                    miniPagination.style.maxHeight = '24px';
-                });
-                miniPaginationContainer.appendChild(pageBtn);
-            }
+                if (pageCount > 1) {
+                    sectorDiv.appendChild(miniPagination);
+                }
+                
+                sectorGrid.appendChild(sectorDiv);
+            });
         }
-        
-        if (pageCount > 1) {
-            sectorDiv.appendChild(miniPagination);
-        }
-        
-        sectorGrid.appendChild(sectorDiv);
-    });
-}
 
         // ===== QUOTES =====
         function initQuotes() {
@@ -2080,6 +2283,24 @@
                 if (scanModeActive) {
                     openTradingViewWindow(randomTickerElement.textContent);
                 }
+            });
+        }
+
+        // ===== CHARACTER COUNTERS =====
+        function initCharCounters() {
+            // Setup for entry reason
+            document.getElementById('entryReason').addEventListener('input', function() {
+                document.getElementById('entryChars').textContent = this.value.length;
+            });
+            
+            // Setup for exit reason
+            document.getElementById('exitReason').addEventListener('input', function() {
+                document.getElementById('exitChars').textContent = this.value.length;
+            });
+            
+            // Setup for lessons learned
+            document.getElementById('lessonsLearned').addEventListener('input', function() {
+                document.getElementById('lessonsChars').textContent = this.value.length;
             });
         }
     </script>
