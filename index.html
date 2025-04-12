@@ -952,32 +952,42 @@
             height: 100%;
         }
         
-        /* Widgets Container */
+       /* Widgets Container - Keep your existing forced height */
 .widgets-container {
   display: flex;
-  flex-wrap: wrap;
   gap: 1rem;
   width: 100%;
+  height: 65vh; /* Your forced height */
+  margin: 2rem 0;
 }
 
-.widget {
-  flex: 1 1 45%; /* Adjust width as needed */
-  min-width: 300px;
+/* Sector Widget (30%) */
+.widget:nth-child(1) {
+  flex: 0 0 30%; /* 30% width, no grow/shrink */
+  height: 100%;
 }
 
+/* Heatmap Widget (70%) */
+.widget:nth-child(2) {
+  flex: 0 0 70%; /* 70% width, no grow/shrink */
+  height: 100%;
+}
+
+/* TradingView Overrides (keep your existing fixes) */
+.tradingview-widget-container,
+.tradingview-widget-container > div,
+.tradingview-widget-container iframe {
+  height: 100% !important;
+  width: 100% !important;
+}
+
+/* Mobile Stacking */
 @media (max-width: 768px) {
-  .widget {
-    flex-basis: 100%;
+  .widget:nth-child(1),
+  .widget:nth-child(2) {
+    flex: 0 0 100% !important; /* Full width on mobile */
+    height: 400px; /* Fixed height for mobile */
   }
-}
-
-.widget {
-  flex: 1 1 45%;
-  min-width: 300px;
-  height: 100%; /* Ensure widgets fill container height */
-}
-.tradingview-widget-container {
-  height: 100% !important; /* Override any inline styles */
 }
 
         /* === RESPONSIVE ADJUSTMENTS === */
