@@ -785,6 +785,28 @@
             transform: scale(1.05);
         }
 
+        /* === SLIDING WIDGET === */
+.sliding-widget {
+    position: fixed;
+    left: -450px; /* Start hidden off-screen (matches widget width) */
+    top: 250px; /* Below header */
+    width: 450px; /* Match widget width */
+    height: 600px; /* Match widget height */
+    z-index: 110; /* Above other elements */
+    transition: left 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.sliding-widget.visible {
+    left: 20px; /* Slide into view */
+}
+
+.tradingview-widget-container {
+    width: 100% !important;
+    height: 100% !important;
+}
+
         /* === TICKER TAPE === */
         .ticker-tape-container {
             width: 100%;
@@ -949,7 +971,7 @@
             height: 100%;
         }
         
-        
+
         /* === RESPONSIVE ADJUSTMENTS === */
         @media (max-width: 1600px) {
             .sector-grid {
@@ -1214,6 +1236,53 @@
 
     <!-- Random Ticker Box -->
     <div class="random-ticker-box">
+        <!-- BSE Sector Indices Widget -->
+<div class="sliding-widget" id="slidingWidget">
+  <div class="tradingview-widget-container">
+    <div class="tradingview-widget-container__widget"></div>
+    <div class="tradingview-widget-copyright">
+      <a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank">
+        Track all markets on TradingView
+      </a>
+    </div>
+    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-quotes.js" async>
+    {
+      "width": "100%",
+      "height": "100%",
+      "symbolsGroups": [
+        {
+          "name": "BSE Sector Indices",
+          "originalName": "BSE Sector Indices",
+          "symbols": [
+            { "name": "BSE:AUTO", "displayName": "BSEAUTO" },
+            { "name": "BSE:BANK", "displayName": "BSE BANKEX" },
+            { "name": "BSE:CD", "displayName": "BSE CONSUMER DURABLES" },
+            { "name": "BSE:CG", "displayName": "BSE CAPITAL GOODS" },
+            { "name": "BSE:COMDTY", "displayName": "BSE Commodities" },
+            { "name": "BSE:ENERGY", "displayName": "BSE Energy" },
+            { "name": "BSE:FINSER", "displayName": "BSE Financial Services" },
+            { "name": "BSE:INDSTR", "displayName": "BSE Industrials" },
+            { "name": "BSE:TELCOM", "displayName": "BSE Telecommunication" },
+            { "name": "BSE:UTILS", "displayName": "BSE Utilities" },
+            { "name": "BSE:FMCG", "displayName": "BSE FMCG" },
+            { "name": "BSE:HC", "displayName": "BSE Healthcare" },
+            { "name": "BSE:IT", "displayName": "BSE IT" },
+            { "name": "BSE:METAL", "displayName": "BSE METAL" },
+            { "name": "BSE:OILGAS", "displayName": "BSE OIL & GAS" },
+            { "name": "BSE:POWER", "displayName": "BSE POWER" },
+            { "name": "BSE:REALTY", "displayName": "BSE REALTY" },
+            { "name": "BSE:BSESER", "displayName": "BSE Services" }
+          ]
+        }
+      ],
+      "showSymbolLogo": false,
+      "isTransparent": false,
+      "colorTheme": "dark",
+      "locale": "en"
+    }
+    </script>
+  </div>
+</div>
         <div class="random-ticker-label">Random Ticker</div>
         <div class="random-ticker-value" id="randomTicker">RELIANCE</div>
     </div>
@@ -1587,6 +1656,14 @@
                 }
             }
         });
+
+        // Sliding Widget Toggle (Ctrl+Shift+X)
+document.addEventListener('keydown', (e) => {
+    if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'x') {
+        e.preventDefault();
+        document.getElementById('slidingWidget').classList.toggle('visible');
+    }
+});
 
         // Initialize watchlist visibility from localStorage
         const savedVisibility = localStorage.getItem('watchlistVisible');
