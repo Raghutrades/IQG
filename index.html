@@ -1216,20 +1216,16 @@
     </div>
 
 
-<!-- ===== SECTOR + HEATMAP WIDGETS ===== -->
+<!-- ===== SECTOR + HEATMAP WIDGETS (Widgets Only) ===== -->
 <div style="display: flex; gap: 20px; margin: 20px auto; max-width: 1200px; padding: 0 20px;">
-  <!-- Left: Sector Widget (Height Increased to 650px) -->
+  <!-- Left: Sector Widget -->
   <div style="flex: 1;">
-    <!-- TradingView Widget BEGIN -->
-    <div class="tradingview-widget-container" style="height: 650px;">  <!-- 👈 Height added here -->
+    <div class="tradingview-widget-container" style="height: 750px;">
       <div class="tradingview-widget-container__widget"></div>
-      <div class="tradingview-widget-copyright">
-        <a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank" style="color: #00bcd4;">Track all markets on TradingView</a>
-      </div>
       <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-quotes.js" async>
       {
         "width": "100%",
-        "height": "650",  <!-- 👈 Match container height -->
+        "height": "750",
         "symbolsGroups": [
           {
             "name": "BSE Sector Indices",
@@ -1264,15 +1260,12 @@
       }
       </script>
     </div>
-    <!-- TradingView Widget END -->
   </div>
 
-  <!-- Right: Heatmap Widget (Height Increased to 650px) -->
+  <!-- Right: Heatmap Widget -->
   <div style="flex: 1;">
-    <!-- TradingView Widget BEGIN -->
-    <div class="tradingview-widget-container" style="height: 650px;">  <!-- 👈 Height added here -->
+    <div class="tradingview-widget-container" style="height: 750px;">
       <div class="tradingview-widget-container__widget"></div>
-      <div class="tradingview-widget-copyright"><a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank"><span class="blue-text">Track all markets on TradingView</span></a></div>
       <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js" async>
       {
         "exchanges": [],
@@ -1289,11 +1282,13 @@
         "hasSymbolTooltip": true,
         "isMonoSize": true,
         "width": "100%",
-        "height": "650"  <!-- 👈 Match container height -->
+        "height": "750"
       }
       </script>
     </div>
-    <!-- TradingView Widget END -->
+  </div>
+</div>
+    <!-- TradingView sector and heatmap Widget END -->
   </div>
 </div>
         
