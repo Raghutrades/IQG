@@ -971,6 +971,15 @@
   }
 }
 
+.widget {
+  flex: 1 1 45%;
+  min-width: 300px;
+  height: 100%; /* Ensure widgets fill container height */
+}
+.tradingview-widget-container {
+  height: 100% !important; /* Override any inline styles */
+}
+
         /* === RESPONSIVE ADJUSTMENTS === */
         @media (max-width: 1600px) {
             .sector-grid {
