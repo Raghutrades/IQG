@@ -800,6 +800,20 @@
             height: auto !important;
         }
 
+<!-- ===== FULL HEIGHT HEATMAP WIDGET ===== -->
+
+  .heatmap-wrapper {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 0 20px;
+    height: 1000px;
+  }
+
+  .heatmap-widget {
+    height: 100%;
+    width: 100%;
+  }
+
 
 
                  
@@ -1217,10 +1231,9 @@
 <!-- TradingView Widget END -->
     </div>
 
-<!-- ===== FULL-WIDTH HEATMAP WIDGET ===== -->
-<div style="max-width: 1200px; margin: 20px auto; padding: 0 20px;">
+<div class="heatmap-wrapper">
   <!-- TradingView Widget BEGIN -->
-  <div class="tradingview-widget-container" style="height: 1000px; width: 100%;">
+  <div class="tradingview-widget-container heatmap-widget">
     <div class="tradingview-widget-container__widget"></div>
     <div class="tradingview-widget-copyright">
       <a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank" style="color: #00bcd4;">
@@ -1249,6 +1262,7 @@
   </div>
   <!-- TradingView Widget END -->
 </div>
+ 
 
 
         
