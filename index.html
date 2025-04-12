@@ -949,47 +949,7 @@
             height: 100%;
         }
         
-        /* === BSE WIDGET TOGGLE === */
-.bse-widget-toggle {
-  grid-column: span 2; /* Double-width sector */
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  overflow: hidden;
-  transform: translateX(-110%);
-  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-  position: relative;
-  z-index: 90;
-}
-
-.bse-widget-toggle.visible {
-  transform: translateX(0);
-}
-
-/* Grid adjustment classes */
-.sector-grid.compact {
-  grid-template-columns: repeat(3, 1fr) !important;
-  transition: all 0.4s ease;
-}
-
-.shortcut-hint {
-  position: fixed;
-  left: 10px;
-  top: 50%;
-  background: var(--accent);
-  color: white;
-  padding: 6px 10px;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  opacity: 0;
-  transition: all 0.3s ease;
-  z-index: 80;
-}
-
-.shortcut-hint.visible {
-  opacity: 0.7;
-}
-
+        
         /* === RESPONSIVE ADJUSTMENTS === */
         @media (max-width: 1600px) {
             .sector-grid {
@@ -1280,47 +1240,9 @@
     </div>
     
     <!-- Sector Grid -->
-<div class="sector-grid" id="sectorGrid">
-  <!-- BSE Widget (Hidden by default) -->
-  <div class="bse-widget-toggle" id="bseWidget">
-    <div class="tradingview-widget-container" style="height:100%;width:100%">
-      <div class="tradingview-widget-container__widget"></div>
-      <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-quotes.js" async>
-      {
-        "width": "100%",
-        "height": "100%",
-        "symbolsGroups": [{
-          "name": "BSE Sectors",
-          "symbols": [
-            { "name": "BSE:AUTO", "displayName": "AUTO" },
-            { "name": "BSE:BANK", "displayName": "BANKEX" },
-            { "name": "BSE:CD", "displayName": "CONSUMER DURABLES" },
-            { "name": "BSE:CG", "displayName": "CAPITAL GOODS" },
-            { "name": "BSE:COMDTY", "displayName": "COMMODITIES" },
-            { "name": "BSE:ENERGY", "displayName": "ENERGY" },
-            { "name": "BSE:FINSER", "displayName": "FINANCIAL SERVICES" },
-            { "name": "BSE:INDSTR", "displayName": "INDUSTRIALS" },
-            { "name": "BSE:TELCOM", "displayName": "TELECOM" },
-            { "name": "BSE:UTILS", "displayName": "UTILITIES" },
-            { "name": "BSE:FMCG", "displayName": "FMCG" },
-            { "name": "BSE:HC", "displayName": "HEALTHCARE" },
-            { "name": "BSE:IT", "displayName": "IT" },
-            { "name": "BSE:METAL", "displayName": "METAL" },
-            { "name": "BSE:OILGAS", "displayName": "OIL & GAS" },
-            { "name": "BSE:POWER", "displayName": "POWER" },
-            { "name": "BSE:REALTY", "displayName": "REALTY" },
-            { "name": "BSE:BSESER", "displayName": "SERVICES" }
-          ]
-        }
-      ],
-        "showSymbolLogo": false,
-        "isTransparent": false,
-        "colorTheme": "dark",
-        "locale": "en"
-      }
-      </script>
+    <div class="sector-grid" id="sectorGrid">
+        <!-- Sectors will be inserted here by JavaScript -->
     </div>
-  </div>
     
     <!-- Enhanced Trading Calculator -->
     <div class="calculator-container">
@@ -1603,45 +1525,6 @@
                 </tr>
             `).join('');
         }
-
-        // BSE Widget Toggle Functionality
-let bseWidgetVisible = false;
-
-function toggleBSEWidget() {
-  const widget = document.getElementById('bseWidget');
-  const sectorGrid = document.getElementById('sectorGrid');
-  const shortcutHint = document.getElementById('shortcutHint');
-  
-  bseWidgetVisible = !bseWidgetVisible;
-  
-  if (bseWidgetVisible) {
-    widget.classList.add('visible');
-    sectorGrid.classList.add('compact');
-    shortcutHint.style.opacity = '0';
-    setTimeout(() => shortcutHint.style.display = 'none', 300);
-  } else {
-    widget.classList.remove('visible');
-    sectorGrid.classList.remove('compact');
-    shortcutHint.style.display = 'block';
-    setTimeout(() => shortcutHint.style.opacity = '0.7', 100);
-  }
-}
-
-// Keyboard Shortcut (Ctrl+Shift+X)
-document.addEventListener('keydown', (e) => {
-  if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'x') {
-    e.preventDefault();
-    toggleBSEWidget();
-  }
-});
-
-// Initialize with widget hidden
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('bseWidget').style.transition = 'none';
-  setTimeout(() => {
-    document.getElementById('bseWidget').style.transition = '';
-  }, 100);
-});
 
         // ===== DRAGGABLE WATCHLIST =====
         const watchlistPanel = document.getElementById('watchlistPanel');
