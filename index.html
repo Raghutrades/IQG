@@ -828,6 +828,27 @@
         .tradingview-widget-container {
             height: auto !important;
         }
+
+        /* === BSE SECTOR WIDGET === */
+.bse-widget-container {
+    width: 100%;
+    height: 200px; /* Adjust this height as needed */
+    margin: 0 auto 1rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    display: none; /* Hidden by default */
+}
+
+.bse-widget-container.visible {
+    display: block; /* Show when toggled */
+}
+
+.bse-widget-container .tradingview-widget-container {
+    width: 100% !important;
+    height: 100% !important;
+}
               
         /* === SCAN MODE BUTTON (NEW DESIGN) === */
         .scan-mode-toggle {
@@ -1661,17 +1682,11 @@
             }
         });
 
-        // Sliding Widget Toggle (Ctrl+Shift+X)
+        // BSE Widget Toggle (Ctrl+Shift+X)
 document.addEventListener('keydown', (e) => {
     if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'x') {
         e.preventDefault();
-        const widget = document.getElementById('slidingWidget');
-        widget.classList.toggle('visible');
-        
-        // Force hide completely when not visible
-        if (!widget.classList.contains('visible')) {
-            widget.style.left = '-100vw';
-        }
+        document.getElementById('bseWidget').classList.toggle('visible');
     }
 });
 
