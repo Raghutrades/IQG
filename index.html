@@ -958,27 +958,37 @@
   flex-wrap: wrap;
   gap: 1rem;
   width: 100%;
+  height: 75vh; /* or any desired height like 50vh */
 }
 
-.widget {
-  flex: 1 1 45%; /* Adjust width as needed */
+/* Sector Widget - 30% width */
+.sector-widget {
+  flex: 0 0 30%;
   min-width: 300px;
+  height: 100%;
 }
 
+/* Heatmap Widget - 70% width */
+.heatmap-widget {
+  flex: 0 0 70%;
+  min-width: 300px;
+  height: 100%;
+}
+
+/* Make both responsive on small screens */
 @media (max-width: 768px) {
-  .widget {
-    flex-basis: 100%;
+  .sector-widget,
+  .heatmap-widget {
+    flex: 0 0 100%;
   }
 }
 
-.widget {
-  flex: 1 1 45%;
-  min-width: 300px;
-  height: 100%; /* Ensure widgets fill container height */
-}
+/* Ensure embedded widget containers stretch */
 .tradingview-widget-container {
-  height: 100% !important; /* Override any inline styles */
+  height: 100% !important;
+  width: 100% !important;
 }
+
 
         /* === RESPONSIVE ADJUSTMENTS === */
         @media (max-width: 1600px) {
