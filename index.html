@@ -1234,7 +1234,38 @@
     </div>
 
 
-        <!-- ===== START: ADDED WIDGETS ===== -->
+        
+
+    <!-- Random Ticker Box -->
+    <div class="random-ticker-box">
+        
+        <div class="random-ticker-label">Random Ticker</div>
+        <div class="random-ticker-value" id="randomTicker">RELIANCE</div>
+    </div>
+    
+    <!-- Watchlist Panel -->
+    <div class="watchlist-panel" id="watchlistPanel" title="Drag to move | Ctrl+Shift+Z to toggle">
+        <button class="close-watchlist" id="closeWatchlist" title="Close Watchlist">×</button>
+        <div class="watchlist-header">
+            <h3>⭐ Your Watchlist</h3>
+            <button class="clear-all-btn" id="clearWatchlist" title="Clear All (Ctrl+Shift+Del)">
+                ✕ Clear All
+            </button>
+        </div>
+        <table class="watchlist-table" id="watchlistTable">
+            <thead>
+                <tr>
+                    <th>Ticker</th>
+                    <th>Sector</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="watchlistBody"></tbody>
+        </table>
+    </div>
+    
+
+    <!-- ===== START: ADDED WIDGETS ===== -->
 <div class="widgets-container" style="margin: 2rem 0; height: 100vh;">
   <!-- Sector Widget -->
   <div class="widget">
@@ -1308,34 +1339,7 @@
 </div>
 <!-- ===== END: ADDED WIDGETS ===== -->
 
-    <!-- Random Ticker Box -->
-    <div class="random-ticker-box">
-        
-        <div class="random-ticker-label">Random Ticker</div>
-        <div class="random-ticker-value" id="randomTicker">RELIANCE</div>
-    </div>
-    
-    <!-- Watchlist Panel -->
-    <div class="watchlist-panel" id="watchlistPanel" title="Drag to move | Ctrl+Shift+Z to toggle">
-        <button class="close-watchlist" id="closeWatchlist" title="Close Watchlist">×</button>
-        <div class="watchlist-header">
-            <h3>⭐ Your Watchlist</h3>
-            <button class="clear-all-btn" id="clearWatchlist" title="Clear All (Ctrl+Shift+Del)">
-                ✕ Clear All
-            </button>
-        </div>
-        <table class="watchlist-table" id="watchlistTable">
-            <thead>
-                <tr>
-                    <th>Ticker</th>
-                    <th>Sector</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody id="watchlistBody"></tbody>
-        </table>
-    </div>
-    
+
     <!-- Sector Grid -->
     <div class="sector-grid" id="sectorGrid">
         <!-- Sectors will be inserted here by JavaScript -->
