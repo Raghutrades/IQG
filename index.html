@@ -1195,77 +1195,8 @@
         <div id="searchResults" class="search-results"></div>
     </div>
     
-    <!-- Ticker Tape Widget -->
-    <div class="ticker-tape-container">
-        <!-- TradingView Widget BEGIN -->
-        <div class="tradingview-widget-container">
-            <div class="tradingview-widget-container__widget"></div>
-            <div class="tradingview-widget-copyright">
-                <a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank">
-                
-                </a>
-            </div>
-            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
-            {
-                "symbols": [
-                    { "description": "Sensex", "proName": "BSE:SENSEX" },
-                    { "description": "Bankex", "proName": "BSE:BANK" },
-                    { "description": "BSE IT", "proName": "BSE:FOCIT" },
-                    { "description": "Reliance", "proName": "BSE:RELIANCE" },
-                    { "description": "HDFC Bank", "proName": "BSE:HDFCBANK" },
-                    { "description": "ICICI Bank", "proName": "BSE:ICICIBANK" },
-                    { "description": "Infosys", "proName": "BSE:INFY" },
-                    { "description": "L&T", "proName": "BSE:LT" },
-                    { "description": "TCS", "proName": "BSE:TCS" },
-                    { "description": "SBI", "proName": "BSE:SBIN" },
-                    { "description": "ITC", "proName": "BSE:ITC" },
-                    { "description": "Airtel", "proName": "BSE:BHARTIARTL" },
-                    { "description": "Axis Bank", "proName": "BSE:AXISBANK" }
-                ],
-                "showSymbolLogo": true,
-                "isTransparent": false,
-                "displayMode": "adaptive",
-                "colorTheme": "dark",
-                "locale": "en"
-            }
-            </script>
-        </div>
-<!-- TradingView Widget END -->
-    </div>
 
-
-        
-
-    <!-- Random Ticker Box -->
-    <div class="random-ticker-box">
-        
-        <div class="random-ticker-label">Random Ticker</div>
-        <div class="random-ticker-value" id="randomTicker">RELIANCE</div>
-    </div>
-    
-    <!-- Watchlist Panel -->
-    <div class="watchlist-panel" id="watchlistPanel" title="Drag to move | Ctrl+Shift+Z to toggle">
-        <button class="close-watchlist" id="closeWatchlist" title="Close Watchlist">×</button>
-        <div class="watchlist-header">
-            <h3>⭐ Your Watchlist</h3>
-            <button class="clear-all-btn" id="clearWatchlist" title="Clear All (Ctrl+Shift+Del)">
-                ✕ Clear All
-            </button>
-        </div>
-        <table class="watchlist-table" id="watchlistTable">
-            <thead>
-                <tr>
-                    <th>Ticker</th>
-                    <th>Sector</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody id="watchlistBody"></tbody>
-        </table>
-    </div>
-    
-
-    <!-- ===== START: ADDED WIDGETS ===== -->
+        <!-- ===== START: ADDED WIDGETS ===== -->
 <div class="widgets-container" style="margin: 2rem 0; height: 100vh;">
   <!-- Sector Widget -->
   <div class="widget">
@@ -1338,6 +1269,77 @@
   </div>
 </div>
 <!-- ===== END: ADDED WIDGETS ===== -->
+
+
+    <!-- Ticker Tape Widget -->
+    <div class="ticker-tape-container">
+        <!-- TradingView Widget BEGIN -->
+        <div class="tradingview-widget-container">
+            <div class="tradingview-widget-container__widget"></div>
+            <div class="tradingview-widget-copyright">
+                <a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank">
+                
+                </a>
+            </div>
+            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
+            {
+                "symbols": [
+                    { "description": "Sensex", "proName": "BSE:SENSEX" },
+                    { "description": "Bankex", "proName": "BSE:BANK" },
+                    { "description": "BSE IT", "proName": "BSE:FOCIT" },
+                    { "description": "Reliance", "proName": "BSE:RELIANCE" },
+                    { "description": "HDFC Bank", "proName": "BSE:HDFCBANK" },
+                    { "description": "ICICI Bank", "proName": "BSE:ICICIBANK" },
+                    { "description": "Infosys", "proName": "BSE:INFY" },
+                    { "description": "L&T", "proName": "BSE:LT" },
+                    { "description": "TCS", "proName": "BSE:TCS" },
+                    { "description": "SBI", "proName": "BSE:SBIN" },
+                    { "description": "ITC", "proName": "BSE:ITC" },
+                    { "description": "Airtel", "proName": "BSE:BHARTIARTL" },
+                    { "description": "Axis Bank", "proName": "BSE:AXISBANK" }
+                ],
+                "showSymbolLogo": true,
+                "isTransparent": false,
+                "displayMode": "adaptive",
+                "colorTheme": "dark",
+                "locale": "en"
+            }
+            </script>
+        </div>
+<!-- TradingView Widget END -->
+    </div>
+
+
+        
+
+    <!-- Random Ticker Box -->
+    <div class="random-ticker-box">
+        
+        <div class="random-ticker-label">Random Ticker</div>
+        <div class="random-ticker-value" id="randomTicker">RELIANCE</div>
+    </div>
+    
+    <!-- Watchlist Panel -->
+    <div class="watchlist-panel" id="watchlistPanel" title="Drag to move | Ctrl+Shift+Z to toggle">
+        <button class="close-watchlist" id="closeWatchlist" title="Close Watchlist">×</button>
+        <div class="watchlist-header">
+            <h3>⭐ Your Watchlist</h3>
+            <button class="clear-all-btn" id="clearWatchlist" title="Clear All (Ctrl+Shift+Del)">
+                ✕ Clear All
+            </button>
+        </div>
+        <table class="watchlist-table" id="watchlistTable">
+            <thead>
+                <tr>
+                    <th>Ticker</th>
+                    <th>Sector</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="watchlistBody"></tbody>
+        </table>
+    </div>
+    
 
 
     <!-- Sector Grid -->
