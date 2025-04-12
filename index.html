@@ -958,36 +958,43 @@
   flex-wrap: wrap;
   gap: 1rem;
   width: 100%;
-  height: 75vh; /* or any desired height like 50vh */
+  height: 75vh; /* Optional: Set a shared height for both widgets */
 }
 
-/* Sector Widget - 30% width */
+/* Base widget style */
+.widget {
+  flex: 1 1 45%; /* Default fallback */
+  min-width: 300px;
+  height: 100%; /* Ensure widgets fill container height */
+}
+
+/* Sector widget - 40% width */
 .sector-widget {
-  flex: 0 0 30%;
-  min-width: 300px;
+  flex: 0 0 40%;
   height: 100%;
 }
 
-/* Heatmap Widget - 70% width */
+/* Heatmap widget - 60% width */
 .heatmap-widget {
-  flex: 0 0 70%;
-  min-width: 300px;
+  flex: 0 0 60%;
   height: 100%;
 }
 
-/* Make both responsive on small screens */
+/* Responsive: stack vertically on small screens */
 @media (max-width: 768px) {
+  .widget,
   .sector-widget,
   .heatmap-widget {
     flex: 0 0 100%;
   }
 }
 
-/* Ensure embedded widget containers stretch */
+/* Ensure embedded TradingView containers fill the widget area */
 .tradingview-widget-container {
   height: 100% !important;
   width: 100% !important;
 }
+
 
 
         /* === RESPONSIVE ADJUSTMENTS === */
