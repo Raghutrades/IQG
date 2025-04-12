@@ -800,19 +800,24 @@
             height: auto !important;
         }
 
-<!-- ===== FULL HEIGHT HEATMAP WIDGET ===== -->
+ <!-- ===== HEATMAP WIDGET FULL WIDTH + TALL HEIGHT ===== -->
 
-  .heatmap-wrapper {
+  .heatmap-full {
     max-width: 1200px;
+    height: 1000px;
     margin: 20px auto;
     padding: 0 20px;
-    height: 1000px;
   }
 
-  .heatmap-widget {
-    height: 100%;
+  .heatmap-full .tradingview-widget-container {
     width: 100%;
+    height: 100%;
   }
+
+  .tradingview-widget-container__widget {
+    height: 100% !important;
+  }
+
 
 
 
