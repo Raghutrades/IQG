@@ -800,36 +800,7 @@
             height: auto !important;
         }
 
-<style>
-  .widget-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    padding: 20px;
-    max-width: 1200px;
-    margin: auto;
-  }
 
-  .sector-widget,
-  .heatmap-widget {
-    height: 1000px;
-  }
-
-  .sector-widget {
-    flex: 0 0 30%;
-  }
-
-  .heatmap-widget {
-    flex: 0 0 70%;
-  }
-
-  @media (max-width: 768px) {
-    .sector-widget,
-    .heatmap-widget {
-      flex: 0 0 100%;
-    }
-  }
-</style>
 
                  
         /* === SCAN MODE BUTTON (NEW DESIGN) === */
@@ -1248,55 +1219,7 @@
 
 
 <!-- ===== SECTOR + HEATMAP WIDGETS (Widgets Only) ===== -->
-<div class="widget-row">
-  <!-- Sector Widget -->
-  <div class="sector-widget">
-    <div class="tradingview-widget-container">
-      <div class="tradingview-widget-container__widget"></div>
-      <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-quotes.js" async>
-      {
-        "width": "100%",
-        "height": "1000",
-        "symbolsGroups": [
-          {
-            "name": "BSE Sector Indices",
-            "symbols": [
-              { "name": "BSE:AUTO", "displayName": "BSEAUTO" },
-              { "name": "BSE:BANK", "displayName": "BSE BANKEX" },
-              { "name": "BSE:FMCG", "displayName": "BSE FMCG" },
-              { "name": "BSE:IT", "displayName": "BSE IT" },
-              { "name": "BSE:HC", "displayName": "BSE Healthcare" },
-              { "name": "BSE:METAL", "displayName": "BSE METAL" }
-            ]
-          }
-        ],
-        "colorTheme": "dark",
-        "isTransparent": false,
-        "locale": "en"
-      }
-      </script>
-    </div>
-  </div>
 
-  <!-- Heatmap Widget -->
-  <div class="heatmap-widget">
-    <div class="tradingview-widget-container">
-      <div class="tradingview-widget-container__widget"></div>
-      <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js" async>
-      {
-        "dataSource": "SENSEX",
-        "grouping": "sector",
-        "blockSize": "market_cap_basic",
-        "blockColor": "change",
-        "locale": "en",
-        "colorTheme": "dark",
-        "width": "100%",
-        "height": "1000"
-      }
-      </script>
-    </div>
-  </div>
-</div>
 
         
 
