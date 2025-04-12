@@ -788,23 +788,32 @@
         /* === SLIDING WIDGET === */
 .sliding-widget {
     position: fixed;
-    left: -450px; /* Start hidden off-screen (matches widget width) */
-    top: 250px; /* Below header */
-    width: 450px; /* Match widget width */
-    height: 600px; /* Match widget height */
-    z-index: 110; /* Above other elements */
-    transition: left 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    left: -100vw; /* COMPLETELY off-screen */
+    top: 150px; /* Below header */
+    width: calc(40% - 40px); /* Matches sectors 1+2+6+7 combined width */
+    height: 840px; /* Double sector height (420px x 2) */
+    z-index: 110;
+    transition: left 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); /* Smooth elastic animation */
     border-radius: 12px;
     overflow: hidden;
+    box-shadow: 0 0 30px rgba(0,0,0,0.3);
+    background: var(--card);
+    border: 1px solid var(--border);
 }
 
 .sliding-widget.visible {
-    left: 20px; /* Slide into view */
+    left: 20px; /* Slides exactly into position */
 }
 
 .tradingview-widget-container {
     width: 100% !important;
     height: 100% !important;
+    min-height: 840px !important; /* Ensure full content shows */
+}
+
+.tradingview-widget-container__widget {
+    overflow: hidden !important;
+    border-radius: 10px !important;
 }
 
         /* === TICKER TAPE === */
@@ -1240,11 +1249,6 @@
 <div class="sliding-widget" id="slidingWidget">
   <div class="tradingview-widget-container">
     <div class="tradingview-widget-container__widget"></div>
-    <div class="tradingview-widget-copyright">
-      <a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank">
-        Track all markets on TradingView
-      </a>
-    </div>
     <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-quotes.js" async>
     {
       "width": "100%",
@@ -1275,7 +1279,7 @@
           ]
         }
       ],
-      "showSymbolLogo": false,
+      "showSymbolLogo": true,
       "isTransparent": false,
       "colorTheme": "dark",
       "locale": "en"
@@ -1661,7 +1665,13 @@
 document.addEventListener('keydown', (e) => {
     if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'x') {
         e.preventDefault();
-        document.getElementById('slidingWidget').classList.toggle('visible');
+        const widget = document.getElementById('slidingWidget');
+        widget.classList.toggle('visible');
+        
+        // Force hide completely when not visible
+        if (!widget.classList.contains('visible')) {
+            widget.style.left = '-100vw';
+        }
     }
 });
 
