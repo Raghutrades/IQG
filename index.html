@@ -785,36 +785,7 @@
             transform: scale(1.05);
         }
 
-        /* === SLIDING WIDGET === */
-.sliding-widget {
-    position: fixed;
-    left: -100vw; /* COMPLETELY off-screen */
-    top: 150px; /* Below header */
-    width: calc(40% - 40px); /* Matches sectors 1+2+6+7 combined width */
-    height: 840px; /* Double sector height (420px x 2) */
-    z-index: 110;
-    transition: left 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); /* Smooth elastic animation */
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 0 30px rgba(0,0,0,0.3);
-    background: var(--card);
-    border: 1px solid var(--border);
-}
-
-.sliding-widget.visible {
-    left: 20px; /* Slides exactly into position */
-}
-
-.tradingview-widget-container {
-    width: 100% !important;
-    height: 100% !important;
-    min-height: 840px !important; /* Ensure full content shows */
-}
-
-.tradingview-widget-container__widget {
-    overflow: hidden !important;
-    border-radius: 10px !important;
-}
+        
 
         /* === TICKER TAPE === */
         .ticker-tape-container {
@@ -829,29 +800,7 @@
             height: auto !important;
         }
 
-        /* === BSE SECTOR WIDGET === */
-.bse-widget-container {
-    width: calc(100% - 4rem); /* Matches sector grid padding */
-    height: 300px; /* Fills the empty space nicely */
-    margin: 0 auto 2rem; /* Centers and adds space below */
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-    display: none; /* Hidden by default */
-}
-
-.bse-widget-container.visible {
-    display: block; /* Show when toggled */
-}
-
-.bse-widget-container .tradingview-widget-container {
-    width: 100% !important;
-    height: 100% !important;
-    min-height: 300px !important;
-}
-              
+                 
         /* === SCAN MODE BUTTON (NEW DESIGN) === */
         .scan-mode-toggle {
             position: fixed;
@@ -1268,48 +1217,7 @@
 
     <!-- Random Ticker Box -->
     <div class="random-ticker-box">
-        <!-- BSE Sector Indices Widget -->
-<div class="bse-widget-container" id="bseWidget">
-  <div class="tradingview-widget-container">
-    <div class="tradingview-widget-container__widget"></div>
-    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-quotes.js" async>
-    {
-      "width": "100%",
-      "height": "100%",
-      "symbolsGroups": [
-        {
-          "name": "BSE Sector Indices",
-          "originalName": "BSE Sector Indices",
-          "symbols": [
-            { "name": "BSE:AUTO", "displayName": "BSEAUTO" },
-            { "name": "BSE:BANK", "displayName": "BSE BANKEX" },
-            { "name": "BSE:CD", "displayName": "BSE CONSUMER DURABLES" },
-            { "name": "BSE:CG", "displayName": "BSE CAPITAL GOODS" },
-            { "name": "BSE:COMDTY", "displayName": "BSE Commodities" },
-            { "name": "BSE:ENERGY", "displayName": "BSE Energy" },
-            { "name": "BSE:FINSER", "displayName": "BSE Financial Services" },
-            { "name": "BSE:INDSTR", "displayName": "BSE Industrials" },
-            { "name": "BSE:TELCOM", "displayName": "BSE Telecommunication" },
-            { "name": "BSE:UTILS", "displayName": "BSE Utilities" },
-            { "name": "BSE:FMCG", "displayName": "BSE FMCG" },
-            { "name": "BSE:HC", "displayName": "BSE Healthcare" },
-            { "name": "BSE:IT", "displayName": "BSE IT" },
-            { "name": "BSE:METAL", "displayName": "BSE METAL" },
-            { "name": "BSE:OILGAS", "displayName": "BSE OIL & GAS" },
-            { "name": "BSE:POWER", "displayName": "BSE POWER" },
-            { "name": "BSE:REALTY", "displayName": "BSE REALTY" },
-            { "name": "BSE:BSESER", "displayName": "BSE Services" }
-          ]
-        }
-      ],
-      "showSymbolLogo": true,
-      "isTransparent": false,
-      "colorTheme": "dark",
-      "locale": "en"
-    }
-    </script>
-  </div>
-</div>
+        
         <div class="random-ticker-label">Random Ticker</div>
         <div class="random-ticker-value" id="randomTicker">RELIANCE</div>
     </div>
@@ -1684,13 +1592,6 @@
             }
         });
 
-        // BSE Widget Toggle (Ctrl+Shift+X)
-document.addEventListener('keydown', (e) => {
-    if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'x') {
-        e.preventDefault();
-        document.getElementById('bseWidget').classList.toggle('visible');
-    }
-});
 
         // Initialize watchlist visibility from localStorage
         const savedVisibility = localStorage.getItem('watchlistVisible');
