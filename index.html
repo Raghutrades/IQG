@@ -2595,32 +2595,31 @@ function exportExcelWithData() {
         // ===== RANDOM TICKER BOX =====
         function initRandomTicker() {
     const tickerBox = document.getElementById('randomTicker');
-    const allStocks = [...new Set(Object.values(sectorData).flat())]; // All unique tickers
+    if (!tickerBox) {
+        console.error("Error: #randomTicker element not found!");
+        return;
+    }
 
-    // Clear old interval to avoid duplicates
+    const allStocks = Object.values(sectorData).flat();
+    if (allStocks.length === 0) {
+        console.error("Error: sectorData is empty!");
+        return;
+    }
+
+    // Clear old interval
     if (window.tickerInterval) clearInterval(window.tickerInterval);
 
-    // Update ticker with animation
+    // Update function with debug
     const updateTicker = () => {
+        console.log("Updating ticker at:", new Date().toLocaleTimeString());
         const randomStock = allStocks[Math.floor(Math.random() * allStocks.length)];
         tickerBox.textContent = randomStock;
-        tickerBox.dataset.ticker = randomStock; // Store for click action
-        tickerBox.classList.add('shuffle'); // Add animation
-        setTimeout(() => tickerBox.classList.remove('shuffle'), 500); // Remove after animation
+        tickerBox.dataset.ticker = randomStock;
     };
 
-    // Run now + every 12 seconds
+    // Start updates
     updateTicker();
     window.tickerInterval = setInterval(updateTicker, 12000);
-
-    // Click to open TradingView
-    tickerBox.onclick = () => openTradingViewWindow(tickerBox.dataset.ticker);
-
-    // Pause on hover
-    tickerBox.addEventListener('mouseenter', () => clearInterval(window.tickerInterval));
-    tickerBox.addEventListener('mouseleave', () => {
-        if (!window.tickerInterval) initRandomTicker(); // Restart if stopped
-    });
 }
 
         // ===== HOVER TO CHART FUNCTIONALITY =====
