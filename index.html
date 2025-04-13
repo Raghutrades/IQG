@@ -2167,21 +2167,19 @@ function getTradeData() {
 }
 
                 // ===== INITIALIZE PAGE =====
-document.addEventListener('DOMContentLoaded', function() {
-    initThemeToggle();
-    initDateTime();
-    initTagline();
-    initSectorGrid();
-    initQuotes();
-    initCalculator();
-    initTradeMultiplier();  // This already calls setupTickerAutocomplete() internally
-    initCollapsibleSections();
-    initRandomTicker();
-    updateWatchlistUI();
-    setupHoverToChart();
-    initCharCounters();
-            
-
+        document.addEventListener('DOMContentLoaded', function() {
+            initThemeToggle();
+            initDateTime();
+            initTagline();
+            initSectorGrid();
+            initQuotes();
+            initCalculator();
+            initTradeMultiplier();
+            initCollapsibleSections();
+            initRandomTicker();
+            updateWatchlistUI();
+            setupHoverToChart();
+            initCharCounters();
             
             // Ensure sector grid is visible
             document.getElementById('sectorGrid').style.display = 'grid';
@@ -2375,7 +2373,7 @@ document.addEventListener('DOMContentLoaded', function() {
             setInterval(showRandomQuote, 10000);
         }
         
-       // ===== TRADE MULTIPLIER =====
+        // ===== TRADE MULTIPLIER =====
 function initTradeMultiplier() {
     const tradeMultiplier = document.getElementById('tradeMultiplier');
     const tradesTableBody = document.getElementById('tradesTableBody');
@@ -2388,31 +2386,23 @@ function initTradeMultiplier() {
             row.innerHTML = `
                 <td>${i + 1}</td>
                 <td>
-                    <div style="position:relative">
-                        <input type="text" class="trade-input ticker-autocomplete" 
-                               id="ticker${i}" placeholder="e.g. RELIANCE" 
-                               autocomplete="off">
-                    </div>
+                    <input type="text" class="trade-input ticker-autocomplete" 
+                           id="ticker${i}" placeholder="e.g. RELIANCE" 
+                           autocomplete="off">
                 </td>
                 <td><input type="number" class="trade-input" id="buyPrice${i}" placeholder="0.00"></td>
                 <td><input type="number" class="trade-input" id="sellPrice${i}" placeholder="0.00"></td>
                 <td><input type="number" class="trade-input" id="quantity${i}" placeholder="0"></td>
+                <td>
+  <div style="position: relative">
+    <input type="text" class="trade-input ticker-autocomplete" 
+           id="ticker0" placeholder="e.g. RELIANCE" autocomplete="off">
+  </div>
+</td>
             `;
             tradesTableBody.appendChild(row);
         }
         
-        // Initialize autocomplete for new rows
-        setupTickerAutocomplete();
-    }
-    
-    // Initialize with single trade
-    generateTradeRows(1);
-    
-    // Update when multiplier changes
-    tradeMultiplier.addEventListener('change', function() {
-        generateTradeRows(parseInt(this.value));
-    });
-
         // 4TH STEP: ACTIVATE AUTOCOMPLETE FOR NEW ROWS
         setupTickerAutocomplete();
     }
