@@ -785,6 +785,16 @@
             transform: scale(1.05);
         }
 
+
+        /* Random Ticker Animation */
+@keyframes shuffle {
+    0% { opacity: 0.5; transform: translateY(5px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+.random-ticker-value.shuffle {
+    animation: shuffle 0.5s ease;
+}
+
         
 
         /* === TICKER TAPE === */
@@ -1208,6 +1218,8 @@
   }
 }
 
+
+
     </style>
 </head>
 <body>
@@ -1367,7 +1379,7 @@
     <div class="random-ticker-box">
         
         <div class="random-ticker-label">Random Ticker</div>
-        <div class="random-ticker-value" id="randomTicker">RELIANCE</div>
+        <div class="random-ticker-value" id="randomTicker">Loading...</div>
     </div>
     
     <!-- Watchlist Panel -->
@@ -2583,20 +2595,32 @@ function exportExcelWithData() {
         // ===== RANDOM TICKER BOX =====
         function initRandomTicker() {
     const tickerBox = document.getElementById('randomTicker');
-    
-    // Clear any old intervals to prevent duplicates
+    const allStocks = [...new Set(Object.values(sectorData).flat())]; // All unique tickers
+
+    // Clear old interval to avoid duplicates
     if (window.tickerInterval) clearInterval(window.tickerInterval);
 
-    function updateTicker() {
-        const allStocks = Object.values(sectorData).flat();
+    // Update ticker with animation
+    const updateTicker = () => {
         const randomStock = allStocks[Math.floor(Math.random() * allStocks.length)];
         tickerBox.textContent = randomStock;
-        tickerBox.onclick = () => openTradingViewWindow(randomStock);
-    }
+        tickerBox.dataset.ticker = randomStock; // Store for click action
+        tickerBox.classList.add('shuffle'); // Add animation
+        setTimeout(() => tickerBox.classList.remove('shuffle'), 500); // Remove after animation
+    };
 
-    // Run immediately and every 12 seconds
+    // Run now + every 12 seconds
     updateTicker();
     window.tickerInterval = setInterval(updateTicker, 12000);
+
+    // Click to open TradingView
+    tickerBox.onclick = () => openTradingViewWindow(tickerBox.dataset.ticker);
+
+    // Pause on hover
+    tickerBox.addEventListener('mouseenter', () => clearInterval(window.tickerInterval));
+    tickerBox.addEventListener('mouseleave', () => {
+        if (!window.tickerInterval) initRandomTicker(); // Restart if stopped
+    });
 }
 
         // ===== HOVER TO CHART FUNCTIONALITY =====
