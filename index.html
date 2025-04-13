@@ -2592,35 +2592,52 @@ function exportExcelWithData() {
             }
         }
 
-        // ===== RANDOM TICKER BOX =====
+         // ===== RANDOM TICKER BOX =====
         function initRandomTicker() {
+    // 1. Get DOM element with error handling
     const tickerBox = document.getElementById('randomTicker');
     if (!tickerBox) {
-        console.error("Error: #randomTicker element not found!");
+        console.error("Error: Ticker box element not found");
         return;
     }
 
-    const allStocks = Object.values(sectorData).flat();
-    if (allStocks.length === 0) {
-        console.error("Error: sectorData is empty!");
+    // 2. Verify sectorData exists
+    if (!sectorData || Object.keys(sectorData).length === 0) {
+        console.error("Error: sectorData is empty");
         return;
     }
 
-    // Clear old interval
-    if (window.tickerInterval) clearInterval(window.tickerInterval);
+    // 3. Flatten all stocks and remove duplicates
+    const allStocks = [...new Set(Object.values(sectorData).flat())];
+    console.log("Total unique stocks:", allStocks.length); // Debug
 
-    // Update function with debug
+    // 4. Clear any existing interval aggressively
+    if (window.tickerInterval) {
+        clearInterval(window.tickerInterval);
+        window.tickerInterval = null;
+    }
+
+    // 5. Bulletproof update function
     const updateTicker = () => {
-        console.log("Updating ticker at:", new Date().toLocaleTimeString());
         const randomStock = allStocks[Math.floor(Math.random() * allStocks.length)];
+        
+        // Force DOM update (critical fix)
+        tickerBox.style.display = 'none';
+        void tickerBox.offsetWidth; // Trigger reflow
+        tickerBox.style.display = '';
+        
         tickerBox.textContent = randomStock;
         tickerBox.dataset.ticker = randomStock;
+        
+        console.log("Updated to:", randomStock, new Date().toLocaleTimeString());
     };
 
-    // Start updates
+    // 6. Initialize immediately + start interval
     updateTicker();
     window.tickerInterval = setInterval(updateTicker, 12000);
 }
+
+
 
         // ===== HOVER TO CHART FUNCTIONALITY =====
         function setupHoverToChart() {
