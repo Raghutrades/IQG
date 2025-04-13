@@ -1158,30 +1158,36 @@
 .trades-table th:nth-child(4) { width: 25%; }  /* Buy/Sell Price columns */
 .trades-table th:nth-child(5) { width: 15%; }  /* Quantity column */
     
-    /* Autocomplete Dropdown */
+    /* Autocomplete Dropdown Styling */
 .autocomplete-dropdown {
-  position: absolute;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-top: none;
-  border-radius: 0 0 8px 8px;
-  width: calc(100% - 2px);
-  max-height: 200px;
-  overflow-y: auto;
-  z-index: 1000;
-  top: 100%;
-  left: 0;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    position: absolute;
+    top: 100%; /* Position below input */
+    left: 0;
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    z-index: 1000; /* Ensure it floats above other elements */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    display: none; /* Hidden by default */
 }
 
 .autocomplete-item {
-  padding: 8px 12px;
-  cursor: pointer;
-  font-size: 14px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 14px;
 }
 
 .autocomplete-item:hover {
-  background: rgba(67, 97, 238, 0.1);
+    background: rgba(67, 97, 238, 0.1);
+}
+
+/* Ensure parent container is positioned relatively */
+.trade-input {
+    position: relative;
 }
 
     </style>
@@ -2065,56 +2071,50 @@ function openTradingViewWindow(ticker, isHover = false) {
 // NEW FUNCTION: TICKER AUTOCOMPLETE
 // -------------------------------
 function setupTickerAutocomplete() {
-  const allTickers = [...new Set(Object.values(sectorData).flat())];
-  
-  document.querySelectorAll('.ticker-autocomplete').forEach(input => {
-    // Create and style dropdown
-    const dropdown = document.createElement('div');
-    dropdown.className = 'autocomplete-dropdown';
-    dropdown.style.display = 'none';
-    
-    // Position the dropdown relative to the input's parent
-    input.parentNode.style.position = 'relative';
-    input.parentNode.appendChild(dropdown);
+    const allTickers = [...new Set(Object.values(sectorData).flat())];
 
-    input.addEventListener('input', (e) => {
-      const query = e.target.value.trim().toUpperCase();
-      dropdown.innerHTML = '';
-      
-      if (query.length < 1) {
-        dropdown.style.display = 'none';
-        return;
-      }
-      
-      // Filter and show matches
-      const matches = allTickers
-        .filter(ticker => ticker.includes(query))
-        .slice(0, 5);
-      
-      if (matches.length > 0) {
-        matches.forEach(ticker => {
-          const item = document.createElement('div');
-          item.className = 'autocomplete-item';
-          item.textContent = ticker;
-          item.addEventListener('click', () => {
-            input.value = ticker;
-            dropdown.style.display = 'none';
-          });
-          dropdown.appendChild(item);
+    document.querySelectorAll('.ticker-autocomplete').forEach(input => {
+        const dropdown = document.createElement('div');
+        dropdown.className = 'autocomplete-dropdown';
+        input.parentNode.appendChild(dropdown);
+
+        input.addEventListener('input', (e) => {
+            const query = e.target.value.trim().toUpperCase();
+            dropdown.innerHTML = '';
+
+            if (query.length < 1) {
+                dropdown.style.display = 'none';
+                return;
+            }
+
+            const matches = allTickers.filter(ticker => 
+                ticker.includes(query)
+            ).slice(0, 5); // Show max 5 results
+
+            if (matches.length > 0) {
+                matches.forEach(ticker => {
+                    const item = document.createElement('div');
+                    item.className = 'autocomplete-item';
+                    item.textContent = ticker;
+                    item.addEventListener('click', () => {
+                        input.value = ticker;
+                        dropdown.style.display = 'none';
+                    });
+                    dropdown.appendChild(item);
+                });
+                dropdown.style.display = 'block';
+            } else {
+                dropdown.style.display = 'none';
+            }
         });
-        dropdown.style.display = 'block';
-      } else {
-        dropdown.style.display = 'none';
-      }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!input.parentNode.contains(e.target)) {
+                dropdown.style.display = 'none';
+            }
+        });
     });
-    
-    // Close dropdown when clicking outside
-    document.addEventListener('click', (e) => {
-      if (!input.parentNode.contains(e.target)) {
-        dropdown.style.display = 'none';
-      }
-    });
-  });
 }
 
 
@@ -2569,7 +2569,10 @@ function exportExcelWithData() {
         // ===== RANDOM TICKER BOX =====
         function initRandomTicker() {
     const randomTickerElement = document.getElementById('randomTicker');
-    let tickerInterval;
+    let tickerInterval = null; // Store interval ID
+
+    // Clear any existing interval to avoid duplicates
+    if (tickerInterval) clearInterval(tickerInterval);
 
     function updateRandomTicker() {
         const allTickers = Object.values(sectorData).flat();
@@ -2578,10 +2581,9 @@ function exportExcelWithData() {
         randomTickerElement.onclick = () => openTradingViewWindow(randomTicker);
     }
 
-    // Clear previous interval to avoid duplicates
-    if (tickerInterval) clearInterval(tickerInterval);
-    updateRandomTicker(); // Immediate update
-    tickerInterval = setInterval(updateRandomTicker, 15000); // Update every 15s
+    // Initial update + start interval
+    updateRandomTicker();
+    tickerInterval = setInterval(updateRandomTicker, 15000); // 15 seconds
 }
 
         // ===== HOVER TO CHART FUNCTIONALITY =====
