@@ -1176,10 +1176,12 @@
 .trades-table th:nth-child(4) { width: 25%; }  /* Buy/Sell Price columns */
 .trades-table th:nth-child(5) { width: 15%; }  /* Quantity column */
     
-    /* ===== AUTOCOMPLETE STYLES ===== */
+    /* ===== AUTOCOMPLETE DROPDOWN ===== */
 .autocomplete-dropdown {
   position: absolute;
-  width: calc(100% - 2px);
+  top: 100%; /* Positions below input */
+  left: 0;
+  width: 100%;
   max-height: 200px;
   overflow-y: auto;
   background: var(--card);
@@ -1187,7 +1189,8 @@
   border-top: none;
   border-radius: 0 0 8px 8px;
   z-index: 1000;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  display: none; /* Hidden by default */
 }
 
 .autocomplete-item {
@@ -1196,15 +1199,16 @@
   font-size: 14px;
 }
 
-.autocomplete-item:hover, 
-.autocomplete-item.highlighted {
+.autocomplete-item:hover {
   background: rgba(67, 97, 238, 0.1);
 }
 
-.trade-input:focus + .autocomplete-dropdown {
-  display: block;
+/* Mobile responsiveness */
+@media (max-width: 600px) {
+  .autocomplete-dropdown {
+    max-height: 150px;
+  }
 }
-
 
 
     </style>
@@ -2086,69 +2090,54 @@ function openTradingViewWindow(ticker, isHover = false) {
 
 // ===== TICKER AUTOCOMPLETE =====
 function setupTickerAutocomplete() {
-  // Get all unique tickers from sectorData
+  // Get all unique tickers
   const allTickers = [...new Set(Object.values(sectorData).flat())];
   
-  // Apply to ALL ticker inputs in calculator
+  // Apply to all calculator ticker inputs
   document.querySelectorAll('.ticker-autocomplete').forEach(input => {
     // Create dropdown container
+    const container = input.parentNode;
+    container.style.position = 'relative'; // Required for dropdown positioning
+    
     const dropdown = document.createElement('div');
     dropdown.className = 'autocomplete-dropdown';
-    input.parentNode.appendChild(dropdown);
+    container.appendChild(dropdown);
 
     // Show suggestions on input
-    input.addEventListener('input', (e) => {
-      const query = e.target.value.trim().toUpperCase();
+    input.addEventListener('input', function() {
+      const query = this.value.trim().toUpperCase();
       dropdown.innerHTML = '';
       
-      if (query.length < 1) return;
-      
-      // Filter matches (max 5)
-      const matches = allTickers.filter(ticker => 
-        ticker.includes(query)
-      ).slice(0, 5);
-      
-      // Display matches
-      matches.forEach(ticker => {
-        const item = document.createElement('div');
-        item.className = 'autocomplete-item';
-        item.textContent = ticker;
-        item.addEventListener('click', () => {
-          input.value = ticker;
-          dropdown.innerHTML = '';
-          input.focus();
-        });
-        dropdown.appendChild(item);
-      });
-    });
-    
-    // Close dropdown when clicking elsewhere
-    document.addEventListener('click', (e) => {
-      if (e.target !== input) dropdown.innerHTML = '';
-    });
-    
-    // Keyboard navigation
-    input.addEventListener('keydown', (e) => {
-      const items = dropdown.querySelectorAll('.autocomplete-item');
-      let currentIndex = -1;
-      
-      if (e.key === 'ArrowDown') {
-        e.preventDefault();
-        currentIndex = Math.min(currentIndex + 1, items.length - 1);
-      } 
-      else if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        currentIndex = Math.max(currentIndex - 1, -1);
-      } 
-      else if (e.key === 'Enter' && currentIndex >= 0) {
-        e.preventDefault();
-        items[currentIndex].click();
+      if (query.length >= 1) {
+        const matches = allTickers
+          .filter(ticker => ticker.includes(query))
+          .slice(0, 5);
+        
+        if (matches.length > 0) {
+          matches.forEach(ticker => {
+            const item = document.createElement('div');
+            item.className = 'autocomplete-item';
+            item.textContent = ticker;
+            item.addEventListener('click', () => {
+              input.value = ticker;
+              dropdown.style.display = 'none';
+            });
+            dropdown.appendChild(item);
+          });
+          dropdown.style.display = 'block';
+        } else {
+          dropdown.style.display = 'none';
+        }
+      } else {
+        dropdown.style.display = 'none';
       }
-      
-      // Highlight item
-      items.forEach((item, index) => {
-        item.classList.toggle('highlighted', index === currentIndex);
-      });
+    });
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+      if (!container.contains(e.target)) {
+        dropdown.style.display = 'none';
+      }
     });
   });
 }
@@ -2191,6 +2180,11 @@ function getTradeData() {
             updateWatchlistUI();
             setupHoverToChart();
             initCharCounters();
+            document.addEventListener('DOMContentLoaded', function() {
+  // ... other initializations ...
+  setupTickerAutocomplete(); // Add this line
+});
+
             
             // Ensure sector grid is visible
             document.getElementById('sectorGrid').style.display = 'grid';
@@ -2384,7 +2378,7 @@ function getTradeData() {
             setInterval(showRandomQuote, 10000);
         }
         
-        // ===== TRADE MULTIPLIER =====
+       // ===== TRADE MULTIPLIER =====
 function initTradeMultiplier() {
     const tradeMultiplier = document.getElementById('tradeMultiplier');
     const tradesTableBody = document.getElementById('tradesTableBody');
@@ -2397,9 +2391,11 @@ function initTradeMultiplier() {
             row.innerHTML = `
                 <td>${i + 1}</td>
                 <td>
-                    <input type="text" class="trade-input ticker-autocomplete" 
-                           id="ticker${i}" placeholder="e.g. RELIANCE" 
-                           autocomplete="off">
+                    <div style="position:relative">
+                        <input type="text" class="trade-input ticker-autocomplete" 
+                               id="ticker${i}" placeholder="e.g. RELIANCE" 
+                               autocomplete="off">
+                    </div>
                 </td>
                 <td><input type="number" class="trade-input" id="buyPrice${i}" placeholder="0.00"></td>
                 <td><input type="number" class="trade-input" id="sellPrice${i}" placeholder="0.00"></td>
@@ -2408,6 +2404,18 @@ function initTradeMultiplier() {
             tradesTableBody.appendChild(row);
         }
         
+        // Initialize autocomplete for new rows
+        setupTickerAutocomplete();
+    }
+    
+    // Initialize with single trade
+    generateTradeRows(1);
+    
+    // Update when multiplier changes
+    tradeMultiplier.addEventListener('change', function() {
+        generateTradeRows(parseInt(this.value));
+    });
+
         // 4TH STEP: ACTIVATE AUTOCOMPLETE FOR NEW ROWS
         setupTickerAutocomplete();
     }
