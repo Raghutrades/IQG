@@ -785,6 +785,14 @@
             transform: scale(1.05);
         }
 
+        /* ===== ADD THIS NEW CSS ===== */
+    #randomTicker {
+        transition: opacity 0.3s ease;
+        display: inline-block;
+        min-width: 120px;
+        text-align: center;
+    }
+
 
         /* Random Ticker Animation */
 @keyframes shuffle {
@@ -2593,49 +2601,58 @@ function exportExcelWithData() {
         }
 
          // ===== RANDOM TICKER BOX =====
-        function initRandomTicker() {
+function initRandomTicker() {
     // 1. Get DOM element with error handling
     const tickerBox = document.getElementById('randomTicker');
     if (!tickerBox) {
-        console.error("Error: Ticker box element not found");
+        console.error("Error: #randomTicker element not found");
         return;
     }
 
-    // 2. Verify sectorData exists
+    // 2. Verify sectorData exists and has stocks
     if (!sectorData || Object.keys(sectorData).length === 0) {
         console.error("Error: sectorData is empty");
         return;
     }
 
-    // 3. Flatten all stocks and remove duplicates
+    // 3. Get all unique stocks
     const allStocks = [...new Set(Object.values(sectorData).flat())];
-    console.log("Total unique stocks:", allStocks.length); // Debug
+    console.log("Total stocks available:", allStocks.length);
 
-    // 4. Clear any existing interval aggressively
+    // 4. Clear any existing interval
     if (window.tickerInterval) {
         clearInterval(window.tickerInterval);
         window.tickerInterval = null;
     }
 
-    // 5. Bulletproof update function
+    // 5. Update function with forced DOM refresh
     const updateTicker = () => {
         const randomStock = allStocks[Math.floor(Math.random() * allStocks.length)];
         
-        // Force DOM update (critical fix)
-        tickerBox.style.display = 'none';
-        void tickerBox.offsetWidth; // Trigger reflow
-        tickerBox.style.display = '';
+        // FORCE DOM UPDATE (critical fix)
+        tickerBox.style.opacity = '0';
+        setTimeout(() => {
+            tickerBox.textContent = randomStock;
+            tickerBox.dataset.ticker = randomStock;
+            tickerBox.style.opacity = '1';
+        }, 50);
         
-        tickerBox.textContent = randomStock;
-        tickerBox.dataset.ticker = randomStock;
-        
-        console.log("Updated to:", randomStock, new Date().toLocaleTimeString());
+        console.log("Updated UI to:", randomStock, new Date().toLocaleTimeString());
     };
 
-    // 6. Initialize immediately + start interval
+    // 6. Initialize immediately
     updateTicker();
-    window.tickerInterval = setInterval(updateTicker, 12000);
+    
+    // 7. Start updates (using recursive timeout for reliability)
+    const startUpdateCycle = () => {
+        updateTicker();
+        window.tickerInterval = setTimeout(startUpdateCycle, 12000);
+    };
+    window.tickerInterval = setTimeout(startUpdateCycle, 12000);
 }
+
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', initRandomTicker);
 
 
 
