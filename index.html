@@ -1158,45 +1158,54 @@
 .trades-table th:nth-child(4) { width: 25%; }  /* Buy/Sell Price columns */
 .trades-table th:nth-child(5) { width: 15%; }  /* Quantity column */
     
-    /* Autocomplete Dropdown Styling */
+    /* Autocomplete Dropdown */
 .autocomplete-dropdown {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    width: 100%;
-    max-height: 200px;
-    overflow-y: auto;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-top: none;
-    border-radius: 0 0 8px 8px;
-    z-index: 9999; /* Higher z-index to ensure it's on top */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    display: none;
-    margin-top: -1px; /* Remove gap between input and dropdown */
+  position: absolute;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 0 0 8px 8px;
+  width: calc(100% - 2px); /* Match input width */
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
-/* Ensure parent container has proper positioning */
-.trade-input {
-    position: relative;
-}
-
-/* Add this to prevent UI elements below from overlapping */
-.trades-table {
-    position: relative;
-    z-index: 1; /* Lower than dropdown */
-}
-
-/* Add smooth transitions */
 .autocomplete-item {
-    padding: 8px 12px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background 0.2s;
+  padding: 8px 12px;
+  cursor: pointer;
 }
 
 .autocomplete-item:hover {
-    background: rgba(67, 97, 238, 0.1);
+  background: rgba(67, 97, 238, 0.1);
+}
+
+/* ===== AUTCOMPLETE DROPDOWN FIXES ===== */
+.trades-table td {
+  position: relative; /* Contains dropdown */
+  z-index: auto !important; /* Reset stacking */
+}
+
+.autocomplete-dropdown {
+  position: absolute;
+  top: calc(100% + 2px) !important; /* Adds gap below input */
+  left: 0 !important;
+  width: calc(100% - 2px) !important; /* Matches input width */
+  max-height: 200px;
+  overflow-y: auto;
+  background: var(--card) !important;
+  border: 1px solid var(--border) !important;
+  border-top: none !important;
+  z-index: 10000 !important; /* Higher than everything */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Mobile fix */
+@media (max-width: 600px) {
+  .autocomplete-dropdown {
+    width: 100% !important;
+    left: 0 !important;
+  }
 }
 
     </style>
@@ -2080,44 +2089,47 @@ function openTradingViewWindow(ticker, isHover = false) {
 // NEW FUNCTION: TICKER AUTOCOMPLETE
 // -------------------------------
 function setupTickerAutocomplete() {
-    const allTickers = [...new Set(Object.values(sectorData).flat())];
+  // Combine all tickers from your 15 sectors
+  const allTickers = [...new Set(Object.values(sectorData).flat())];
+  
+  // Apply to all ticker inputs in the calculator
+  document.querySelectorAll('.ticker-autocomplete').forEach(input => {
+    // Create a dropdown box below the input
+    const dropdown = document.createElement('div');
+    dropdown.className = 'autocomplete-dropdown';
+    input.parentNode.appendChild(dropdown);
 
-    document.querySelectorAll('.ticker-autocomplete').forEach(input => {
-        const dropdown = document.createElement('div');
-        dropdown.className = 'autocomplete-dropdown';
-        input.parentNode.appendChild(dropdown);
-
-        input.addEventListener('input', (e) => {
-    const query = e.target.value.trim().toUpperCase();
-    dropdown.innerHTML = '';
-
-    if (query.length < 1) {
-        dropdown.style.display = 'none';
-        return;
-    }
-
-    const matches = allTickers.filter(ticker => 
+    // Show suggestions when typing
+    input.addEventListener('input', (e) => {
+      const query = e.target.value.toUpperCase();
+      dropdown.innerHTML = '';
+      
+      if (query.length < 1) return; // Skip if empty
+      
+      // Filter matching tickers (max 5)
+      const matches = allTickers.filter(ticker => 
         ticker.includes(query)
-    ).slice(0, 5); // Show max 5 results
-
-    if (matches.length > 0) {
-        matches.forEach(ticker => {
-            const item = document.createElement('div');
-            item.className = 'autocomplete-item';
-            item.textContent = ticker;
-            item.addEventListener('click', () => {
-                input.value = ticker;
-                dropdown.style.display = 'none';
-                // Add focus to next field for better UX
-                input.closest('td').nextElementSibling.querySelector('input').focus();
-            });
-            dropdown.appendChild(item);
+      ).slice(0, 5);
+      
+      // Display matches
+      matches.forEach(ticker => {
+        const item = document.createElement('div');
+        item.className = 'autocomplete-item';
+        item.textContent = ticker;
+        item.addEventListener('click', () => {
+          input.value = ticker; // Auto-fill on click
+          dropdown.innerHTML = ''; // Close dropdown
         });
-        dropdown.style.display = 'block';
-    } else {
-        dropdown.style.display = 'none';
-    }
-});
+        dropdown.appendChild(item);
+      });
+    });
+    
+    // Close dropdown when clicking elsewhere
+    document.addEventListener('click', (e) => {
+      if (e.target !== input) dropdown.innerHTML = '';
+    });
+  });
+}
 
 
 function getTradeData() {
@@ -2570,29 +2582,21 @@ function exportExcelWithData() {
 
         // ===== RANDOM TICKER BOX =====
         function initRandomTicker() {
-    const randomTickerElement = document.getElementById('randomTicker');
-    let tickerInterval = null;
+    const tickerBox = document.getElementById('randomTicker');
     
-    // Clear previous interval if exists
-    if (tickerInterval) clearInterval(tickerInterval);
+    // Clear any old intervals to prevent duplicates
+    if (window.tickerInterval) clearInterval(window.tickerInterval);
 
-    function updateRandomTicker() {
-        const allTickers = Object.values(sectorData).flat();
-        const randomTicker = allTickers[Math.floor(Math.random() * allTickers.length)];
-        randomTickerElement.textContent = randomTicker;
-        randomTickerElement.onclick = () => openTradingViewWindow(randomTicker);
+    function updateTicker() {
+        const allStocks = Object.values(sectorData).flat();
+        const randomStock = allStocks[Math.floor(Math.random() * allStocks.length)];
+        tickerBox.textContent = randomStock;
+        tickerBox.onclick = () => openTradingViewWindow(randomStock);
     }
 
-    // Initial update
-    updateRandomTicker();
-    
-    // Set interval (12000ms = 12 seconds)
-    tickerInterval = setInterval(updateRandomTicker, 12000);
-    
-    // Clean up interval when leaving page
-    window.addEventListener('beforeunload', () => {
-        if (tickerInterval) clearInterval(tickerInterval);
-    });
+    // Run immediately and every 12 seconds
+    updateTicker();
+    window.tickerInterval = setInterval(updateTicker, 12000);
 }
 
         // ===== HOVER TO CHART FUNCTIONALITY =====
