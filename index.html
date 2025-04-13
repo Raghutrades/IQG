@@ -1161,18 +1161,16 @@
     /* Autocomplete Dropdown Styling */
 .autocomplete-dropdown {
     position: absolute;
-    top: 100%; /* Position below input */
+    top: calc(100% + 2px);
     left: 0;
     width: 100%;
     max-height: 200px;
     overflow-y: auto;
     background: var(--card);
     border: 1px solid var(--border);
-    border-top: none;
-    border-radius: 0 0 8px 8px;
-    z-index: 1000; /* Ensure it floats above other elements */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    display: none; /* Hidden by default */
+    border-radius: 0 0 4px 4px;
+    z-index: 1000;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .autocomplete-item {
@@ -2071,26 +2069,32 @@ function openTradingViewWindow(ticker, isHover = false) {
 // NEW FUNCTION: TICKER AUTOCOMPLETE
 // -------------------------------
 function setupTickerAutocomplete() {
+    // Create a list of all unique tickers
     const allTickers = [...new Set(Object.values(sectorData).flat())];
-
+    
     document.querySelectorAll('.ticker-autocomplete').forEach(input => {
+        // Create dropdown container
         const dropdown = document.createElement('div');
         dropdown.className = 'autocomplete-dropdown';
+        dropdown.style.display = 'none';
+        
+        // Position the dropdown properly
+        input.parentNode.style.position = 'relative';
         input.parentNode.appendChild(dropdown);
-
-        input.addEventListener('input', (e) => {
-            const query = e.target.value.trim().toUpperCase();
+        
+        input.addEventListener('input', function() {
+            const query = this.value.trim().toUpperCase();
             dropdown.innerHTML = '';
-
-            if (query.length < 1) {
+            
+            if (query.length < 2) {
                 dropdown.style.display = 'none';
                 return;
             }
-
+            
             const matches = allTickers.filter(ticker => 
                 ticker.includes(query)
-            ).slice(0, 5); // Show max 5 results
-
+            ).slice(0, 5); // Show max 5 suggestions
+            
             if (matches.length > 0) {
                 matches.forEach(ticker => {
                     const item = document.createElement('div');
@@ -2107,10 +2111,10 @@ function setupTickerAutocomplete() {
                 dropdown.style.display = 'none';
             }
         });
-
-        // Close dropdown when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!input.parentNode.contains(e.target)) {
+        
+        // Close dropdown when clicking elsewhere
+        document.addEventListener('click', function(e) {
+            if (!input.contains(e.target) {
                 dropdown.style.display = 'none';
             }
         });
@@ -2568,22 +2572,32 @@ function exportExcelWithData() {
 
         // ===== RANDOM TICKER BOX =====
         function initRandomTicker() {
-    const randomTickerElement = document.getElementById('randomTicker');
-    let tickerInterval = null; // Store interval ID
-
-    // Clear any existing interval to avoid duplicates
-    if (tickerInterval) clearInterval(tickerInterval);
-
-    function updateRandomTicker() {
-        const allTickers = Object.values(sectorData).flat();
-        const randomTicker = allTickers[Math.floor(Math.random() * allTickers.length)];
-        randomTickerElement.textContent = randomTicker;
-        randomTickerElement.onclick = () => openTradingViewWindow(randomTicker);
+    const tickerBox = document.getElementById('randomTicker');
+    let updateInterval;
+    
+    // Clear any existing interval first
+    if (updateInterval) clearInterval(updateInterval);
+    
+    function updateTicker() {
+        const allTickers = [];
+        // Flatten all sector data into one array
+        for (const sector in sectorData) {
+            allTickers.push(...sectorData[sector]);
+        }
+        const randomIndex = Math.floor(Math.random() * allTickers.length);
+        tickerBox.textContent = allTickers[randomIndex];
+        tickerBox.onclick = () => openTradingViewWindow(allTickers[randomIndex]);
     }
-
-    // Initial update + start interval
-    updateRandomTicker();
-    tickerInterval = setInterval(updateRandomTicker, 15000); // 15 seconds
+    
+    // Initial update
+    updateTicker();
+    // Set interval (will continue even if tab is backgrounded)
+    updateInterval = setInterval(updateTicker, 15000);
+    
+    // Clean up when page unloads
+    window.addEventListener('beforeunload', () => {
+        clearInterval(updateInterval);
+    });
 }
 
         // ===== HOVER TO CHART FUNCTIONALITY =====
