@@ -2167,23 +2167,20 @@ function getTradeData() {
 }
 
                 // ===== INITIALIZE PAGE =====
-        document.addEventListener('DOMContentLoaded', function() {
-            initThemeToggle();
-            initDateTime();
-            initTagline();
-            initSectorGrid();
-            initQuotes();
-            initCalculator();
-            initTradeMultiplier();
-            initCollapsibleSections();
-            initRandomTicker();
-            updateWatchlistUI();
-            setupHoverToChart();
-            initCharCounters();
-            document.addEventListener('DOMContentLoaded', function() {
-  // ... other initializations ...
-  setupTickerAutocomplete(); // Add this line
-});
+document.addEventListener('DOMContentLoaded', function() {
+    initThemeToggle();
+    initDateTime();
+    initTagline();
+    initSectorGrid();
+    initQuotes();
+    initCalculator();
+    initTradeMultiplier();  // This already calls setupTickerAutocomplete() internally
+    initCollapsibleSections();
+    initRandomTicker();
+    updateWatchlistUI();
+    setupHoverToChart();
+    initCharCounters();
+            
 
             
             // Ensure sector grid is visible
