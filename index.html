@@ -80,6 +80,32 @@
             -webkit-overflow-scrolling: touch;
         }
         
+        /* === MINIMAL NAV === */
+.minimal-nav {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+}
+.minimal-nav-btn {
+  background: none;
+  border: none;
+  color: var(--text);
+  opacity: 0.7;
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+.minimal-nav-btn.active {
+  opacity: 1;
+  font-weight: 600;
+  color: var(--gold-primary);
+}
+
+
         /* === HEADER STYLES === */
         .header {
             display: grid;
@@ -1246,6 +1272,13 @@
         </div>
     </header>
     
+    <!-- Minimal Nav Bar -->
+<nav class="minimal-nav">
+  <button class="minimal-nav-btn active" data-page="market">MARKET</button>
+  <button class="minimal-nav-btn" data-page="home">HOME</button>
+  <button class="minimal-nav-btn" data-page="tools">TOOLS</button>
+</nav>
+
     <!-- Search Bar -->
     <div class="search-container">
         <input type="text" id="tickerSearch" placeholder="Search ticker" class="search-input">
@@ -1365,6 +1398,8 @@
 
 
         
+
+    <div id="market-page" class="page active">
 
     <!-- Random Ticker Box -->
     <div class="random-ticker-box">
@@ -1561,6 +1596,10 @@
         </div>
     </div>
     
+    </div> <!-- Close market-page -->
+<div id="home-page" class="page"></div>
+<div id="tools-page" class="page"></div>
+
     <!-- Quote Container -->
     <div class="quote-container">
         <p class="quote-text" id="quoteText">"The market is a device for transferring money from the impatient to the patient."</p>
@@ -2165,6 +2204,18 @@ function getTradeData() {
     }
     return data;
 }
+
+// ===== MINIMAL NAV TOGGLE =====
+function switchPage(pageId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.minimal-nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(`${pageId}-page`).classList.add('active');
+  document.querySelector(`.minimal-nav-btn[data-page="${pageId}"]`).classList.add('active');
+}
+document.querySelectorAll('.minimal-nav-btn').forEach(btn => {
+  btn.addEventListener('click', () => switchPage(btn.dataset.page));
+});
+
 
                 // ===== INITIALIZE PAGE =====
         document.addEventListener('DOMContentLoaded', function() {
